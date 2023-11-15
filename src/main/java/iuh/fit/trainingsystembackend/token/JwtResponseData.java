@@ -1,4 +1,4 @@
-package com.thinkvitals.token;
+package iuh.fit.trainingsystembackend.token;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

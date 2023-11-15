@@ -1,4 +1,4 @@
-package com.thinkvitals.config;
+package iuh.fit.trainingsystembackend.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;

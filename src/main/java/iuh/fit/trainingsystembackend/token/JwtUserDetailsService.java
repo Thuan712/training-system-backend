@@ -1,7 +1,8 @@
-package com.thinkvitals.token;
+package iuh.fit.trainingsystembackend.token;
 
-import com.thinkvitals.model.UserEntity;
-import com.thinkvitals.repository.UserRepository;
+
+import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

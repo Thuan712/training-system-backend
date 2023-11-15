@@ -1,6 +1,6 @@
-package com.thinkvitals.token;
+package iuh.fit.trainingsystembackend.token;
 
-import com.thinkvitals.model.UserEntity;
+import iuh.fit.trainingsystembackend.model.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

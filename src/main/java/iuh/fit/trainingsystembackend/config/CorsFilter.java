@@ -1,4 +1,4 @@
-package com.thinkvitals.config;
+package iuh.fit.trainingsystembackend.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;

@@ -1,6 +1,6 @@
 <filter>
     <filter-name>CorsFilter</filter-name>
-    <filter-class>com.thinkvitals.config.CorsFilter</filter-class>
+    <filter-class>iuh.fit.trainingsystembackend.config.CorsFilter</filter-class>
     <async-supported>true</async-supported>
 </filter>
 

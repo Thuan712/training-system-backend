@@ -1,4 +1,4 @@
-package com.thinkvitals.authentication;
+package iuh.fit.trainingsystembackend.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JwtRequest implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
-    private String hospital;
     private String username;
     private String password;
     private String email;

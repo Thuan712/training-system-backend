@@ -1,8 +1,8 @@
-package com.thinkvitals.ratelimit;
+package iuh.fit.trainingsystembackend.ratelimit;
 
-import com.thinkvitals.exceptions.ValidationException;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
+import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

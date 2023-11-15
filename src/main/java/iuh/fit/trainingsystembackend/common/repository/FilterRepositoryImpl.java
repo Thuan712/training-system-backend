@@ -1,8 +1,8 @@
-package com.thinkvitals.common.repository;
+package iuh.fit.trainingsystembackend.common.repository;
 
-import com.thinkvitals.common.specification.Filter;
-import com.thinkvitals.common.specification.FilterType;
-import com.thinkvitals.common.specification.JoinProperty;
+import iuh.fit.trainingsystembackend.common.specification.Filter;
+import iuh.fit.trainingsystembackend.common.specification.FilterType;
+import iuh.fit.trainingsystembackend.common.specification.JoinProperty;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;

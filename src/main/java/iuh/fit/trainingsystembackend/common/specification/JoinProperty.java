@@ -1,4 +1,4 @@
-package com.thinkvitals.common.specification;
+package iuh.fit.trainingsystembackend.common.specification;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

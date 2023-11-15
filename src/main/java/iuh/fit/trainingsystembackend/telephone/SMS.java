@@ -1,4 +1,4 @@
-package com.thinkvitals.telephone;
+package iuh.fit.trainingsystembackend.telephone;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

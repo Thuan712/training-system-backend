@@ -1,4 +1,4 @@
-package com.thinkvitals.token;
+package iuh.fit.trainingsystembackend.token;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

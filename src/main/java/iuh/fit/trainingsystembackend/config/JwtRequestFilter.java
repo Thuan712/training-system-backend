@@ -1,8 +1,8 @@
-package com.thinkvitals.config;
+package iuh.fit.trainingsystembackend.config;
 
-import com.thinkvitals.authentication.UserCacheService;
-import com.thinkvitals.token.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import iuh.fit.trainingsystembackend.authentication.UserCacheService;
+import iuh.fit.trainingsystembackend.token.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

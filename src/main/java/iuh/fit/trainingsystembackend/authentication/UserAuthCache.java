@@ -1,7 +1,7 @@
-package com.thinkvitals.authentication;
+package iuh.fit.trainingsystembackend.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.thinkvitals.enums.SystemRole;
+import iuh.fit.trainingsystembackend.enums.SystemRole;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -24,8 +24,6 @@ public class UserAuthCache implements Serializable {
     private int failedLoginAttempts = 0;
     //#endregion
 
-    //#region Access Location
-    private String ipAddress;
     private Set<String> previousIpAddresses = new HashSet<>(){};
     private String userAgent;
     //#endregion
@@ -33,20 +31,6 @@ public class UserAuthCache implements Serializable {
     //#region Menu Items
     private SystemRole userRole;
     private String menuItems;
-    //#endregion
-
-    //#region Hospital Logo
-    private Long hospitalId;
-    private String hospitalLogo;
-    private String hospitalName;
-    //#endregion
-
-    //#region Notification Setting
-    private String notificationSetting;
-    //#endregion
-
-    //#region Hospitals Belong
-    private String hospitalsBelong;
     //#endregion
 
 }

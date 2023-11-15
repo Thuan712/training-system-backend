@@ -1,9 +1,9 @@
-package com.thinkvitals.authentication;
+package iuh.fit.trainingsystembackend.authentication;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.thinkvitals.cache.CacheKeys;
-import com.thinkvitals.cache.CacheService;
+import iuh.fit.trainingsystembackend.cache.CacheKeys;
+import iuh.fit.trainingsystembackend.cache.CacheService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

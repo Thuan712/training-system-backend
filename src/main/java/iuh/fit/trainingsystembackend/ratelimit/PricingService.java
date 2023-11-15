@@ -1,4 +1,4 @@
-package com.thinkvitals.ratelimit;
+package iuh.fit.trainingsystembackend.ratelimit;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;

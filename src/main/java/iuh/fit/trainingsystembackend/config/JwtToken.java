@@ -1,4 +1,4 @@
-package com.thinkvitals.config;
+package iuh.fit.trainingsystembackend.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

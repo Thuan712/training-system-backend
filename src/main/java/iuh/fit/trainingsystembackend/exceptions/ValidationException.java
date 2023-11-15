@@ -1,4 +1,4 @@
-package com.thinkvitals.exceptions;
+package iuh.fit.trainingsystembackend.exceptions;
 public class ValidationException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private String msg;

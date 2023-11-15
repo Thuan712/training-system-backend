@@ -1,4 +1,4 @@
-package com.thinkvitals.rabbitmq;
+package iuh.fit.trainingsystembackend.rabbitmq;
 
 public enum MessagePayloadType {
     notification("Notification"),

@@ -1,26 +1,19 @@
-package com.thinkvitals.authentication;
+package iuh.fit.trainingsystembackend.authentication;
 
-import com.maxmind.geoip2.model.CityResponse;
-import com.thinkvitals.cache.CacheService;
-import com.thinkvitals.config.JwtToken;
-import com.thinkvitals.dto.UserInfoDTO;
-import com.thinkvitals.exceptions.ValidationException;
-import com.thinkvitals.mail.MailEnvelope;
-import com.thinkvitals.mail.MailTemplates;
-import com.thinkvitals.model.UserEntity;
-import com.thinkvitals.rabbitmq.RabbitMQSender;
-import com.thinkvitals.repository.UserRepository;
-import com.thinkvitals.service.IPService;
-import com.thinkvitals.service.UserService;
-import com.thinkvitals.token.*;
-import com.thinkvitals.utils.Constants;
-import com.thinkvitals.utils.StringUtils;
+
+import iuh.fit.trainingsystembackend.config.JwtToken;
+import iuh.fit.trainingsystembackend.dto.UserInfoDTO;
+import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.repository.UserRepository;
+import iuh.fit.trainingsystembackend.token.*;
+import iuh.fit.trainingsystembackend.utils.Constants;
+import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,13 +40,8 @@ public class AuthenticationController {
     private JwtUserDetailsService jwtUserDetailsService;
     private UserRepository userEntityRepository;
     private RefreshTokenService refreshTokenService;
-    private RabbitMQSender rabbitMQSender;
-    private UserService userService;
-    private IPService ipService;
     private AuthService authService;
     private UserCacheService userCacheService;
-    private CacheService cacheService;
-//    private UserInfoMapper userInfoMapper;
 
     //#region Issue Token
     @PostMapping(value = "/getToken")
@@ -118,54 +106,6 @@ public class AuthenticationController {
             }
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            //update number of fail login attempt
-            try {
-                userAuthCache.setFailedLoginAttempts(userAuthCache.getFailedLoginAttempts() + 1);
-                userCacheService.setUserAuthCache(username, userAuthCache);
-
-                if(userAuthCache.getFailedLoginAttempts() == 5) {
-                    String userAgent = request.getHeader("User-Agent");
-                    ExecutorService executor = Executors.newFixedThreadPool(1);
-                    FutureTask<String> futureTasks = new FutureTask<>(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                UserEntity userEntity = userEntityRepository.findByUsername(username);
-                                if(userEntity != null && userEntity.getEmail() != null && !userEntity.getEmail().isEmpty()) {
-                                    // Get user location
-                                    String ipAddress = ipService.getPublicIpAddress();
-                                    CityResponse cityResponse = ipService.getLocationFromIP(ipAddress);
-
-                                    // Send verification code to user email
-                                    MailEnvelope mailEnvelop = new MailEnvelope();
-                                    mailEnvelop.setTo(userEntity.getEmail());
-                                    mailEnvelop.setSubject("TaVIE - Account Blocked");
-
-                                    mailEnvelop.setData(new HashMap<>(Map.of(
-                                            "fullName", userEntity.getFullName(),
-                                            "loginLink", MailTemplates.loginRedirectUrl,
-                                            "ipAddress", ipAddress,
-                                            "userAgent", userAgent,
-                                            "origin", cityResponse != null && cityResponse.getCity() != null ? cityResponse.getCity().getName() + ", " + cityResponse.getCountry().getName() : "Unknown"
-                                    )));
-                                    mailEnvelop.setTemplate(MailTemplates.ACCOUNT_LOCKED);
-
-//                                    rabbitMQSender.sendMail(mailEnvelop);
-                                }
-                            } catch (Exception exception) {
-                                System.out.println("Fail to update fail login attempt");
-                            }
-                        }
-                    }, "Done");
-
-                    executor.submit(futureTasks);
-                }
-            } catch (Exception ex) {
-                System.out.println("Fail to update fail login attempt");
-            }
-
-            throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
 
@@ -289,42 +229,6 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send verification code");
         }
 
-        String userAgent = request.getHeader("User-Agent");
-
-        try {
-            ExecutorService executor = Executors.newFixedThreadPool(1);
-            UserEntity finalUser = user;
-            FutureTask<String> futureTasks = new FutureTask<>(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        // Get user location
-                        String ipAddress = ipService.getPublicIpAddress();
-                        CityResponse cityResponse = ipService.getLocationFromIP(ipAddress);
-
-                        // Send verification code to user email
-                        MailEnvelope mailEnvelop = new MailEnvelope();
-                        mailEnvelop.setTo(finalUser.getEmail());
-                        mailEnvelop.setSubject("TaVIE - Verification code");
-                        mailEnvelop.setTemplate(MailTemplates.PASSWORD_VERIFICATION_CODE);
-
-//                        mailEnvelop.setData(new HashMap<>(Map.of(
-//                                "verificationCode", passwordConfig.getVerificationCode(),
-//                                "verificationCodeExpiry", passwordConfig.getVerificationCodeExpiry(),
-//                                "ipAddress", ipAddress,
-//                                "userAgent", userAgent,
-//                                "origin", cityResponse != null && cityResponse.getCity() != null ? cityResponse.getCity().getName() + ", " + cityResponse.getCountry().getName() : "Unknown"
-//                        )));
-//
-//                        rabbitMQSender.sendMail(mailEnvelop);
-                    } catch (Exception ignored) {}
-                }
-            }, "Done");
-            executor.submit(futureTasks);
-        } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send verification code");
-        }
-
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -420,84 +324,9 @@ public class AuthenticationController {
         if (user.getId() == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to change password");
         }
-
-        try {
-            try {
-                UserAuthCache userAuthCache = userCacheService.getUserAuthCache(user.getUsername());
-                if(userAuthCache == null) {
-                    userAuthCache = new UserAuthCache();
-                }
-
-                userAuthCache.setToken(null);
-                userAuthCache.setSessionId(null);
-                userAuthCache.setFailedLoginAttempts(0);
-
-                userCacheService.setUserAuthCache(user.getUsername(), userAuthCache);
-            } catch (Exception e) {
-                System.out.println("Fail to clear user auth cache");
-            }
-
-            String userAgent = request.getHeader("User-Agent");
-
-            ExecutorService executor = Executors.newFixedThreadPool(1);
-            FutureTask<String> futureTasks = getStringFutureTask(user, userAgent);
-            executor.execute(futureTasks);
-        } catch (Exception exception) {
-            System.out.println("Failed to send email");
-        }
-
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    private FutureTask<String> getStringFutureTask(UserEntity user, String userAgent) {
-        return new FutureTask<>(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Get user location
-                    String ipAddress = ipService.getPublicIpAddress();
 
-                    CityResponse cityResponse = ipService.getLocationFromIP(ipAddress);
-
-                    UserAuthCache userAuthCache = userCacheService.getUserAuthCache( user.getUsername());
-                    if(userAuthCache == null) {
-                        userAuthCache = new UserAuthCache();
-                    }
-
-                    userAuthCache.setIpAddress(ipAddress);
-                    userAuthCache.setUserAgent(userAgent);
-
-                    Set<String> previousIpAddresses = userAuthCache.getPreviousIpAddresses();
-                    if(previousIpAddresses == null) {
-                        previousIpAddresses = new HashSet<>();
-                    }
-
-                    previousIpAddresses.add(ipAddress);
-                    userAuthCache.setPreviousIpAddresses(previousIpAddresses);
-
-                    userCacheService.setUserAuthCache(user.getUsername(), userAuthCache);
-
-                    // Send verification code to user email
-                    MailEnvelope mailEnvelop = new MailEnvelope();
-                    mailEnvelop.setTo(user.getEmail());
-                    mailEnvelop.setSubject("TaVIE - Password changed");
-                    mailEnvelop.setTemplate(MailTemplates.PASSWORD_CHANGED);
-
-                    mailEnvelop.setData(new HashMap<>(Map.of(
-                            "fullName", user.getFullName(),
-                            "loginLink", MailTemplates.loginRedirectUrl,
-                            "ipAddress", ipAddress,
-                            "userAgent", userAgent,
-                            "origin", cityResponse != null && cityResponse.getCity() != null ? cityResponse.getCity().getName() + ", " + cityResponse.getCountry().getName() : "Unknown"
-                    )));
-                    mailEnvelop.setTemplate(MailTemplates.PASSWORD_CHANGED);
-
-//                    rabbitMQSender.sendMail(mailEnvelop);
-                } catch (Exception e){
-                    System.out.println("Failed to send email");
-                }
-            }
-        }, "Done");
-    }
 
 }

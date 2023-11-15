@@ -1,15 +1,19 @@
-package com.thinkvitals.utils;
+package iuh.fit.trainingsystembackend.utils;
 
 public class Constants {
     public static final String rateLimitMode = "prod";
 
-    //#region Global Countries
-    public static final String GLOBAL_COUNTRY_ENDPOINT = "https://api.countrystatecity.in/v1/countries";
-    public static final String GLOBAL_COUNTRY_KEY = "Q0cydlRpeTQ4S1ZmbXA5eGlhZ1p3aDNLWDJlcnVZc2RyN3J6bFFyMA==";
-    public static final String GLOBAL_API_KEY_HEADER = "X-CSCAPI-KEY";
-    //#endregion
-
     //#region Path prefix
     public static final String PREFIX_ENDPOINT = "/backend/api/";
+    public static final String USER_ENDPOINT = "user";
+    public static final String FACULTY_ENDPOINT = "faculty";
+    public static final String ACADEMIC_YEAR_ENDPOINT = "academic";
+    public static final String TERM_ENDPOINT = "term";
+    public static final String ADDRESS_ENDPOINT = "address";
+    public static final String COURSE_ENDPOINT = "course";
+    public static final String STUDENT_ENDPOINT = "student";
+    public static final String LECTURER_ENDPOINT = "lecturer";
+    public static final String SECTION_ENDPOINT = "section";
+    public static final String SPECIALIZATION_ENDPOINT = "specialization";
     //#endregion
 }

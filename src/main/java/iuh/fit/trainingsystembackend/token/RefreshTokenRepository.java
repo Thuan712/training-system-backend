@@ -1,4 +1,4 @@
-package com.thinkvitals.token;
+package iuh.fit.trainingsystembackend.token;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

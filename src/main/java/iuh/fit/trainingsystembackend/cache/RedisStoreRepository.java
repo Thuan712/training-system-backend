@@ -1,4 +1,4 @@
-package com.thinkvitals.cache;
+package iuh.fit.trainingsystembackend.cache;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -11,7 +11,7 @@ import java.util.Set;
 @Repository
 public class RedisStoreRepository {
     private ValueOperations valueOperations;
-    private RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate ;
 
     public RedisStoreRepository(RedisTemplate redisTemplate){
         this.redisTemplate = redisTemplate;

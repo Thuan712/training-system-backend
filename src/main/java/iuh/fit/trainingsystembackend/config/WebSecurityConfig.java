@@ -1,7 +1,6 @@
-package com.thinkvitals.config;
+package iuh.fit.trainingsystembackend.config;
 
-import com.thinkvitals.token.JwtUserDetailsService;
-import com.thinkvitals.utils.Constants;
+import iuh.fit.trainingsystembackend.token.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         httpSecurity.csrf().disable()
 
-                .authorizeRequests().antMatchers("/actuator/**", "/backend/api/authentication/getToken", "/backend/api/user/createOrUpdate", "/backend/api/address/**", "/backend/api/socialAuth/**","/backend/api/**").permitAll().
+                .authorizeRequests().antMatchers("/actuator/**", "/websocket/**", "/backend/api/**").permitAll().
 
         anyRequest().authenticated().and().
 

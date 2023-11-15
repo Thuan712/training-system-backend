@@ -1,21 +1,17 @@
-package com.thinkvitals.model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+package iuh.fit.trainingsystembackend.model;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
-import com.google.gson.reflect.TypeToken;
-import com.thinkvitals.data.PhoneExtension;
-import com.thinkvitals.enums.AddressRefType;
-import com.thinkvitals.enums.AddressType;
-import com.thinkvitals.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+
 @Table(name="address")
 @Entity
 @Data
@@ -30,69 +26,32 @@ public class Address implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="ref_id")
-    private Long refId;
+    @Column(name="user_id")
+    private Long userId;
 
-    @Column(name="ref_type")
-    @Enumerated(EnumType.STRING)
-    private AddressRefType refType = AddressRefType.none;
+    @Column(name = "address_line")
+    private String addressLine;
 
-    @Column(name="type")
-    @Enumerated(EnumType.STRING)
-    private AddressType type = AddressType.other;
+    @Column(name = "region_id")
+    private Integer regionId;
 
-    @Column(name="main")
-    @Expose
-    private boolean main = false;
+    @Column(name = "region_name")
+    private String regionName;
 
-    @Column(name="address_line_1")
-    private String addressLine1;
+    @Column(name = "province_code")
+    private String provinceCode;
 
-    @Column(name="address_line_2")
-    private String addressLine2;
+    @Column(name = "province_name")
+    private String provinceName;
 
-    @Column(name="address_line_3")
-    private String addressLine3;
+    @Column(name = "ward_code")
+    private String wardCode;
 
-    @Column(name="address_line_4")
-    private String addressLine4;
-
-    @Column(name="city")
-    private String city;
-
-    @Column(name="state")
-    private String state;
-
-    @Column(name="ref_state")
-    private String refState;
-
-    @Column(name="country")
-    private String country;
-
-    @Column(name="ref_country")
-    private String refCountry;
-
-    @Column(name="postal_code")
-    private String postalCode;
+    @Column(name = "ward_name")
+    private String wardName;
 
     @Column(name="phone")
     private String phone;
-
-    @Column(name="phone_extension")
-    @JsonIgnore
-    private String phoneExtensionString;
-
-    @Transient
-    private PhoneExtension phoneExtension;
-
-    @Transient
-    public PhoneExtension getPhoneExtension() {
-        if(this.phoneExtensionString != null && !this.phoneExtensionString.isEmpty()) {
-            return new Gson().fromJson(this.phoneExtensionString, new TypeToken<PhoneExtension>(){}.getType());
-        }
-
-        return null;
-    }
 
     @Column(name="created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -107,29 +66,17 @@ public class Address implements Serializable {
     @Transient
     public String getFormattedAddress() {
         String formattedAddress = "";
-        if(this.addressLine1 != null && !this.addressLine1.isEmpty()) {
-            formattedAddress += this.addressLine1;
+        if(this.addressLine != null && !this.addressLine.isEmpty()) {
+            formattedAddress += this.addressLine;
         }
-        if(this.addressLine2 != null && !this.addressLine2.isEmpty()) {
-            formattedAddress += ", " + this.addressLine2;
+        if(this.wardName != null && !this.wardName.isEmpty()) {
+            formattedAddress += ", " + this.wardName;
         }
-        if(this.addressLine3!= null && !this.addressLine3.isEmpty()) {
-            formattedAddress += ", " + this.addressLine3;
+        if(this.provinceName != null && !this.provinceName.isEmpty()) {
+            formattedAddress += ", " + this.provinceName;
         }
-        if(this.addressLine4 != null && !this.addressLine4.isEmpty()) {
-            formattedAddress += ", " + this.addressLine4;
-        }
-        if(this.city != null && !this.city.isEmpty()) {
-            formattedAddress += ", " + this.city;
-        }
-        if(this.state != null && !this.state.isEmpty()) {
-            formattedAddress += ", " + this.state;
-        }
-        if(this.country != null && !this.country.isEmpty()) {
-            formattedAddress += ", " + this.country;
-        }
-        if(this.postalCode != null && !this.postalCode.isEmpty()) {
-            formattedAddress += ", " + this.postalCode;
+        if(this.regionName != null && !this.regionName.isEmpty()) {
+            formattedAddress += ", " + this.regionName;
         }
         return formattedAddress;
     }

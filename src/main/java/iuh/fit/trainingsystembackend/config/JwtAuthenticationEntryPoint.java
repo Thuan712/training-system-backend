@@ -1,4 +1,4 @@
-package com.thinkvitals.config;
+package iuh.fit.trainingsystembackend.config;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

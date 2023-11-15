@@ -1,4 +1,4 @@
-package com.thinkvitals.cache;
+package iuh.fit.trainingsystembackend.cache;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class CacheService {
-    private static String KEY_PREFIX = "Luxury-Mall";
+    private static String KEY_PREFIX = "LuxuryMall";
     private RedisStoreRepository redisStoreRepository;
 
     public String getKey(String key) {

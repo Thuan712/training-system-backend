@@ -1,10 +1,5 @@
-package com.thinkvitals.utils;
+package iuh.fit.trainingsystembackend.utils;
 
-import okhttp3.HttpUrl;
-
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;

@@ -1,6 +1,6 @@
-package com.thinkvitals.common.repository;
+package iuh.fit.trainingsystembackend.common.repository;
 
-import com.thinkvitals.common.specification.Filter;
+import iuh.fit.trainingsystembackend.common.specification.Filter;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

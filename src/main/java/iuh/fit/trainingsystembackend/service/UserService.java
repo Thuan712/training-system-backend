@@ -1,9 +1,9 @@
-package com.thinkvitals.service;
+package iuh.fit.trainingsystembackend.service;
 
-import com.thinkvitals.exceptions.ValidationException;
-import com.thinkvitals.model.UserEntity;
-import com.thinkvitals.repository.UserRepository;
-import com.thinkvitals.utils.StringUtils;
+import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.repository.UserRepository;
+import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

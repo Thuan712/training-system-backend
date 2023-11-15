@@ -1,16 +1,15 @@
-package com.thinkvitals.dto;
+package iuh.fit.trainingsystembackend.dto;
 
 import com.google.gson.annotations.Expose;
-import com.thinkvitals.address.enums.AddressType;
-import com.thinkvitals.data.PhoneExtension;
-import com.thinkvitals.enums.Gender;
-import com.thinkvitals.enums.SystemRole;
-import com.thinkvitals.enums.Title;
+
+import iuh.fit.trainingsystembackend.enums.*;
+import iuh.fit.trainingsystembackend.model.Address;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.Cacheable;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,38 +21,56 @@ public class UserInfoDTO implements Serializable {
     //#region User
     @Expose
     private Long id;
+
     private String username;
+
     private String email;
+    private String firstname;
+    private String lastname;
     private String password;
+
     private SystemRole systemRole;
-    private String firstName;
-    private String lastName;
-    private Gender gender;
-    private Title title;
-    private String avatar;
+
+    private String code;
+
     private String dob;
-    private Date createdAt;
-    private Date updatedAt;
-    private Date deletedAt;
+
+    private String CINumber;
+
+    private String avatar;
+
     private boolean active;
+
     private boolean deleted;
+
+    private Date createdAt;
+
+    private Date deletedAt;
+
+    private Date updatedAt;
     //#endregion
 
     //#region Address
-    private Long addressId;
-    private AddressType type;
-    private String address;
-    private String addressLine1;
-    private String addressLine2;
-    private String addressLine3;
-    private String addressLine4;
-    private String city;
-    private String state;
-    private String refState;
-    private String country;
-    private String refCountry;
-    private String postalCode;
-    private String phone;
-    private PhoneExtension phoneExtension;
+    private Address address;
+    //#endregion
+
+    //#region Student
+    private Long specializationClassId;
+
+    private TrainingLevel trainingLevel;
+
+    private TypeOfEducation typeOfEducation;
+
+    private String schoolYear;
+    //#endregion
+
+    //#region Lecturer
+    private Long specializationId;
+
+    private Title title;
+
+    private Position position;
+
+    private Date entryDate;
     //#endregion
 }

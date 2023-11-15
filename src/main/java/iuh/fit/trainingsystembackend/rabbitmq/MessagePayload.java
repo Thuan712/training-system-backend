@@ -1,4 +1,4 @@
-package com.thinkvitals.rabbitmq;
+package iuh.fit.trainingsystembackend.rabbitmq;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -22,8 +22,6 @@ public class MessagePayload {
     //#endregion
     //#region Message
     private Long id;
-    private Long participantId;
-    private Long roomId;
     private String data;
     private String fullName;
     private String avatar;

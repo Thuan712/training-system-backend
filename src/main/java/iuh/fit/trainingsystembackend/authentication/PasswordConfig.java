@@ -1,4 +1,4 @@
-package com.thinkvitals.authentication;
+package iuh.fit.trainingsystembackend.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
