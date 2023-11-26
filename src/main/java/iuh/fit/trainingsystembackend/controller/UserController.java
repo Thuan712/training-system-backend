@@ -1,8 +1,10 @@
 package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.bean.UserBean;
+import iuh.fit.trainingsystembackend.dto.UserInfoDTO;
 import iuh.fit.trainingsystembackend.enums.SystemRole;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.UserInfoMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.request.UserRequest;
@@ -36,6 +38,7 @@ public class UserController {
     private AcademicYearRepository academicYearRepository;
     private SpecializationRepository specializationRepository;
     private AddressService addressService;
+    private UserInfoMapper userInfoMapper;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId") Long userId, @RequestBody UserBean data) {
         UserEntity toSave = null;
@@ -130,10 +133,10 @@ public class UserController {
                 toSave.setCode(code);
                 toSave.setUsername(code);
                 toSave.setEmail(code + "." + data.getFirstName().toLowerCase() + "@iuh.edu.com");
-
-                String encodedPassword = new BCryptPasswordEncoder().encode("1111");
-                toSave.setPassword(encodedPassword);
             }
+
+            String encodedPassword = new BCryptPasswordEncoder().encode("1111");
+            toSave.setPassword(encodedPassword);
 
             toSave.setActive(true);
             toSave.setDeleted(false);
@@ -221,7 +224,9 @@ public class UserController {
         if(userEntity == null){
             throw new ValidationException("User is not found !");
         }
-        return ResponseEntity.ok(userEntity);
+
+        UserInfoDTO userInfoDTO = userInfoMapper.mapToDTO(userEntity);
+        return ResponseEntity.ok(userInfoDTO);
     }
 
     @PostMapping("/getPage")

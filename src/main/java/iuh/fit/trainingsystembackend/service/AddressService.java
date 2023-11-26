@@ -3,12 +3,14 @@ package iuh.fit.trainingsystembackend.service;
 import iuh.fit.trainingsystembackend.bean.AddressBean;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Service
+@AllArgsConstructor
 public class AddressService implements Serializable {
     private AddressRepository addressRepository;
     private RegionRepository regionRepository;
@@ -25,6 +27,7 @@ public class AddressService implements Serializable {
         }
         if (toSave == null) {
             toSave = new Address();
+            toSave.setUserId(data.getUserId());
         }
 
         toSave.setAddressLine(data.getAddressLine());
@@ -73,4 +76,7 @@ public class AddressService implements Serializable {
         return toSave;
     }
 
+    public Address getUserAddress(Long userId){
+        return addressRepository.findAddressByUserId(userId);
+    }
 }
