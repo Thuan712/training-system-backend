@@ -47,7 +47,11 @@ public class UserInfoMapper {
             student = studentRepository.getStudentByUserId(userEntity.getId());
             if(student != null){
                 specialization = specializationRepository.findById(student.getSpecializationId()).orElse(null);
-                specializationClass = specializationClassRepository.findById(student.getSpecializationClassId()).orElse(null);
+
+                if(student.getSpecializationClassId() != null){
+                    specializationClass = specializationClassRepository.findById(student.getSpecializationClassId()).orElse(null);
+                }
+
                 academicYear = academicYearRepository.findById(student.getAcademicYearId()).orElse(null);
             }
         }
