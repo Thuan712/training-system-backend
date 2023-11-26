@@ -1,12 +1,8 @@
 package iuh.fit.trainingsystembackend.service;
 
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
-import iuh.fit.trainingsystembackend.model.Course;
-import iuh.fit.trainingsystembackend.model.Result;
-import iuh.fit.trainingsystembackend.model.Section;
-import iuh.fit.trainingsystembackend.repository.CourseRepository;
-import iuh.fit.trainingsystembackend.repository.ResultRepository;
-import iuh.fit.trainingsystembackend.repository.SectionRepository;
+import iuh.fit.trainingsystembackend.model.*;
+import iuh.fit.trainingsystembackend.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -18,6 +14,9 @@ public class SectionService {
     private SectionRepository sectionRepository;
     private CourseRepository courseRepository;
     private ResultRepository resultRepository;
+    private StudentRepository studentRepository;
+    private SectionClassRepository sectionClassRepository;
+
     public boolean isEnoughCourseRequireForRegister(Long studentId, Long sectionId){
 
         if(sectionId == null){

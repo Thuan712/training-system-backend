@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface WardRepository extends JpaRepository<Ward, String> {
-    Ward findWardByCode(String code);
     List<Ward> findWardByDistrictCode(String districtCode);
 }

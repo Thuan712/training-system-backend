@@ -9,6 +9,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StudentRequest {
     private Long userId;
+    private Long sectionClassId;
     private Long specializationClassId;
     private Long specializationId;
     private Long academicYearId;

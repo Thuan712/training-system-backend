@@ -4,8 +4,6 @@ public enum ReloadActionType {
     update("Update"),
     refetch("Refetch");
 
-
-
     ReloadActionType(String value) {
         this.value = value;
     }

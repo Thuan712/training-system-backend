@@ -1,9 +1,13 @@
 package iuh.fit.trainingsystembackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,8 +27,26 @@ public class Result implements Serializable {
     @Column(name = "student_id")
     private Long studentId;
 
+    @ManyToOne
+    @JoinFormula(value = "student_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Student student;
+
+    @Column(name = "student_name")
+    private String studentName;
+
+    @Column(name = "student_code")
+    private String studentCode;
+
     @Column(name = "section_id")
     private Long sectionId;
+
+    @ManyToOne
+    @JoinFormula(value = "section_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Section section;
 
     @Column(name = "course_id")
     private Long courseId;
@@ -53,13 +75,12 @@ public class Result implements Serializable {
     @Column(name = "midterm_point_3")
     private Double midtermPoint3;
 
-    @Column(name = "final_point_1")
-    private Double finalPoint1;
+    @Column(name = "final_point")
+    private Double finalPoint;
 
     @Column(name = "practice_point_1")
     private Double practicePoint1;
 
     @Column(name = "practice_point_2")
     private Double practicePoint2;
-
 }

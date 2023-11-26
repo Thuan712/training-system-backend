@@ -1,6 +1,5 @@
 package iuh.fit.trainingsystembackend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,26 +9,33 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Data
-@Table(name = "administrative_regions")
+@Table(name = "administrative_units")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Region implements Serializable {
+public class AddressUnit implements Serializable {
+
     @Id
-    private int id;
+    @Column(name = "id")
+    private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "full_name")
+    private String fullName;
 
-    @Column(name = "name_en")
-    private String nameEN;
+    @Column(name = "full_name_en")
+    private String fullNameEn;
+
+    @Column(name = "short_name")
+    private String shortName;
+
+    @Column(name = "short_name_en")
+    private String shortNameEn;
 
     @Column(name = "code_name")
     private String codeName;
 
     @Column(name = "code_name_en")
-    private String codeNameEN;
-
+    private String codeNameEn;
 }

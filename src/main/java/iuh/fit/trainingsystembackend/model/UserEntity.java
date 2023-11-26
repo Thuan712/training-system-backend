@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import iuh.fit.trainingsystembackend.enums.Gender;
 import iuh.fit.trainingsystembackend.enums.SystemRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -57,6 +58,9 @@ public class UserEntity implements Serializable {
 
     @Column(name = "avatar")
     private String avatar;
+
+    @Column(name = "gender")
+    private Gender gender;
 
     @Column(name = "active")
     private boolean active;

@@ -1,25 +1,22 @@
 package iuh.fit.trainingsystembackend.service;
 
 import iuh.fit.trainingsystembackend.bean.AddressBean;
-import iuh.fit.trainingsystembackend.model.Address;
-import iuh.fit.trainingsystembackend.model.Province;
-import iuh.fit.trainingsystembackend.model.Region;
-import iuh.fit.trainingsystembackend.model.Ward;
-import iuh.fit.trainingsystembackend.repository.AddressRepository;
-import iuh.fit.trainingsystembackend.repository.ProvinceRepository;
-import iuh.fit.trainingsystembackend.repository.RegionRepository;
-import iuh.fit.trainingsystembackend.repository.WardRepository;
+import iuh.fit.trainingsystembackend.model.*;
+import iuh.fit.trainingsystembackend.repository.*;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Service
+@AllArgsConstructor
 public class AddressService implements Serializable {
     private AddressRepository addressRepository;
     private RegionRepository regionRepository;
     private WardRepository wardRepository;
     private ProvinceRepository provinceRepository;
+    private DistrictRepository districtRepository;
     public Address saveAddress(AddressBean data) {
         Address toSave = null;
         if (data.getAddressId() != null) {
@@ -30,6 +27,7 @@ public class AddressService implements Serializable {
         }
         if (toSave == null) {
             toSave = new Address();
+            toSave.setUserId(data.getUserId());
         }
 
         toSave.setAddressLine(data.getAddressLine());
@@ -42,8 +40,16 @@ public class AddressService implements Serializable {
             }
         }
 
+        if(data.getDistrictCode() != null && !data.getDistrictCode().isEmpty()) {
+            District district = districtRepository.findById(data.getDistrictCode()).orElse(null);
+            if(district != null){
+                toSave.setDistrictCode(district.getCode());
+                toSave.setDistrictName(district.getName());
+            }
+        }
+
         if(data.getProvinceCode() != null && !data.getProvinceName().isEmpty()) {
-            Province province = provinceRepository.findProvinceByCode(data.getProvinceCode());
+            Province province = provinceRepository.findById(data.getProvinceCode()).orElse(null);
             if(province != null) {
                 toSave.setProvinceCode(province.getCode());
                 toSave.setProvinceName(province.getFullName());
@@ -52,7 +58,7 @@ public class AddressService implements Serializable {
 
 
         if(data.getWardCode() != null && !data.getWardCode().isEmpty()) {
-            Ward ward = wardRepository.findWardByCode(data.getWardCode());
+            Ward ward = wardRepository.findById(data.getWardCode()).orElse(null);
             if(ward != null) {
                 toSave.setWardName(ward.getName());
                 toSave.setWardCode(ward.getCode());
@@ -70,4 +76,7 @@ public class AddressService implements Serializable {
         return toSave;
     }
 
+    public Address getUserAddress(Long userId){
+        return addressRepository.findAddressByUserId(userId);
+    }
 }

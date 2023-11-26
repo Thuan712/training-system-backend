@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ProvinceRepository extends JpaRepository<Province, String> {
-    Province findProvinceByCode(String code);
     List<Province> findProvincesByRegionId(Integer region);
 }

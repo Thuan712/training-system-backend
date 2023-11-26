@@ -11,12 +11,16 @@ import java.io.Serializable;
 public class AddressBean implements Serializable {
     @SerializedName("user_address_id")
     private Long userId;
+
     private Long addressId;
 
     private String addressLine;
 
     private Integer regionId;
     private String regionName;
+
+    private String districtName;
+    private String districtCode;
 
     private String provinceCode;
     private String provinceName;

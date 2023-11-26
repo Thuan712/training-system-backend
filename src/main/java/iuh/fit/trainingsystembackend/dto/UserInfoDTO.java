@@ -25,12 +25,13 @@ public class UserInfoDTO implements Serializable {
     private String username;
 
     private String email;
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
+    private String fullName;
     private String password;
 
     private SystemRole systemRole;
-
+    private String gender;
     private String code;
 
     private String dob;
@@ -56,18 +57,20 @@ public class UserInfoDTO implements Serializable {
 
     //#region Student
     private Long specializationClassId;
+    private String specializationClassName;
 
     private TrainingLevel trainingLevel;
 
-    private TypeOfEducation typeOfEducation;
+    private String typeOfEducation;
 
-    private String schoolYear;
+    private String academicYearName;
     //#endregion
 
     //#region Lecturer
     private Long specializationId;
+    private String specializationName;
 
-    private Title title;
+    private String title;
 
     private Position position;
 

@@ -32,9 +32,6 @@ public class Student implements Serializable {
 
     @Column(name = "user_id")
     private Long userId;
-//    @Column(name = "training_level")
-//    @Enumerated(EnumType.STRING)
-//    private TrainingLevel trainingLevel;
 
     @Column(name = "academic_year_id")
     private Long academicYearId;

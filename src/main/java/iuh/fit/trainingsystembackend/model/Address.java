@@ -50,6 +50,12 @@ public class Address implements Serializable {
     @Column(name = "ward_name")
     private String wardName;
 
+    @Column(name = "district_name")
+    private String districtName;
+
+    @Column(name = "district_code")
+    private String districtCode;
+
     @Column(name="phone")
     private String phone;
 
