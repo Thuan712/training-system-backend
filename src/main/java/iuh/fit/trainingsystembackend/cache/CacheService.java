@@ -9,7 +9,7 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class CacheService {
-    private static String KEY_PREFIX = "LuxuryMall";
+    private static String KEY_PREFIX = "TrainingSystem";
     private RedisStoreRepository redisStoreRepository;
 
     public String getKey(String key) {

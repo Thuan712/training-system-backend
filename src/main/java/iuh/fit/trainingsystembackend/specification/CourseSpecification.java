@@ -12,7 +12,7 @@ public class CourseSpecification extends BaseSpecification<Course, CourseRequest
     public Specification<Course> getFilter(CourseRequest request) {
         return (root, query, criteriaBuilder) -> Specification.where(attributeContains("name", request.getName()))
                 .and(attributeContains("code", request.getCode()))
-                .and(attributeEqual("credits", request.getCredit()))
+                .and(attributeEqual("credit", request.getCredit()))
                 .and(attributeEqual("deleted", request.getDeleted()))
                 //TODO: Attribute course require in
                 .toPredicate(root, query, criteriaBuilder);

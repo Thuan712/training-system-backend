@@ -10,6 +10,7 @@ import iuh.fit.trainingsystembackend.request.CourseRequest;
 import iuh.fit.trainingsystembackend.request.UserRequest;
 import iuh.fit.trainingsystembackend.specification.CourseSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
+import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +30,7 @@ public class CourseController {
     private CourseSpecification courseSpecification;
 
     @PostMapping("/createOrUpdate")
-    public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId", required = false) Long userId, @RequestParam CourseBean data) {
+    public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId", required = false) Long userId, @RequestBody CourseBean data) {
         Course toSave = null;
 
         if (data.getId() != null) {
@@ -43,10 +44,24 @@ public class CourseController {
         if (toSave == null) {
             toSave = new Course();
             //TODO: Generate code for course
+            String code = "";
+            boolean isExist = true;
+            while (isExist){
+                code = StringUtils.randomNumberGenerate(12);
+                isExist = courseRepository.existsCourseByCode(code);
+            }
 
+            if(!code.isEmpty()){
+                toSave.setCode(code);
+            }
         }
 
         toSave.setName(data.getName());
+
+        if(data.getCredits() == null || data.getCredits() < 1){
+            throw new ValidationException("Credits of course should be greater than 0!");
+        }
+
         toSave.setCredit(data.getCredits());
 
         boolean isError = false;

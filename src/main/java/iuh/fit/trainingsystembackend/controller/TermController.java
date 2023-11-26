@@ -32,8 +32,8 @@ public class TermController {
 
         String name = academicYear.getName();
 
-        for(int i = 0; i < 3; i++){
-            String hkName = "HK" + i + name;
+        for(int i = 1; i <= 3; i++){
+            String hkName = "HK" + i  + "-" + name;
             Term term = termRepository.findDistinctByName(hkName);
 
             if(term != null && term.getId() != null){

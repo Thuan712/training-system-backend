@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ResultRepository extends JpaRepository<Result, Long> {
     List<Result> findAllByStudentId(Long studentId);
+
+    Result findResultBySectionIdAndStudentId(Long sectionId, Long studentId);
 }

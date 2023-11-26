@@ -1,5 +1,6 @@
 package iuh.fit.trainingsystembackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,7 @@ public class Course implements Serializable {
     private int credit;
 
     @Column(name = "require_course")
+    @JsonIgnore
     private String requireCourseString;
 
     @Transient
@@ -59,8 +61,8 @@ public class Course implements Serializable {
     @Column(name = "deleted_at")
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
-    private Date deletedAt;
+    private Date deletedAt = new Date();
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = false;
 }
