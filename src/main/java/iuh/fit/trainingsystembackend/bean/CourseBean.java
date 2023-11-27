@@ -12,7 +12,7 @@ public class CourseBean implements Serializable {
     private Long id;
     private String name;
     private String code;
-    private Integer credits;
+    private Integer credit;
 
     private List<Long> requireCourse;
     private Boolean deleted = false;

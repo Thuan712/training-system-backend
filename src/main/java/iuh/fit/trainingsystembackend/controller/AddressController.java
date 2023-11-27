@@ -4,14 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.maxmind.geoip2.record.City;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
-import iuh.fit.trainingsystembackend.model.Address;
-import iuh.fit.trainingsystembackend.model.Province;
-import iuh.fit.trainingsystembackend.model.Region;
-import iuh.fit.trainingsystembackend.model.Ward;
-import iuh.fit.trainingsystembackend.repository.AddressRepository;
-import iuh.fit.trainingsystembackend.repository.ProvinceRepository;
-import iuh.fit.trainingsystembackend.repository.RegionRepository;
-import iuh.fit.trainingsystembackend.repository.WardRepository;
+import iuh.fit.trainingsystembackend.model.*;
+import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +23,7 @@ public class AddressController {
     private RegionRepository regionRepository;
     private WardRepository wardRepository;
     private ProvinceRepository provinceRepository;
+    private DistrictRepository districtRepository;
     @GetMapping("/getById")
     public ResponseEntity<?> getById(
             @RequestParam("id") Long id
@@ -54,10 +49,19 @@ public class AddressController {
     }
     @GetMapping("/getWards")
     public ResponseEntity<?> getWards(
-            @RequestParam("provinceCode") String provinceCode
+            @RequestParam("districtCode") String districtCode
 
     ){
-        List<Ward> wards = wardRepository.findWardByDistrictCode(provinceCode);
+        List<Ward> wards = wardRepository.findWardByDistrictCode(districtCode);
         return ResponseEntity.ok(wards);
     }
+
+    @GetMapping("/getDistrict")
+    public ResponseEntity<?> getDistricts(
+            @RequestParam("provinceCode") String provinceCode
+    ){
+        List<District> districts = districtRepository.findDistrictsByProvinceCode(provinceCode);
+        return ResponseEntity.ok(districts);
+    }
 }
+

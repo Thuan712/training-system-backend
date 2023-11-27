@@ -2,7 +2,9 @@ package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
+import iuh.fit.trainingsystembackend.dto.SectionDTO;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.SectionMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.request.SectionClassRequest;
@@ -48,6 +50,8 @@ public class SectionController {
     private StudentSectionClassRepository studentSectionClassRepository;
     private StudentRepository studentRepository;
     private ScheduleRepository scheduleRepository;
+    private SectionMapper sectionMapper;
+
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
         Section toSave = null;
@@ -126,7 +130,9 @@ public class SectionController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody SectionRequest filterRequest) {
         Page<Section> sections = sectionRepository.findAll(sectionSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(sections);
+
+        Page<SectionDTO> sectionDTO = sectionMapper.mapToDTO(sections);
+        return ResponseEntity.ok(sectionDTO);
     }
 
     @PostMapping("/getList")
@@ -218,6 +224,7 @@ public class SectionController {
                                                  @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                                  @RequestBody SectionClassRequest filterRequest) {
         Page<SectionClass> sectionClasses = sectionClassRepository.findAll(sectionClassSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
+
         return ResponseEntity.ok(sectionClasses);
     }
 

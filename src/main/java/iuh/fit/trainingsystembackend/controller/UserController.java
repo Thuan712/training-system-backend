@@ -39,6 +39,7 @@ public class UserController {
     private SpecializationRepository specializationRepository;
     private AddressService addressService;
     private UserInfoMapper userInfoMapper;
+    private SpecializationClassRepository specializationClassRepository;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId") Long userId, @RequestBody UserBean data) {
         UserEntity toSave = null;
@@ -147,6 +148,7 @@ public class UserController {
         toSave.setAvatar(data.getAvatar());
         toSave.setDob(data.getDob());
         toSave.setCINumber(data.getCINumber());
+        toSave.setGender(data.getGender());
 
         toSave = userRepository.saveAndFlush(toSave);
 
@@ -179,8 +181,19 @@ public class UserController {
                     throw new ValidationException("Create lecturer fail");
                 }
             } else if (toSave.getSystemRole().equals(SystemRole.student)) {
+                if(data.getSpecializationClassId() == null){
+                    throw new ValidationException("Specialization Class ID is required !!");
+                }
+
+                SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
+
+                if(specializationClass == null){
+                    throw new ValidationException("Specialization Class is not found !");
+                }
+
                 Student student = new Student();
                 student.setSpecializationId(specialization.getId());
+                student.setSpecializationClassId(specializationClass.getId());
                 student.setTypeOfEducation(data.getTypeOfEducation());
                 student.setUserId(toSave.getId());
 
@@ -236,7 +249,9 @@ public class UserController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody UserRequest filterRequest) {
         Page<UserEntity> userEntities = userRepository.findAll(userSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(userEntities);
+
+        Page<UserInfoDTO> userInfoDTO = userInfoMapper.mapToDTO(userEntities);
+        return ResponseEntity.ok(userInfoDTO);
     }
 
     @PostMapping("/getList")

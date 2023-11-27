@@ -48,7 +48,7 @@ public class AddressService implements Serializable {
             }
         }
 
-        if(data.getProvinceCode() != null && !data.getProvinceName().isEmpty()) {
+        if(data.getProvinceCode() != null && !data.getProvinceCode().isEmpty()) {
             Province province = provinceRepository.findById(data.getProvinceCode()).orElse(null);
             if(province != null) {
                 toSave.setProvinceCode(province.getCode());

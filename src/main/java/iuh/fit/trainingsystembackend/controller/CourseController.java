@@ -58,11 +58,11 @@ public class CourseController {
 
         toSave.setName(data.getName());
 
-        if(data.getCredits() == null || data.getCredits() < 1){
+        if(data.getCredit() == null || data.getCredit() < 1){
             throw new ValidationException("Credits of course should be greater than 0!");
         }
 
-        toSave.setCredit(data.getCredits());
+        toSave.setCredit(data.getCredit());
 
         boolean isError = false;
         for(Long courseId : data.getRequireCourse()){
@@ -123,7 +123,7 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
-    @PostMapping("/getList")
+        @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody CourseRequest filterRequest) {
         List<Course> courses = courseRepository.findAll(courseSpecification.getFilter(filterRequest));
         return ResponseEntity.ok(courses);

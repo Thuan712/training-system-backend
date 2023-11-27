@@ -1,10 +1,15 @@
 package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.model.Course;
 import iuh.fit.trainingsystembackend.model.Faculty;
 import iuh.fit.trainingsystembackend.repository.FacultyRepository;
+import iuh.fit.trainingsystembackend.request.CourseRequest;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +50,15 @@ public class FacultyController {
     @GetMapping("/getList")
     public ResponseEntity<?> getList(){
         return ResponseEntity.ok(facultyRepository.findAll());
+    }
+
+    @PostMapping("/getPage")
+    public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
+                                     @RequestParam("pageNumber") int pageNumber, @RequestParam("pageRows") int pageRows,
+                                     @RequestParam(value = "sortField", required = false, defaultValue = "id") String sortField,
+                                     @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
+                                     @RequestBody Faculty filterRequest) {
+        Page<Faculty> facultyPage = facultyRepository.findAll(PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
+        return ResponseEntity.ok(facultyPage);
     }
 }

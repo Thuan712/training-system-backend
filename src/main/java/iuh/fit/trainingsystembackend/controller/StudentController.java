@@ -1,19 +1,28 @@
 package iuh.fit.trainingsystembackend.controller;
 
-import iuh.fit.trainingsystembackend.model.Student;
-import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.bean.UserBean;
+import iuh.fit.trainingsystembackend.enums.SystemRole;
+import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.StudentRepository;
 import iuh.fit.trainingsystembackend.request.StudentRequest;
 import iuh.fit.trainingsystembackend.request.UserRequest;
 import iuh.fit.trainingsystembackend.specification.StudentSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
+import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController

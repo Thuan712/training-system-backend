@@ -32,10 +32,10 @@ public class Lecturer implements Serializable {
 
     @Column(name = "title")
     @Enumerated(EnumType.STRING)
-    private Title title;
+    private Title title = Title.unknown;
 
     @Column(name = "position")
-    private Position position;
+    private Position position = Position.teacher;
 
     @Column(name = "entry_date")
     @CreatedDate

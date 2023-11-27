@@ -30,6 +30,7 @@ public class UserBean extends AddressBean implements Serializable {
     private String firstName;
 
     private SystemRole systemRole;
+    private Gender gender;
 
     private String code;
 
@@ -42,15 +43,15 @@ public class UserBean extends AddressBean implements Serializable {
 
     //#region Student
     private Long specializationClassId;
-    private TypeOfEducation typeOfEducation;
+    private TypeOfEducation typeOfEducation = TypeOfEducation.general_program;
     private Long academicYearId;
     //#endregion
 
     //#region Lecturer
     private Long specializationId;
 
-    private Title title;
+    private Title title = Title.unknown;
 
-    private Position position;
+    private Position position = Position.teacher;
     //#endregion
 }

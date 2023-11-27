@@ -27,13 +27,13 @@ public class LecturerController {
                                      @RequestParam(value = "sortField", required = false, defaultValue = "id") String sortField,
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody LecturerRequest filterRequest){
-        Page<Lecturer> students = lecturerRepository.findAll(lecturerSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(students);
+        Page<Lecturer> lecturers = lecturerRepository.findAll(lecturerSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
+        return ResponseEntity.ok(lecturers);
     }
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody LecturerRequest filterRequest) {
-        List<Lecturer> students = lecturerRepository.findAll(lecturerSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(students);
+        List<Lecturer> lecturers = lecturerRepository.findAll(lecturerSpecification.getFilter(filterRequest));
+        return ResponseEntity.ok(lecturers);
     }
 }

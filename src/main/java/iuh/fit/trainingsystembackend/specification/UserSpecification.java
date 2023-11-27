@@ -21,8 +21,8 @@ public class UserSpecification extends BaseSpecification<UserEntity, UserRequest
                 .and(attributeContains("dob", request.getDob()))
                 .and(attributeContains("CINumber", request.getCINumber()))
                 .and(attributeContains("avatar", request.getAvatar()))
-                .and(attributeEqual("active", request.isActive()))
-                .and(attributeEqual("deleted", request.isDeleted()))
+                .and(attributeEqual("active", request.getActive()))
+                .and(attributeEqual("deleted", request.getDeleted()))
                 .toPredicate(root, criteriaQuery, criteriaBuilder);
     }
 

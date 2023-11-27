@@ -10,7 +10,7 @@ import java.util.List;
 public class CourseRequest {
     private String name;
     private String code;
-    private int credit;
+    private Integer credit;
     private List<Long> requireCourses;
     private Boolean deleted = false;
 }

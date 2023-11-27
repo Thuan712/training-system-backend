@@ -60,6 +60,7 @@ public class UserEntity implements Serializable {
     private String avatar;
 
     @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(name = "active")

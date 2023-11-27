@@ -56,12 +56,14 @@ public class SectionClass implements Serializable {
     private Integer numberOfStudents;
 
     @Column(name = "day_in_week")
+    @Enumerated(EnumType.STRING)
     private DayInWeek dayInWeek;
 
     @Column(name = "note")
     private String note;
 
     @Column(name = "section_class_type")
+    @Enumerated(EnumType.STRING)
     private SectionClassType sectionClassType;
 
     @Column(name = "started_at")

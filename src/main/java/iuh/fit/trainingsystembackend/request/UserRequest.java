@@ -34,9 +34,9 @@ public class UserRequest {
 
     private String avatar;
 
-    private boolean active;
+    private Boolean active;
 
-    private boolean deleted;
+    private Boolean deleted;
 
     private Date createdAt;
 

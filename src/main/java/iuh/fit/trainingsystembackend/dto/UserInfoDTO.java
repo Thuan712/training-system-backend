@@ -52,7 +52,24 @@ public class UserInfoDTO implements Serializable {
     //#endregion
 
     //#region Address
-    private Address address;
+    private Long addressId;
+
+    private String addressLine;
+
+    private Integer regionId;
+    private String regionName;
+
+    private String districtName;
+    private String districtCode;
+
+    private String provinceCode;
+    private String provinceName;
+
+    private String wardCode;
+    private String wardName;
+
+    private String phone;
+    private String formattedAddress;
     //#endregion
 
     //#region Student
@@ -70,10 +87,10 @@ public class UserInfoDTO implements Serializable {
     private Long specializationId;
     private String specializationName;
 
-    private String title;
-
+    private String titleValue;
+    private Title title;
+    private String positionValue;
     private Position position;
-
     private Date entryDate;
     //#endregion
 }
