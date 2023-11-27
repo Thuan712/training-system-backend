@@ -1,7 +1,9 @@
 package iuh.fit.trainingsystembackend.controller;
 
+import iuh.fit.trainingsystembackend.dto.SpecializationDTO;
 import iuh.fit.trainingsystembackend.enums.TypeOfEducation;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.SpecializationMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.request.SpecializationClassRequest;
@@ -39,7 +41,7 @@ public class SpecializationController {
     private SpecializationClassRepository specializationClassRepository;
     private StudentSpecification studentSpecification;
     private SpecializationClassSpecification specializationClassSpecification;
-
+    private SpecializationMapper specializationMapper;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSpecialization(@RequestParam(name = "userId", required = false) Long userId, @RequestBody Specialization data) {
         Specialization toSave = null;
@@ -56,7 +58,7 @@ public class SpecializationController {
         }
 
         toSave.setName(data.getName());
-
+        toSave.setCode(data.getCode());
         if (data.getFacultyId() == null) {
             throw new ValidationException("Faculty ID is required !");
         }
@@ -85,13 +87,15 @@ public class SpecializationController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody SpecializationRequest filterRequest) {
         Page<Specialization> specializations = specializationRepository.findAll(specializationSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(specializations);
+        Page<SpecializationDTO> specializationDTOS = specializationMapper.mapToDTO(specializations);
+        return ResponseEntity.ok(specializationDTOS);
     }
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SpecializationRequest filterRequest) {
         List<Specialization> specializations = specializationRepository.findAll(specializationSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(specializations);
+        List<SpecializationDTO> specializationDTOS = specializationMapper.mapToDTO(specializations);
+        return ResponseEntity.ok(specializationDTOS);
     }
 
     @PostMapping("/class/createOrUpdate")

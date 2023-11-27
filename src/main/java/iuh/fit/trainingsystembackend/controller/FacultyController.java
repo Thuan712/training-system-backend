@@ -1,10 +1,13 @@
 package iuh.fit.trainingsystembackend.controller;
 
+import iuh.fit.trainingsystembackend.dto.SpecializationDTO;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.model.Course;
 import iuh.fit.trainingsystembackend.model.Faculty;
+import iuh.fit.trainingsystembackend.model.Specialization;
 import iuh.fit.trainingsystembackend.repository.FacultyRepository;
 import iuh.fit.trainingsystembackend.request.CourseRequest;
+import iuh.fit.trainingsystembackend.request.SpecializationRequest;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.FacesWebRequest;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -47,9 +53,10 @@ public class FacultyController {
         return ResponseEntity.ok(toSave);
     }
 
-    @GetMapping("/getList")
-    public ResponseEntity<?> getList(){
-        return ResponseEntity.ok(facultyRepository.findAll());
+    @PostMapping("/getList")
+    public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody Faculty filterRequest) {
+        List<Faculty> faculties = facultyRepository.findAll();
+        return ResponseEntity.ok(faculties);
     }
 
     @PostMapping("/getPage")

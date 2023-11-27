@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping(Constants.PREFIX_ENDPOINT + Constants.ACADEMIC_YEAR_ENDPOINT)
@@ -74,11 +76,11 @@ public class AcademicYearController {
         return ResponseEntity.ok(toSave);
     }
 
-    @GetMapping("/getList")
-    public ResponseEntity<?> getList(){
-        return ResponseEntity.ok(academicYearRepository.findAll());
+    @PostMapping("/getList")
+    public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody AcademicYear filterRequest) {
+        List<AcademicYear> academicYears = academicYearRepository.findAll();
+        return ResponseEntity.ok(academicYears);
     }
-
     @PostMapping("/getPage")
     public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
                                      @RequestParam("pageNumber") int pageNumber, @RequestParam("pageRows") int pageRows,
