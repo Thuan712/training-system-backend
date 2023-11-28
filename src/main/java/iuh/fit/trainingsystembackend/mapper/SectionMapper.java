@@ -1,5 +1,7 @@
 package iuh.fit.trainingsystembackend.mapper;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
 import iuh.fit.trainingsystembackend.model.Course;
 import iuh.fit.trainingsystembackend.model.Section;
@@ -10,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,8 @@ public class SectionMapper {
                 .courseId(course != null ? course.getId() : null)
                 .courseName(course != null ? course.getName() : "")
                 .courseCode(course != null ? course.getCode() : "")
+                .credit(course != null ? course.getCredit() : null)
+                .requireCourse(course != null ? course.getRequireCourse() : new ArrayList<>())
                 .termId(term != null ? term.getId() : null)
                 .termName(term != null ? term.getName() : "")
                 .name(section.getName())

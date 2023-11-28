@@ -14,7 +14,7 @@ public class SpecializationClassSpecification extends BaseSpecification<Speciali
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeContains("name", request.getName()))
                         .and(attributeEqual("specializationId", request.getSpecializationId()))
-                        .and(attributeEqual("academicYearId", request.getAcademicYearId()))
+                        .and(attributeContains("schoolYear", request.getSchoolYear()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 

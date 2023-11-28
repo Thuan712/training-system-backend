@@ -10,6 +10,7 @@ import iuh.fit.trainingsystembackend.repository.TermRepository;
 import iuh.fit.trainingsystembackend.request.CourseRequest;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import lombok.AllArgsConstructor;
+import org.checkerframework.checker.units.qual.s;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -43,7 +44,22 @@ public class AcademicYearController {
 
         //TODO: Validate Name of Academic year
 
+        try {
+            if(data.getName() == null || data.getName().isEmpty()){
+                throw new ValidationException("Academic Year Name is required !!");
+            }
+
+            if(!data.getName().matches("^[0-9]{4} - [0-9]{4}$")){
+                throw new ValidationException("Academic Year Name is invalid !! Should be XXXX - XXXX");
+            }
+
+
+        }catch (Exception exception){
+            throw new ValidationException("Academic Year Name is invalid !!");
+        }
+
         toSave.setName(data.getName());
+
 
         toSave = academicYearRepository.saveAndFlush(toSave);
 

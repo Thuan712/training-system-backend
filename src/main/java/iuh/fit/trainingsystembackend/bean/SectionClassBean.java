@@ -1,6 +1,8 @@
 package iuh.fit.trainingsystembackend.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import iuh.fit.trainingsystembackend.enums.DayInWeek;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.Result;
 import lombok.Data;
 
@@ -17,7 +19,11 @@ public class SectionClassBean {
     private Integer periodTo;
     private Integer periodFrom;
     private Integer numberOfStudents;
+    private SectionClassType sectionClassType;
     private String note;
+    private String startedAt;
+    private DayInWeek dayInWeek;
     // Result
+    private Long studentId;
     private List<Result> results = new ArrayList<>();
 }

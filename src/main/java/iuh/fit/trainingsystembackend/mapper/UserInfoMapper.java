@@ -43,11 +43,9 @@ public class UserInfoMapper {
             if (student != null) {
                 specialization = specializationRepository.findById(student.getSpecializationId()).orElse(null);
 
-                if (student.getSpecializationClassId() != null) {
-                    specializationClass = specializationClassRepository.findById(student.getSpecializationClassId()).orElse(null);
+                if(student.getSpecializationClassId() != null){
+                    specializationClass =  specializationClassRepository.findById(student.getSpecializationClassId()).orElse(null);
                 }
-
-                academicYear = academicYearRepository.findById(student.getAcademicYearId()).orElse(null);
             }
         }
 
@@ -91,7 +89,7 @@ public class UserInfoMapper {
                 .specializationId(specialization != null ? specialization.getId() : null)
                 .specializationName(specialization != null ? specialization.getName() : "")
                 .specializationClassName(specializationClass != null ? specializationClass.getName() : "")
-                .academicYearName(academicYear != null ? academicYear.getName() : "")
+                .schoolYear(student != null ? student.getSchoolYear() : "")
                 // Lecturer
                 .titleValue(lecturer != null ? lecturer.getTitle().getValue() : "")
                 .title(lecturer != null ? lecturer.getTitle() : null)

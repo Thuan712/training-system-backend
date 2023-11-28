@@ -79,7 +79,7 @@ public class CourseController {
         }
 
         toSave.setRequireCourseString(new Gson().toJson(data.getRequireCourse()));
-
+        toSave.setCourseType(data.getCourseType());
         toSave = courseRepository.saveAndFlush(toSave);
 
         if(toSave.getId() == null){

@@ -20,7 +20,7 @@ public class StudentSpecification extends BaseSpecification<Student, StudentRequ
                 Specification.where(attributeEqual("specializationClassId", request.getSpecializationClassId()))
                         .and(attributeEqual("userId", request.getUserId()))
                         .and(attributeSectionClassIdEqual(request.getSectionClassId()))
-                        .and(attributeEqual("academicYearId", request.getAcademicYearId()))
+                        .and(attributeContains("schoolYear", request.getSchoolYear()))
                         .and(attributeEqual("typeOfEducation", request.getTypeOfEducation()))
                         .and(attributeEqual("specializationId", request.getSpecializationId()))
                         .toPredicate(root, criteriaQuery, criteriaBuilder);

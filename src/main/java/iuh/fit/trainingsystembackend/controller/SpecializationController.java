@@ -1,8 +1,10 @@
 package iuh.fit.trainingsystembackend.controller;
 
+import iuh.fit.trainingsystembackend.dto.SpecializationClassDTO;
 import iuh.fit.trainingsystembackend.dto.SpecializationDTO;
 import iuh.fit.trainingsystembackend.enums.TypeOfEducation;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.SpecializationClassMapper;
 import iuh.fit.trainingsystembackend.mapper.SpecializationMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
@@ -42,6 +44,7 @@ public class SpecializationController {
     private StudentSpecification studentSpecification;
     private SpecializationClassSpecification specializationClassSpecification;
     private SpecializationMapper specializationMapper;
+    private SpecializationClassMapper specializationClassMapper;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSpecialization(@RequestParam(name = "userId", required = false) Long userId, @RequestBody Specialization data) {
         Specialization toSave = null;
@@ -123,6 +126,7 @@ public class SpecializationController {
             throw new ValidationException("Specialization is not found !");
         }
 
+        toSave.setSchoolYear(data.getSchoolYear());
         toSave.setSpecializationId(specialization.getId());
         toSave.setName(data.getName());
 
@@ -142,24 +146,21 @@ public class SpecializationController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody SpecializationClassRequest filterRequest) {
         Page<SpecializationClass> specializationClasses = specializationClassRepository.findAll(specializationClassSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(specializationClasses);
+        Page<SpecializationClassDTO> page = specializationClassMapper.mapToDTO(specializationClasses);
+        return ResponseEntity.ok(page);
     }
 
     @PostMapping("/class/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SpecializationClassRequest filterRequest) {
         List<SpecializationClass> specializationClasses = specializationClassRepository.findAll(specializationClassSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(specializationClasses);
+        List<SpecializationClassDTO> specializationClassDTOS = specializationClassMapper.mapToDTO(specializationClasses);
+
+        return ResponseEntity.ok(specializationClassDTOS);
     }
 
     // Create Class and Separate Student in
     @GetMapping("/class/separateStudents")
     public ResponseEntity<?> separateStudentsByClass(@RequestParam(name = "schoolYear") String schoolYear) {
-
-        AcademicYear academicYear = academicYearRepository.findAcademicYearByName(schoolYear);
-
-        if (academicYear == null) {
-            throw new ValidationException("Academic Year is not found !");
-        }
 
         try {
             ExecutorService executor = Executors.newFixedThreadPool(5);
@@ -171,17 +172,16 @@ public class SpecializationController {
 
                     for (Specialization specialization : specializations) {
                         SpecializationClassRequest specializationClassRequest = new SpecializationClassRequest();
-                        specializationClassRequest.setAcademicYearId(academicYear.getId());
                         specializationClassRequest.setSpecializationId(specialization.getId());
-
+                        specializationClassRequest.setSchoolYear(schoolYear);
                         // Số lớp của chuyên ngành đó trong niên khoá
                         int countSpecializationClasses = specializationClassRepository.findAll(specializationClassSpecification.getFilter(specializationClassRequest)).size();
 
                         //#region Separate For University (General)
                         StudentRequest studentGeneralRequest = new StudentRequest();
-                        studentGeneralRequest.setAcademicYearId(academicYear.getId());
                         studentGeneralRequest.setSpecializationId(specialization.getId());
                         studentGeneralRequest.setTypeOfEducation(TypeOfEducation.general_program);
+                        studentGeneralRequest.setSchoolYear(schoolYear);
                         // Tìm sinh viên thuộc chuyên ngành chưa có lớp và thuộc niên khoá (Hệ đại trà)
                         List<Student> studentGeneralList = studentRepository.findAll(studentSpecification.getFilter(studentGeneralRequest)).stream().filter(student -> student.getSpecializationClassId() == null).collect(Collectors.toList());
 
@@ -195,12 +195,11 @@ public class SpecializationController {
                                         SpecializationClass specializationClass = new SpecializationClass();
                                         temp += countSpecializationClasses < 1 ? 0 : countSpecializationClasses;
                                         char key = (char) (temp + 66);
-                                        String endYear = academicYear.getName().substring(2, 4);
+                                        String endYear = schoolYear;
                                         String nameGenerate = "DH" + specialization.getCode() + endYear + key;
 
                                         specializationClass.setName(nameGenerate);
                                         specializationClass.setSpecializationId(specialization.getId());
-                                        specializationClass.setAcademicYearId(academicYear.getId());
 
                                         specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
@@ -233,12 +232,11 @@ public class SpecializationController {
                                     SpecializationClass specializationClass = new SpecializationClass();
                                     temp += countSpecializationClasses < 1 ? 0 : countSpecializationClasses;
                                     char key = (char) (temp + 66);
-                                    String endYear = academicYear.getName().substring(2, 4);
+                                    String endYear = schoolYear;
                                     String nameGenerate = "DH" + specialization.getCode() + endYear + key;
 
                                     specializationClass.setName(nameGenerate);
                                     specializationClass.setSpecializationId(specialization.getId());
-                                    specializationClass.setAcademicYearId(academicYear.getId());
 
                                     specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
@@ -261,6 +259,22 @@ public class SpecializationController {
                                 } else {
                                     // Tìm lớp cuối cùng để add hết sv vào
                                     SpecializationClass specializationClass = specializationClassRepository.findFirstByOrderBySpecializationIdDesc();
+                                    if(specializationClass == null){
+                                        specializationClass = new SpecializationClass();
+                                        temp += countSpecializationClasses < 1 ? 0 : countSpecializationClasses;
+                                        char key = (char) (temp + 66);
+                                        String endYear = schoolYear;
+                                        String nameGenerate = "DH" + specialization.getCode() + endYear + key;
+
+                                        specializationClass.setName(nameGenerate);
+                                        specializationClass.setSpecializationId(specialization.getId());
+
+                                        specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
+
+                                        if (specializationClass.getId() == null) {
+                                            throw new ValidationException("Create Specialization Class fail !");
+                                        }
+                                    }
 
                                     for (int j = (studentGeneralList.size() - flag); j < studentGeneralList.size(); j++) {
                                         Student student = studentGeneralList.get(j);
@@ -281,7 +295,6 @@ public class SpecializationController {
 
                         //#region Separate For University (High Quality)
                         StudentRequest studentHighQualityRequest = new StudentRequest();
-                        studentHighQualityRequest.setAcademicYearId(academicYear.getId());
                         studentHighQualityRequest.setSpecializationId(specialization.getId());
                         studentHighQualityRequest.setTypeOfEducation(TypeOfEducation.high_quality_program);
                         // Tìm sinh viên thuộc chuyên ngành chưa có lớp và thuộc niên khoá (Hệ chất lượng cao)
@@ -297,12 +310,11 @@ public class SpecializationController {
                                         SpecializationClass specializationClass = new SpecializationClass();
                                         temp += countSpecializationClasses < 1 ? 0 : countSpecializationClasses;
                                         char key = (char) (temp + 66);
-                                        String endYear = academicYear.getName().substring(2, 4);
+                                        String endYear = schoolYear;
                                         String nameGenerate = "DH" + specialization.getCode() + endYear + key + "CLC";
 
                                         specializationClass.setName(nameGenerate);
                                         specializationClass.setSpecializationId(specialization.getId());
-                                        specializationClass.setAcademicYearId(academicYear.getId());
 
                                         specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
@@ -335,12 +347,11 @@ public class SpecializationController {
                                     SpecializationClass specializationClass = new SpecializationClass();
                                     temp += countSpecializationClasses < 1 ? 0 : countSpecializationClasses;
                                     char key = (char) (temp + 66);
-                                    String endYear = academicYear.getName().substring(2, 4);
+                                    String endYear = schoolYear;
                                     String nameGenerate = "DH" + specialization.getCode() + endYear + key + "CLC";
 
                                     specializationClass.setName(nameGenerate);
                                     specializationClass.setSpecializationId(specialization.getId());
-                                    specializationClass.setAcademicYearId(academicYear.getId());
 
                                     specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
@@ -364,8 +375,25 @@ public class SpecializationController {
                                     // Tìm lớp cuối cùng để add hết sv vào
                                     SpecializationClass specializationClass = specializationClassRepository.findFirstByOrderBySpecializationIdDesc();
 
-                                    for (int j = (studentGeneralList.size() - flag); j < studentGeneralList.size(); j++) {
-                                        Student student = studentGeneralList.get(j);
+                                    if(specializationClass == null){
+                                        specializationClass = new SpecializationClass();
+                                        temp += countSpecializationClasses < 1 ? 0 : countSpecializationClasses;
+                                        char key = (char) (temp + 66);
+                                        String endYear = schoolYear;
+                                        String nameGenerate = "DH" + specialization.getCode() + endYear + key + "CLC";
+
+                                        specializationClass.setName(nameGenerate);
+                                        specializationClass.setSpecializationId(specialization.getId());
+
+                                        specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
+
+                                        if (specializationClass.getId() == null) {
+                                            throw new ValidationException("Create Specialization Class fail !");
+                                        }
+                                    }
+
+                                    for (int j = (studentHighQualityList.size() - flag); j < studentHighQualityList.size(); j++) {
+                                        Student student = studentHighQualityList.get(j);
                                         student.setSpecializationClassId(specializationClass.getId());
 
                                         student = studentRepository.saveAndFlush(student);

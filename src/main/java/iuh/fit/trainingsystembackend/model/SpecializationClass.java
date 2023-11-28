@@ -24,8 +24,8 @@ public class SpecializationClass implements Serializable {
     @Column(name = "specialization_id")
     private Long specializationId;
 
-    @Column(name = "academic_year_id")
-    private Long academicYearId;
+    @Column(name = "school_year")
+    private String schoolYear;
 
     @Column(name = "name")
     private String name;

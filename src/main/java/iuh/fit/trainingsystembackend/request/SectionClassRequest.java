@@ -8,9 +8,7 @@ import lombok.Data;
 public class SectionClassRequest {
     private Long studentId;
     private Long lecturerId;
-
     private Long sectionId;
-
     private String classCode;
 
     private String room;

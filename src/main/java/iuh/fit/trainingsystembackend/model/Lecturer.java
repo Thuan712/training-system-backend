@@ -35,6 +35,7 @@ public class Lecturer implements Serializable {
     private Title title = Title.unknown;
 
     @Column(name = "position")
+    @Enumerated(EnumType.STRING)
     private Position position = Position.teacher;
 
     @Column(name = "entry_date")

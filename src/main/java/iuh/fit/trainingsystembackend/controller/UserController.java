@@ -181,34 +181,22 @@ public class UserController {
                     throw new ValidationException("Create lecturer fail");
                 }
             } else if (toSave.getSystemRole().equals(SystemRole.student)) {
-                if(data.getSpecializationClassId() == null){
-                    throw new ValidationException("Specialization Class ID is required !!");
-                }
-
-                SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
-
-                if(specializationClass == null){
-                    throw new ValidationException("Specialization Class is not found !");
-                }
-
                 Student student = new Student();
                 student.setSpecializationId(specialization.getId());
-                student.setSpecializationClassId(specializationClass.getId());
                 student.setTypeOfEducation(data.getTypeOfEducation());
                 student.setUserId(toSave.getId());
 
-                if(data.getAcademicYearId() == null){
-                    throw new ValidationException("School Year is required !");
+                if(data.getSpecializationClassId() != null){
+                    SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
+
+                    if(specializationClass == null){
+                        throw new ValidationException("Specialization Class is not found !");
+                    }
+                    student.setSpecializationClassId(specializationClass.getId());
                 }
-
-                AcademicYear academicYear = academicYearRepository.findById(data.getAcademicYearId()).orElse(null);
-
-                if(academicYear == null){
-                    throw new ValidationException("School Year is not found !");
-                }
-
-                student.setAcademicYearId(academicYear.getId());
-
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
+                String year = simpleDateFormat.format(student.getEntryDate());
+                student.setSchoolYear(year);
                 student = studentRepository.saveAndFlush(student);
 
                 if (student.getId() == null) {

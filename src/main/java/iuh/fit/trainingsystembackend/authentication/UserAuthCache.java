@@ -30,7 +30,7 @@ public class UserAuthCache implements Serializable {
 
     //#region Menu Items
     private SystemRole userRole;
-    private String menuItems;
+    private Long refId;
     //#endregion
 
 }

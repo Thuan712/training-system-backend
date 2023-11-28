@@ -2,8 +2,11 @@ package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
+import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.SectionClassMapper;
 import iuh.fit.trainingsystembackend.mapper.SectionMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
@@ -11,11 +14,9 @@ import iuh.fit.trainingsystembackend.request.SectionClassRequest;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
 import iuh.fit.trainingsystembackend.specification.SectionClassSpecification;
 import iuh.fit.trainingsystembackend.specification.SectionSpecification;
-import iuh.fit.trainingsystembackend.token.RefreshToken;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,10 +24,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,6 +54,7 @@ public class SectionController {
     private StudentRepository studentRepository;
     private ScheduleRepository scheduleRepository;
     private SectionMapper sectionMapper;
+    private SectionClassMapper sectionClassMapper;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -138,11 +142,12 @@ public class SectionController {
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SectionRequest filterRequest) {
         List<Section> sections = sectionRepository.findAll(sectionSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(sections);
+        List<SectionDTO> sectionDTOS = sectionMapper.mapToDTO(sections);
+        return ResponseEntity.ok(sectionDTOS);
     }
 
     @PostMapping("/class/createOrUpdate")
-    public ResponseEntity<?> createOrUpdateSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) {
+    public ResponseEntity<?> createOrUpdateSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) throws ParseException {
         SectionClass toSave = null;
 
         if (data.getId() != null) {
@@ -165,6 +170,8 @@ public class SectionController {
             if (section == null) {
                 throw new ValidationException("Section is not found !");
             }
+
+            toSave.setSectionId(section.getId());
 
             String classCode = "";
             boolean isExist = true;
@@ -207,6 +214,16 @@ public class SectionController {
 
         toSave.setRoom(data.getRoom());
         toSave.setNote(data.getNote());
+        toSave.setSectionClassType(data.getSectionClassType());
+        toSave.setNumberOfStudents(data.getNumberOfStudents());
+        toSave.setDayInWeek(data.getDayInWeek());
+
+        String inputModified = data.getStartedAt().replace("T", " ");
+
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSX");
+        LocalDateTime result = LocalDateTime.parse(inputModified, format);
+        Date out = Date.from(result.atZone(ZoneId.systemDefault()).toInstant());
+        toSave.setStartedAt(out);
 
         toSave = sectionClassRepository.saveAndFlush(toSave);
 
@@ -224,39 +241,30 @@ public class SectionController {
                                                  @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                                  @RequestBody SectionClassRequest filterRequest) {
         Page<SectionClass> sectionClasses = sectionClassRepository.findAll(sectionClassSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-
-        return ResponseEntity.ok(sectionClasses);
+        Page<SectionClassDTO> page = sectionClassMapper.mapToDTO(sectionClasses);
+        return ResponseEntity.ok(page);
     }
 
     @PostMapping("/class/getList")
     public ResponseEntity<?> getSectionClassList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SectionClassRequest filterRequest) {
         List<SectionClass> sectionClasses = sectionClassRepository.findAll(sectionClassSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(sectionClasses);
+        List<SectionClassDTO> sectionClassDTOS = sectionClassMapper.mapToDTO(sectionClasses);
+        return ResponseEntity.ok(sectionClassDTOS);
     }
 
     @PostMapping("/class/registerSection")
-    public ResponseEntity<?> registerSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody List<StudentSectionClass> data) {
-        List<StudentSectionClass> sectionClasses = new ArrayList<>();
-        if (!data.isEmpty()) {
-            for (StudentSectionClass studentSectionClass : data) {
-                StudentSectionClass toSave = null;
-                if (studentSectionClass.getId() != null) {
-                    toSave = studentSectionClassRepository.findById(studentSectionClass.getId()).orElse(null);
+    public ResponseEntity<?> registerSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) {
 
-                    if (toSave == null) {
-                        throw new ValidationException("Student in Section Class is not found !!");
-                    }
-                }
+        List<SectionClass> sectionClasses = sectionClassRepository.findSectionClassBySectionIdAndLecturerId(data.getSectionId(), data.getLecturerId());
+        if(!sectionClasses.isEmpty()){
+            for(SectionClass sectionClass : sectionClasses){
+                StudentSectionClass toSave =new StudentSectionClass();
 
-                if (toSave == null) {
-                    toSave = new StudentSectionClass();
-                }
-
-                if (studentSectionClass.getStudentId() == null) {
+                if (data.getStudentId() == null) {
                     throw new ValidationException("Student ID is required !");
                 }
 
-                Student student = studentRepository.findById(studentSectionClass.getStudentId()).orElse(null);
+                Student student = studentRepository.findById(data.getStudentId()).orElse(null);
 
                 if (student == null) {
                     throw new ValidationException("Student is not found !!");
@@ -264,15 +272,6 @@ public class SectionController {
 
                 toSave.setStudentId(student.getId());
 
-                if (studentSectionClass.getSectionClassId() == null) {
-                    throw new ValidationException("Section Class ID is required !!");
-                }
-
-                SectionClass sectionClass = sectionClassRepository.findById(studentSectionClass.getSectionClassId()).orElse(null);
-
-                if (sectionClass == null) {
-                    throw new ValidationException("Section Class is not found !!");
-                }
 
                 int studentsInClass = studentSectionClassRepository.countAllBySectionClassId(sectionClass.getId());
                 if (studentsInClass >= sectionClass.getNumberOfStudents()) {
@@ -289,22 +288,45 @@ public class SectionController {
 
                 try {
                     ExecutorService executor = Executors.newFixedThreadPool(1);
+                    StudentSectionClass finalToSave = toSave;
                     FutureTask<String> futureTasks = new FutureTask<>(new Runnable() {
                         @Override
                         public void run() {
-                            for (int i = 0; i < sectionClass.getSection().getTheoryPeriods() /3; i++){
-                                Schedule schedule = new Schedule();
-                                schedule.setSectionClassId(sectionClass.getId());
-                                Date date = sectionClass.getStartedAt();
-                                Instant instantDateLearn = Instant.ofEpochMilli(date.getTime());
-                                schedule.setLearningDate(Date.from(Instant.from(LocalDateTime.ofInstant(instantDateLearn, ZoneId.systemDefault()).toLocalDate().plusDays(i * 7L))));
+                            if(sectionClass.getSectionClassType().equals(SectionClassType.theory)){
+                                for (int i = 0; i < sectionClass.getSection().getTheoryPeriods() * 15; i++) {
+                                    Schedule schedule = new Schedule();
+                                    schedule.setSectionClassId(sectionClass.getId());
+                                    Date date = sectionClass.getStartedAt();
+                                    Instant instantDateLearn = Instant.ofEpochMilli(date.getTime());
+                                    schedule.setLearningDate(Date.from(Instant.from(LocalDateTime.ofInstant(instantDateLearn, ZoneId.systemDefault()).toLocalDate().plusDays(i * 7L))));
+                                    schedule.setStudentSectionClassId(finalToSave.getId());
 
-                                schedule = scheduleRepository.saveAndFlush(schedule);
+                                    schedule = scheduleRepository.saveAndFlush(schedule);
 
-                                if(schedule.getId() == null){
-                                    throw new ValidationException("Create Schedule failed !!");
+                                    if (schedule.getId() == null) {
+                                        throw new ValidationException("Create Schedule failed !!");
+                                    }
+
                                 }
+                            } else {
+                                for (int i = 0; i < sectionClass.getSection().getPracticePeriods() * 30; i++) {
+                                    Schedule schedule = new Schedule();
+                                    schedule.setSectionClassId(sectionClass.getId());
+                                    Date date = sectionClass.getStartedAt();
+                                    Instant instantDateLearn = Instant.ofEpochMilli(date.getTime());
+                                    LocalDate localDate = LocalDateTime.ofInstant(instantDateLearn, ZoneId.systemDefault()).toLocalDate().plusDays(i * 7);
+                                    schedule.setLearningDate(Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                                    schedule.setStudentSectionClassId(finalToSave.getId());
+                                    schedule = scheduleRepository.saveAndFlush(schedule);
+
+                                    if (schedule.getId() == null) {
+                                        throw new ValidationException("Create Schedule failed !!");
+                                    }
+
+                                }
+
                             }
+
                         }
                     }, "Done");
 
@@ -313,10 +335,10 @@ public class SectionController {
                     System.out.println("Fail to create schedule !!");
                 }
 
-                sectionClasses.add(toSave);
             }
         }
 
-        return ResponseEntity.ok(sectionClasses);
+
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

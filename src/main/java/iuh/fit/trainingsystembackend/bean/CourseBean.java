@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import iuh.fit.trainingsystembackend.enums.CourseType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,7 +14,7 @@ public class CourseBean implements Serializable {
     private String name;
     private String code;
     private Integer credit;
-
+    private CourseType courseType;
     private List<Long> requireCourse;
     private Boolean deleted = false;
 }

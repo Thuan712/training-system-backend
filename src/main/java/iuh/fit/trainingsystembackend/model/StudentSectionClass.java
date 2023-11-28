@@ -28,6 +28,4 @@ public class StudentSectionClass implements Serializable {
     @Column(name = "section_class_id")
     private Long sectionClassId;
 
-    @Column(name = "schedule_id")
-    private Long scheduleId;
 }

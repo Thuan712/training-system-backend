@@ -1,7 +1,6 @@
 package iuh.fit.trainingsystembackend.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import iuh.fit.trainingsystembackend.enums.TrainingLevel;
 import iuh.fit.trainingsystembackend.enums.TypeOfEducation;
 import lombok.Data;
 
@@ -12,6 +11,6 @@ public class StudentRequest {
     private Long sectionClassId;
     private Long specializationClassId;
     private Long specializationId;
-    private Long academicYearId;
+    private String schoolYear;
     private TypeOfEducation typeOfEducation;
 }

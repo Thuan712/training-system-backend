@@ -34,6 +34,15 @@ public class Schedule {
     @JsonIgnore
     private SectionClass sectionClass;
 
+    @Column(name = "student_section_class_id")
+    private Long studentSectionClassId;
+
+    @ManyToOne
+    @JoinFormula(value = "student_section_class_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private StudentSectionClass studentSectionClass;
+
     @Column(name = "learning_date")
     private Date learningDate;
 }

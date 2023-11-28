@@ -8,5 +8,5 @@ import lombok.Data;
 public class SpecializationClassRequest {
     private String name;
     private Long specializationId;
-    private Long academicYearId;
+    private String schoolYear;
 }

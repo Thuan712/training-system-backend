@@ -4,7 +4,11 @@ package iuh.fit.trainingsystembackend.authentication;
 import iuh.fit.trainingsystembackend.config.JwtToken;
 import iuh.fit.trainingsystembackend.enums.SystemRole;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.model.Lecturer;
+import iuh.fit.trainingsystembackend.model.Student;
 import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.repository.LecturerRepository;
+import iuh.fit.trainingsystembackend.repository.StudentRepository;
 import iuh.fit.trainingsystembackend.token.JwtUserDetailsService;
 import iuh.fit.trainingsystembackend.token.RefreshToken;
 import iuh.fit.trainingsystembackend.token.RefreshTokenResponse;
@@ -25,7 +29,8 @@ public class AuthService {
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
     private RefreshTokenService refreshTokenService;
-
+private StudentRepository studentRepository;
+private LecturerRepository lecturerRepository;
     private UserCacheService userCacheService;
 
 
@@ -43,8 +48,6 @@ public class AuthService {
             String sessionId = UUID.randomUUID().toString();
 
             try {
-                // Get user location
-
 
                 // Get user agent
                 String userAgent = request.getHeader("User-Agent");
@@ -65,9 +68,22 @@ public class AuthService {
                 if (userEntity.getSystemRole().equals(SystemRole.admin)) {
                     existingCachedData.setUserRole(SystemRole.admin);
                 } else if (userEntity.getSystemRole().equals(SystemRole.lecturer)) {
-                    existingCachedData.setUserRole(SystemRole.student);
+                    existingCachedData.setUserRole(SystemRole.lecturer);
+
+                    Lecturer lecturer = lecturerRepository.getLecturersByUserId(userEntity.getId());
+
+                    if(lecturer != null){
+                        existingCachedData.setRefId(lecturer.getId());
+                    }
+
                 } else if (userEntity.getSystemRole().equals(SystemRole.student)) {
                     existingCachedData.setUserRole(SystemRole.student);
+
+                    Student student = studentRepository.getStudentByUserId(userEntity.getId());
+
+                    if(student != null){
+                        existingCachedData.setRefId(student.getId());
+                    }
                 }
 
                 userCacheService.setUserAuthCache(userEntity.getUsername(), existingCachedData);
@@ -103,8 +119,20 @@ public class AuthService {
                 returnedData.put("userRole", "Admin");
             } else if (userEntity.getSystemRole().equals(SystemRole.lecturer)) {
                 returnedData.put("userRole", "Lecturer");
+
+                Lecturer lecturer = lecturerRepository.getLecturersByUserId(userEntity.getId());
+
+                if(lecturer != null){
+                    returnedData.put("refId", lecturer.getId());
+                }
             } else if (userEntity.getSystemRole().equals(SystemRole.student)) {
                 returnedData.put("userRole", "Student");
+
+                Student student = studentRepository.getStudentByUserId(userEntity.getId());
+
+                if(student != null){
+                    returnedData.put("refId", student.getId());
+                }
             }
             //#endregion
         }

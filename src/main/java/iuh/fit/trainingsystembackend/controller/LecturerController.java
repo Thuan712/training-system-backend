@@ -1,5 +1,7 @@
 package iuh.fit.trainingsystembackend.controller;
 
+import iuh.fit.trainingsystembackend.dto.LecturerDTO;
+import iuh.fit.trainingsystembackend.mapper.LecturerMapper;
 import iuh.fit.trainingsystembackend.model.Lecturer;
 import iuh.fit.trainingsystembackend.repository.LecturerRepository;
 import iuh.fit.trainingsystembackend.request.LecturerRequest;
@@ -20,7 +22,7 @@ import java.util.List;
 public class LecturerController {
     private LecturerRepository lecturerRepository;
     private LecturerSpecification lecturerSpecification;
-
+private LecturerMapper lecturerMapper;
     @PostMapping("/getPage")
     public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
                                      @RequestParam("pageNumber") int pageNumber, @RequestParam("pageRows") int pageRows,
@@ -28,12 +30,16 @@ public class LecturerController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody LecturerRequest filterRequest){
         Page<Lecturer> lecturers = lecturerRepository.findAll(lecturerSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(lecturers);
+
+        Page<LecturerDTO> page = lecturerMapper.mapToDTO(lecturers);
+        return ResponseEntity.ok(page);
     }
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody LecturerRequest filterRequest) {
         List<Lecturer> lecturers = lecturerRepository.findAll(lecturerSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(lecturers);
+
+        List<LecturerDTO> lecturerDTOS = lecturerMapper.mapToDTO(lecturers);
+        return ResponseEntity.ok(lecturerDTOS);
     }
 }

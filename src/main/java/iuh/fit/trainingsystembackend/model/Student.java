@@ -33,8 +33,8 @@ public class Student implements Serializable {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "academic_year_id")
-    private Long academicYearId;
+    @Column(name = "school_year")
+    private String schoolYear;
 
     @Column(name = "type_of_education")
     @Enumerated(EnumType.STRING)

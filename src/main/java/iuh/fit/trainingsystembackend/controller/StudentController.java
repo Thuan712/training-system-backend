@@ -1,8 +1,10 @@
 package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.bean.UserBean;
+import iuh.fit.trainingsystembackend.dto.StudentDTO;
 import iuh.fit.trainingsystembackend.enums.SystemRole;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.StudentMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.StudentRepository;
 import iuh.fit.trainingsystembackend.request.StudentRequest;
@@ -24,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -31,6 +35,7 @@ import java.util.List;
 public class StudentController {
     private StudentRepository studentRepository;
     private StudentSpecification studentSpecification;
+    private StudentMapper studentMapper;
     @PostMapping("/getPage")
     public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
                                      @RequestParam("pageNumber") int pageNumber, @RequestParam("pageRows") int pageRows,
@@ -38,13 +43,19 @@ public class StudentController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody StudentRequest filterRequest){
         Page<Student> students = studentRepository.findAll(studentSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(students);
+        Page<StudentDTO> page = studentMapper.mapToDTO(students);
+        return ResponseEntity.ok(page);
     }
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody StudentRequest filterRequest) {
         List<Student> students = studentRepository.findAll(studentSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(students);
+        List<StudentDTO> studentDTOS = studentMapper.mapToDTO(students);
+        return ResponseEntity.ok(studentDTOS);
     }
-
+    @GetMapping("/getListSchoolYear")
+    public ResponseEntity<?> getListSchoolYear(@RequestParam(value = "userId", required = false) Long userId) {
+        Set<String> schoolYears = studentRepository.findAll().stream().map(Student::getSchoolYear).collect(Collectors.toSet());
+        return ResponseEntity.ok(schoolYears);
+    }
 }

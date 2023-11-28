@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -26,6 +27,8 @@ public class SectionDTO {
     private String courseName;
 
     private String courseCode;
+    private Integer credit;
+    private List<Long> requireCourse;
 
     private Long termId;
 

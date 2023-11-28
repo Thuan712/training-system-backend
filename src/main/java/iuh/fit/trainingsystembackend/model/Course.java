@@ -3,6 +3,7 @@ package iuh.fit.trainingsystembackend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import iuh.fit.trainingsystembackend.enums.CourseType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,10 @@ public class Course implements Serializable {
 
     @Column(name = "credit")
     private int credit;
+
+    @Column(name = "course_type")
+    @Enumerated(EnumType.STRING)
+    private CourseType courseType;
 
     @Column(name = "require_course")
     @JsonIgnore

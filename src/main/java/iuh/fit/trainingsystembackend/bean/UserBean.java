@@ -44,7 +44,6 @@ public class UserBean extends AddressBean implements Serializable {
     //#region Student
     private Long specializationClassId;
     private TypeOfEducation typeOfEducation = TypeOfEducation.general_program;
-    private Long academicYearId;
     //#endregion
 
     //#region Lecturer
@@ -54,4 +53,6 @@ public class UserBean extends AddressBean implements Serializable {
 
     private Position position = Position.teacher;
     //#endregion
+
+    private Date entryDate = new Date();
 }

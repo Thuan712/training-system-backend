@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
+import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -65,6 +66,10 @@ public class SectionClass implements Serializable {
     @Column(name = "section_class_type")
     @Enumerated(EnumType.STRING)
     private SectionClassType sectionClassType;
+
+    @Column(name = "section_class_status")
+    @Enumerated(EnumType.STRING)
+    private SectionClassStatus sectionClassStatus;
 
     @Column(name = "started_at")
     private Date startedAt;

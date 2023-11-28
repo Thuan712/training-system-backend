@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AcademicYearRepository extends JpaRepository<AcademicYear, Long> {
     AcademicYear findAcademicYearByName(String name);
+    AcademicYear findDistinctByNameContains(String schoolYear);
 }
