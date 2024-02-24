@@ -3,10 +3,12 @@ package iuh.fit.trainingsystembackend.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Table(name = "term")
@@ -26,4 +28,10 @@ public class Term implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "term_start")
+    private Date termStart;
+
+    @Column(name = "term_end")
+    private Date termEnd;
 }

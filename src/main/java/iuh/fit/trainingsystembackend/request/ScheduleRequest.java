@@ -9,5 +9,6 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ScheduleRequest {
     private Long sectionClassId;
+    private Long studentSectionClassId;
     private Date learningDate;
 }

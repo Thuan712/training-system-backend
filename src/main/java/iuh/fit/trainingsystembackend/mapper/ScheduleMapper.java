@@ -26,8 +26,17 @@ public class ScheduleMapper {
         Section section = null;
         Lecturer lecturer = null;
         UserEntity userEntity = null;
+        String date = "";
         if (schedule.getSectionClass() != null) {
             section = schedule.getSectionClass().getSection();
+
+            if(schedule.getSectionClass().getPeriodTo() >= 1 &&  schedule.getSectionClass().getPeriodTo() <= 3 || schedule.getSectionClass().getPeriodTo() >= 4 &&  schedule.getSectionClass().getPeriodTo() <= 6){
+                date = "morning";
+            } else if(schedule.getSectionClass().getPeriodTo() >= 7 &&  schedule.getSectionClass().getPeriodTo() <= 9 || schedule.getSectionClass().getPeriodTo() >= 10 &&  schedule.getSectionClass().getPeriodTo() <= 12){
+                date = "afternoon";
+            } else {
+                date = "evening";
+            }
 
             if (schedule.getSectionClass().getLecturerId() != null) {
                 lecturer = lecturerRepository.findById(schedule.getSectionClass().getLecturerId()).orElse(null);
@@ -37,6 +46,9 @@ public class ScheduleMapper {
                 }
             }
         }
+
+
+
 
         return ScheduleDTO.builder()
                 .id(schedule.getId())
@@ -56,6 +68,7 @@ public class ScheduleMapper {
                 .sectionClassType(schedule.getSectionClass() != null ? schedule.getSectionClass().getSectionClassType().name() : "")
                 .startedAt(schedule.getSectionClass() != null ? schedule.getSectionClass().getStartedAt() : null)
                 .learningDate(schedule.getLearningDate())
+                .dateTime(date)
                 .build();
     }
 

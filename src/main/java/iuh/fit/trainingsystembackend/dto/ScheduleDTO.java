@@ -54,5 +54,5 @@ public class ScheduleDTO {
     private String sectionClassType;
 
     private Date startedAt;
-
+    private String dateTime;
 }

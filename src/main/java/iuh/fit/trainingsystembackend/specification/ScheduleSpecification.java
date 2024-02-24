@@ -14,6 +14,7 @@ public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleR
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("sectionClassId", request.getSectionClassId()))
                         .and(attributeEqual("learningDate", request.getLearningDate()))
+                        .and(attributeEqual("studentSectionClassId", request.getStudentSectionClassId()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 
