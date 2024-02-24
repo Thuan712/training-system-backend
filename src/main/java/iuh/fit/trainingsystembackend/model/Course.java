@@ -66,7 +66,7 @@ public class Course implements Serializable {
     @Column(name = "deleted_at")
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
-    private Date deletedAt = new Date();
+    private Date deletedAt;
 
     @Column(name = "deleted")
     private Boolean deleted = false;

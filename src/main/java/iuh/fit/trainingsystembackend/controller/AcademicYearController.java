@@ -49,8 +49,8 @@ public class AcademicYearController {
                 throw new ValidationException("Academic Year Name is required !!");
             }
 
-            if(!data.getName().matches("^[0-9]{4} - [0-9]{4}$")){
-                throw new ValidationException("Academic Year Name is invalid !! Should be XXXX - XXXX");
+            if(!data.getName().matches("^[0-9]{4}-[0-9]{4}$")){
+                throw new ValidationException("Academic Year Name is invalid !! Should be XXXX-XXXX");
             }
 
 
@@ -105,6 +105,19 @@ public class AcademicYearController {
                                      @RequestBody AcademicYear filterRequest) {
         Page<AcademicYear> academicYearPage = academicYearRepository.findAll(PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
         return ResponseEntity.ok(academicYearPage);
+    }
+
+    @DeleteMapping("/deleteById")
+    public ResponseEntity<?> deleteById(@RequestParam(value = "userId", required = false) Long userId,
+                                        @RequestParam(value = "id") Long id){
+
+        try {
+            academicYearRepository.deleteById(id);
+        } catch (Exception exception){
+            throw new ValidationException("Academic Year is not found !!");
+        }
+
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 }

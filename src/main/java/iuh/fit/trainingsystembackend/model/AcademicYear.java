@@ -7,6 +7,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Table(name = "academic_year")
@@ -22,4 +23,10 @@ public class AcademicYear implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "delete")
+    private boolean delete = false;
+
+    @Column(name = "deleted_at")
+    private Date deletedAt;
 }
