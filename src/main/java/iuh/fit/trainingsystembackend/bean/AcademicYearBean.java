@@ -13,17 +13,17 @@ public class AcademicYearBean {
 
     private Long firstTermId;
     private String firstTermName;
-    private String firstTermStart;
-    private String firstTermEnd;
+    private Date firstTermStart;
+    private Date firstTermEnd;
 
     private Long secondTermId;
     private String secondTermName;
-    private String secondTermStart;
-    private String secondTermEnd;
+    private Date secondTermStart;
+    private Date secondTermEnd;
 
     private Long thirdTermId;
     private String thirdTermName;
-    private String thirdTermStart;
-    private String thirdTermEnd;
+    private Date thirdTermStart;
+    private Date thirdTermEnd;
 
 }

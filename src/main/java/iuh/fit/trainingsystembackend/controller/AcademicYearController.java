@@ -113,8 +113,8 @@ public class AcademicYearController {
         firstTerm.setName(data.getFirstTermName());
 
         try {
-            firstTerm.setTermStart(format.parse(data.getFirstTermStart()));
-            firstTerm.setTermEnd(format.parse(data.getFirstTermEnd()));
+            firstTerm.setTermStart(data.getFirstTermStart());
+            firstTerm.setTermEnd(data.getFirstTermEnd());
         } catch (Exception exception){
             System.out.println("Parsed Date fail !!");
         }
@@ -140,8 +140,8 @@ public class AcademicYearController {
         secondTerm.setName(data.getFirstTermName());
 
         try {
-            secondTerm.setTermStart(format.parse(data.getSecondTermStart()));
-            secondTerm.setTermEnd(format.parse(data.getSecondTermEnd()));
+            secondTerm.setTermStart(data.getSecondTermStart());
+            secondTerm.setTermEnd(data.getSecondTermEnd());
         } catch (Exception exception){
             System.out.println("Parsed Date fail !!");
         }
@@ -167,8 +167,8 @@ public class AcademicYearController {
         thirdTerm.setAcademicYearId(toSave.getId());
         thirdTerm.setName(data.getFirstTermName());
         try {
-            thirdTerm.setTermStart(format.parse(data.getThirdTermStart()));
-            thirdTerm.setTermEnd(format.parse(data.getThirdTermEnd()));
+            thirdTerm.setTermStart(data.getThirdTermStart());
+            thirdTerm.setTermEnd(data.getThirdTermEnd());
         } catch (Exception exception){
             System.out.println("Parsed Date fail !!");
         }

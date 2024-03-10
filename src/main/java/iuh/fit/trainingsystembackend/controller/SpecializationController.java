@@ -48,6 +48,7 @@ public class SpecializationController {
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSpecialization(@RequestParam(name = "userId", required = false) Long userId, @RequestBody Specialization data) {
         Specialization toSave = null;
+
         if (data.getId() != null) {
             toSave = specializationRepository.findById(data.getId()).orElse(null);
 

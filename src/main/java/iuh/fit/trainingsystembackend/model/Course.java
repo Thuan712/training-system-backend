@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import iuh.fit.trainingsystembackend.enums.CourseType;
+import iuh.fit.trainingsystembackend.enums.SectionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,11 +29,17 @@ public class Course implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "specialization_id")
+    private Long specializationId;
+
     @Column(name = "name")
     private String name;
 
     @Column(name = "code")
     private String code;
+
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "credit")
     private int credit;
@@ -41,17 +48,17 @@ public class Course implements Serializable {
     @Enumerated(EnumType.STRING)
     private CourseType courseType;
 
-    @Column(name = "require_course")
+    @Column(name = "prerequisite")
     @JsonIgnore
-    private String requireCourseString;
+    private String prerequisiteString;
 
     @Transient
     public List<Long> requireCourse;
 
     @Transient
-    public List<Long> getRequireCourse(){
-        if(this.requireCourseString != null && !this.requireCourseString.isEmpty()) {
-            return new Gson().fromJson(this.requireCourseString, new TypeToken<List<Long>>(){}.getType());
+    public List<Long> getPrerequisite(){
+        if(this.prerequisiteString != null && !this.prerequisiteString.isEmpty()) {
+            return new Gson().fromJson(this.prerequisiteString, new TypeToken<List<Long>>(){}.getType());
         }
 
         return new ArrayList<>();
