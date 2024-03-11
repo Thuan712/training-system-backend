@@ -2,7 +2,9 @@ package iuh.fit.trainingsystembackend.controller;
 
 import com.google.gson.Gson;
 import iuh.fit.trainingsystembackend.bean.CourseBean;
+import iuh.fit.trainingsystembackend.dto.CourseDTO;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.CourseMapper;
 import iuh.fit.trainingsystembackend.model.Course;
 import iuh.fit.trainingsystembackend.model.UserEntity;
 import iuh.fit.trainingsystembackend.repository.CourseRepository;
@@ -28,22 +30,21 @@ import java.util.List;
 public class CourseController {
     private CourseRepository courseRepository;
     private CourseSpecification courseSpecification;
-
+    private CourseMapper courseMapper;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId", required = false) Long userId, @RequestBody CourseBean data) {
         Course toSave = null;
-
+        boolean isChangedCode = true;
         if (data.getId() != null) {
             toSave = courseRepository.findById(data.getId()).orElse(null);
 
             if (toSave == null) {
-                throw new ValidationException("Course is not found !");
+                throw new ValidationException("Không tìm thấy môn học !");
             }
         }
 
         if (toSave == null) {
             toSave = new Course();
-            //TODO: Generate code for course
             String code = "";
             boolean isExist = true;
             while (isExist){
@@ -57,15 +58,16 @@ public class CourseController {
         }
 
         toSave.setName(data.getName());
+        toSave.setDescription(data.getDescription());
 
         if(data.getCredit() == null || data.getCredit() < 1){
-            throw new ValidationException("Credits of course should be greater than 0!");
+            throw new ValidationException("Tín chỉ của môn học phải lớn hơn 0!");
         }
 
         toSave.setCredit(data.getCredit());
 
         boolean isError = false;
-        for(Long courseId : data.getRequireCourse()){
+        for(Long courseId : data.getPrerequisite()){
             Course course = courseRepository.findById(courseId).orElse(null);
 
             if(course == null){
@@ -75,10 +77,10 @@ public class CourseController {
         }
 
         if(isError){
-            throw new ValidationException("Have require courses not found !");
+            throw new ValidationException("Không tìm thấy môn học tiên quyết !");
         }
 
-        toSave.setRequireCourseString(new Gson().toJson(data.getRequireCourse()));
+        toSave.setPrerequisiteString(new Gson().toJson(data.getPrerequisite()));
         toSave.setCourseType(data.getCourseType());
         toSave = courseRepository.saveAndFlush(toSave);
 
@@ -86,9 +88,9 @@ public class CourseController {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        //TODO: Map to DTO
+        CourseDTO courseDTO = courseMapper.mapToDTO(toSave);
 
-        return ResponseEntity.ok(toSave);
+        return ResponseEntity.ok(courseDTO);
     }
 
     @DeleteMapping("/deleteById")
@@ -120,13 +122,15 @@ public class CourseController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody CourseRequest filterRequest) {
         Page<Course> courses = courseRepository.findAll(courseSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-        return ResponseEntity.ok(courses);
+        Page<CourseDTO> courseDTOS = courseMapper.mapToDTO(courses);
+        return ResponseEntity.ok(courseDTOS);
     }
 
         @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody CourseRequest filterRequest) {
         List<Course> courses = courseRepository.findAll(courseSpecification.getFilter(filterRequest));
-        return ResponseEntity.ok(courses);
+        List<CourseDTO> courseDTOS = courseMapper.mapToDTO(courses);
+        return ResponseEntity.ok(courseDTOS);
     }
 
 }

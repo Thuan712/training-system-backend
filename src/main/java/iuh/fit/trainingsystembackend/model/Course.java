@@ -53,7 +53,7 @@ public class Course implements Serializable {
     private String prerequisiteString;
 
     @Transient
-    public List<Long> requireCourse;
+    public List<Long> prerequisite;
 
     @Transient
     public List<Long> getPrerequisite(){

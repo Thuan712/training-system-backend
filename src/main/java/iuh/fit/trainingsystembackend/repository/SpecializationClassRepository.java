@@ -8,5 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SpecializationClassRepository extends JpaRepository<SpecializationClass, Long> , JpaSpecificationExecutor<SpecializationClass> {
-    SpecializationClass findFirstByOrderBySpecializationIdDesc ();
+    SpecializationClass findFirstByOrderBySpecializationIdDesc();
+
+    int countBySpecializationId(Long specializationId);
 }

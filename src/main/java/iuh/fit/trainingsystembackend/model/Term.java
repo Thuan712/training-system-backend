@@ -34,4 +34,7 @@ public class Term implements Serializable {
 
     @Column(name = "term_end")
     private Date termEnd;
+
+    @Column(name = "cost_per_credit")
+    private Double costPerCredit;
 }

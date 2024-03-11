@@ -42,6 +42,7 @@ public class Section implements Serializable {
     private Integer practicePeriods;
 
     @Column(name = "section_type")
+    @Enumerated(EnumType.STRING)
     private SectionType sectionType;
 
     @Column(name = "created_at")

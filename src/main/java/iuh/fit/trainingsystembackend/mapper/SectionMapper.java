@@ -40,7 +40,7 @@ public class SectionMapper {
                 .courseName(course != null ? course.getName() : "")
                 .courseCode(course != null ? course.getCode() : "")
                 .credit(course != null ? course.getCredit() : null)
-                .requireCourse(course != null ? course.getRequireCourse() : new ArrayList<>())
+                .requireCourse(course != null ? course.getPrerequisite() : new ArrayList<>())
                 .termId(term != null ? term.getId() : null)
                 .termName(term != null ? term.getName() : "")
                 .name(section.getName())

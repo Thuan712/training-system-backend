@@ -35,7 +35,7 @@ public class SectionService {
             throw new ValidationException("Course is not found !");
         }
 
-        List<Long> courseRequireIds = course.getRequireCourse();
+        List<Long> courseRequireIds = course.getPrerequisite();
 
         if(courseRequireIds.isEmpty()){
             return true;

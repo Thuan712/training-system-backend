@@ -53,7 +53,7 @@ public class SpecializationController {
             toSave = specializationRepository.findById(data.getId()).orElse(null);
 
             if (toSave == null) {
-                throw new ValidationException("Specialization is not found !");
+                throw new ValidationException("Không tìm thấy chuyên ngành !");
             }
         }
 
@@ -64,13 +64,13 @@ public class SpecializationController {
         toSave.setName(data.getName());
         toSave.setCode(data.getCode());
         if (data.getFacultyId() == null) {
-            throw new ValidationException("Faculty ID is required !");
+            throw new ValidationException("Mã khoa không dược để trống !");
         }
 
         Faculty faculty = facultyRepository.findById(data.getFacultyId()).orElse(null);
 
         if (faculty == null) {
-            throw new ValidationException("Faculty is not found !");
+            throw new ValidationException("Không tìm thấy khoa !");
         }
 
         toSave.setFacultyId(faculty.getId());
@@ -109,7 +109,7 @@ public class SpecializationController {
             toSave = specializationClassRepository.findById(data.getId()).orElse(null);
 
             if (toSave == null) {
-                throw new ValidationException("Specialization Class is not found !");
+                throw new ValidationException("Không tìm thấy lớp chuyên ngành !");
             }
         }
 
@@ -118,18 +118,37 @@ public class SpecializationController {
         }
 
         if (data.getSpecializationId() == null) {
-            throw new ValidationException("Specialization ID is required ");
+            throw new ValidationException("Mã chuyên ngành không được để trống !!");
         }
 
         Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
 
         if (specialization == null) {
-            throw new ValidationException("Specialization is not found !");
+            throw new ValidationException("Không tìm thấy chuyên ngành !!");
         }
 
         toSave.setSchoolYear(data.getSchoolYear());
         toSave.setSpecializationId(specialization.getId());
-        toSave.setName(data.getName());
+
+        if(data.getName() == null || data.getName().isEmpty()){
+            int numOfSpecializationClass = specializationClassRepository.countBySpecializationId(specialization.getId());
+
+            if(numOfSpecializationClass == 0){
+                char key = (char) (67);
+                String endYear = data.getSchoolYear();
+                String nameGenerate = "DH" + specialization.getCode() + endYear + key;
+
+                toSave.setName(nameGenerate);
+            } else {
+                char key = (char) (numOfSpecializationClass + 66);
+                String endYear = data.getSchoolYear();
+                String nameGenerate = "DH" + specialization.getCode() + endYear + key;
+
+                toSave.setName(nameGenerate);
+            }
+        } else {
+            toSave.setName(data.getName());
+        }
 
         toSave = specializationClassRepository.saveAndFlush(toSave);
 
@@ -205,7 +224,7 @@ public class SpecializationController {
                                         specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
                                         if (specializationClass.getId() == null) {
-                                            throw new ValidationException("Create Specialization Class fail !");
+                                            throw new ValidationException("Tạo lớp chuyên ngành không thành công !");
                                         }
 
                                         int endList;
@@ -222,7 +241,7 @@ public class SpecializationController {
                                             student = studentRepository.saveAndFlush(student);
 
                                             if (student.getId() == null) {
-                                                throw new ValidationException("Update Specialization Class for Student fail !!");
+                                                throw new ValidationException("Cập nhật lớp chuyên ngành cho sinh viên không thành công !!");
                                             }
                                         }
 
@@ -242,7 +261,7 @@ public class SpecializationController {
                                     specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
                                     if (specializationClass.getId() == null) {
-                                        throw new ValidationException("Create Specialization Class fail !");
+                                        throw new ValidationException("Tạo lớp chuyên ngành không thành công !!");
                                     }
 
                                     for (int j = (studentGeneralList.size() - flag); j < studentGeneralList.size(); j++) {
@@ -252,7 +271,7 @@ public class SpecializationController {
                                         student = studentRepository.saveAndFlush(student);
 
                                         if (student.getId() == null) {
-                                            throw new ValidationException("Update Specialization Class for Student fail !!");
+                                            throw new ValidationException("Cập nhật lớp chuyên ngành cho sinh viên không thành công !!");
                                         }
                                     }
 
@@ -273,7 +292,7 @@ public class SpecializationController {
                                         specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
                                         if (specializationClass.getId() == null) {
-                                            throw new ValidationException("Create Specialization Class fail !");
+                                            throw new ValidationException("Tạo lớp chuyên ngành không thành công !");
                                         }
                                     }
 
@@ -284,7 +303,7 @@ public class SpecializationController {
                                         student = studentRepository.saveAndFlush(student);
 
                                         if (student.getId() == null) {
-                                            throw new ValidationException("Update Specialization Class for Student fail !!");
+                                            throw new ValidationException("Cập nhật lớp chuyên ngành cho sinh viên không thành công !!");
                                         }
                                     }
 
@@ -320,7 +339,7 @@ public class SpecializationController {
                                         specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
                                         if (specializationClass.getId() == null) {
-                                            throw new ValidationException("Create Specialization Class fail !");
+                                            throw new ValidationException("Tạo lớp chuyên ngành không thành công !");
                                         }
 
                                         int endList;
@@ -337,7 +356,7 @@ public class SpecializationController {
                                             student = studentRepository.saveAndFlush(student);
 
                                             if (student.getId() == null) {
-                                                throw new ValidationException("Update Specialization Class for Student fail !!");
+                                                throw new ValidationException("Cập nhật lớp chuyên ngành cho sinh viên không thành công !!");
                                             }
                                         }
 
@@ -357,7 +376,7 @@ public class SpecializationController {
                                     specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
                                     if (specializationClass.getId() == null) {
-                                        throw new ValidationException("Create Specialization Class fail !");
+                                        throw new ValidationException("Tạo lớp chuyên ngành không thành công !");
                                     }
 
                                     for (int j = (studentGeneralList.size() - flag); j < studentGeneralList.size(); j++) {
@@ -367,7 +386,7 @@ public class SpecializationController {
                                         student = studentRepository.saveAndFlush(student);
 
                                         if (student.getId() == null) {
-                                            throw new ValidationException("Update Specialization Class for Student fail !!");
+                                            throw new ValidationException("Cập nhật lớp chuyên ngành cho sinh viên không thành công !!");
                                         }
                                     }
 
@@ -389,7 +408,7 @@ public class SpecializationController {
                                         specializationClass = specializationClassRepository.saveAndFlush(specializationClass);
 
                                         if (specializationClass.getId() == null) {
-                                            throw new ValidationException("Create Specialization Class fail !");
+                                            throw new ValidationException("Tạo lớp chuyên ngành không thành công !");
                                         }
                                     }
 
@@ -400,7 +419,7 @@ public class SpecializationController {
                                         student = studentRepository.saveAndFlush(student);
 
                                         if (student.getId() == null) {
-                                            throw new ValidationException("Update Specialization Class for Student fail !!");
+                                            throw new ValidationException("Cập nhật lớp chuyên ngành cho sinh viên không thành công !!");
                                         }
                                     }
 
@@ -414,7 +433,7 @@ public class SpecializationController {
             }, "Done");
             executor.submit(futureTasks);
         } catch (Exception e) {
-            System.out.println("Fail to separate class for students !");
+            System.out.println("Có lỗi xảy ra! Không thể phân chia lớp cho sinh viên!");
         }
 
         return ResponseEntity.ok(HttpStatus.OK);

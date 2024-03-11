@@ -13,8 +13,9 @@ public class CourseBean implements Serializable {
     private Long id;
     private String name;
     private String code;
+    private String description;
     private Integer credit;
     private CourseType courseType;
-    private List<Long> requireCourse;
+    private List<Long> prerequisite;
     private Boolean deleted = false;
 }

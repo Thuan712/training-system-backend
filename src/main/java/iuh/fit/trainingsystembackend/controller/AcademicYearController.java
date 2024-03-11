@@ -99,6 +99,10 @@ public class AcademicYearController {
             throw new ValidationException("Tên của học kỳ đầu không được để trống !!");
         }
 
+        if(data.getCostFirstTerm() == null || data.getCostFirstTerm() <= 0){
+            throw new ValidationException("Chi phí tín chỉ của học kỳ đầu không được để trống và lớn hơn 0 !!");
+        }
+
         if (data.getFirstTermStart() == null) {
             throw new ValidationException("Thời gian bắt đầu học kỳ đầu không được để trống !!");
         }
@@ -111,7 +115,7 @@ public class AcademicYearController {
 
         firstTerm.setAcademicYearId(toSave.getId());
         firstTerm.setName(data.getFirstTermName());
-
+        firstTerm.setCostPerCredit(data.getCostFirstTerm());
         try {
             firstTerm.setTermStart(data.getFirstTermStart());
             firstTerm.setTermEnd(data.getFirstTermEnd());
@@ -128,6 +132,10 @@ public class AcademicYearController {
             throw new ValidationException("Tên của học kỳ hai không được để trống !!");
         }
 
+        if(data.getCostSecondTerm() == null || data.getCostSecondTerm() <= 0){
+            throw new ValidationException("Chi phí tín chỉ của học kỳ hai không được để trống và lớn hơn 0 !!");
+        }
+
         if (data.getSecondTermStart() == null) {
             throw new ValidationException("Thời gian bắt đầu học kỳ hai không được để trống !!");
         }
@@ -137,8 +145,8 @@ public class AcademicYearController {
         }
 
         secondTerm.setAcademicYearId(toSave.getId());
-        secondTerm.setName(data.getFirstTermName());
-
+        secondTerm.setName(data.getSecondTermName());
+        secondTerm.setCostPerCredit(data.getCostSecondTerm());
         try {
             secondTerm.setTermStart(data.getSecondTermStart());
             secondTerm.setTermEnd(data.getSecondTermEnd());
@@ -156,6 +164,10 @@ public class AcademicYearController {
             throw new ValidationException("Tên của học kỳ ba không được để trống !!");
         }
 
+        if(data.getCostThirdTerm() == null || data.getCostThirdTerm() <= 0){
+            throw new ValidationException("Chi phí tín chỉ của học kỳ ba không được để trống và lớn hơn 0 !!");
+        }
+
         if (data.getThirdTermStart() == null) {
             throw new ValidationException("Thời gian bắt đầu học kỳ ba không được để trống !!");
         }
@@ -165,7 +177,8 @@ public class AcademicYearController {
         }
 
         thirdTerm.setAcademicYearId(toSave.getId());
-        thirdTerm.setName(data.getFirstTermName());
+        thirdTerm.setName(data.getThirdTermName());
+        thirdTerm.setCostPerCredit(data.getCostThirdTerm());
         try {
             thirdTerm.setTermStart(data.getThirdTermStart());
             thirdTerm.setTermEnd(data.getThirdTermEnd());
