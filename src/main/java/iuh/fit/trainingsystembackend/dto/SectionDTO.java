@@ -1,7 +1,10 @@
 package iuh.fit.trainingsystembackend.dto;
 
 import com.google.gson.annotations.Expose;
+import iuh.fit.trainingsystembackend.data.RequireSection;
+import iuh.fit.trainingsystembackend.data.SectionDuration;
 import iuh.fit.trainingsystembackend.enums.SectionType;
+import iuh.fit.trainingsystembackend.enums.TermType;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -22,29 +25,47 @@ public class SectionDTO {
     @Expose
     private Long id;
 
-    private Long courseId;
+    private Long specializationId;
 
-    private String courseName;
+    private String specializationName;
 
-    private String courseCode;
-    private Integer credit;
-    private List<Long> requireCourse;
+    private String specializationCode;
 
-    private Long termId;
-
-    private String termName;
+    private List<Long> courseIds;
 
     private String name;
 
     private String code;
 
-    private Integer theoryPeriods;
+    private String description;
 
-    private Integer practicePeriods;
+    private List<String> prerequisite;
 
-    private String sectionType;
+    private List<String> studyFirst;
 
-    private Date createdAt = new Date();
+    private List<String> parallel;
+
+    private RequireSection requireSection;
+
+    private SectionDuration sectionDuration;
+
+    private int theory;
+
+    private int practice;
+
+    private int discussionExercises;
+
+    private int selfLearning;
+
+    private List<TermType> termRegister;
+
+    private Integer credits;
+
+    private Double costCredits;
+
+    private SectionType sectionType;
+
+    private Date createdAt;
 
     private Date updatedAt;
 

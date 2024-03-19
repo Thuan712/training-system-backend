@@ -50,32 +50,32 @@ public class ResultService {
         }
 
         List<Result> toSaveResults = new ArrayList<>();
-
-        if(!data.getResults().isEmpty()){
-            boolean isFail = false;
-            for (Result result : data.getResults()){
-                //TODO: Ham input diem tung sinh vien
-                try{
-                    Result toSave = createOrUpdateResult(result);
-
-                    if(toSave.getId() == null){
-                        throw new ValidationException("Create Student " + result.getStudentCode() + " fail !!");
-                    }
-
-                    toSaveResults.add(result);
-                } catch (Exception e){
-                    isFail = true;
-                }
-            }
-
-            if(isFail){
-                throw new ValidationException("Create Or Update Result for students fail !!");
-            }
-        }
-
-        if(toSaveResults.isEmpty()){
-            return new ArrayList<>();
-        }
+//
+//        if(!data.getResults().isEmpty()){
+//            boolean isFail = false;
+//            for (Result result : data.getResults()){
+//                //TODO: Ham input diem tung sinh vien
+//                try{
+//                    Result toSave = createOrUpdateResult(result);
+//
+//                    if(toSave.getId() == null){
+//                        throw new ValidationException("Create Student " + result.getStudentCode() + " fail !!");
+//                    }
+//
+//                    toSaveResults.add(result);
+//                } catch (Exception e){
+//                    isFail = true;
+//                }
+//            }
+//
+//            if(isFail){
+//                throw new ValidationException("Create Or Update Result for students fail !!");
+//            }
+//        }
+//
+//        if(toSaveResults.isEmpty()){
+//            return new ArrayList<>();
+//        }
 
         return toSaveResults;
     }

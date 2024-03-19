@@ -1,6 +1,12 @@
 package iuh.fit.trainingsystembackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import iuh.fit.trainingsystembackend.data.SectionDuration;
+import iuh.fit.trainingsystembackend.data.RequireSection;
 import iuh.fit.trainingsystembackend.enums.SectionType;
+import iuh.fit.trainingsystembackend.enums.TermType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +15,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Data
 @Table(name = "section")
@@ -23,27 +29,92 @@ public class Section implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "course_id")
-    private Long courseId;
-
-    @Column(name = "term_id")
-    private Long termId;
-
-    @Column(name = "name")
-    private String name;
+    @Column(name = "specialization_id")
+    private Long specializationId;
 
     @Column(name = "code")
     private String code;
 
-    @Column(name = "theory_periods")
-    private Integer theoryPeriods;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "practice_periods")
-    private Integer practicePeriods;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "section_type")
     @Enumerated(EnumType.STRING)
     private SectionType sectionType;
+
+    @Column(name = "course_ids")
+    private String courseIdsString;
+
+    @Transient
+    private List<Long> courseIds;
+
+    @Transient
+    public List<Long> getCourseIds(){
+        if(this.courseIdsString != null && !this.courseIdsString.isEmpty()) {
+            return new Gson().fromJson(this.courseIdsString, new TypeToken<List<Long>>(){}.getType());
+        }
+
+        return new ArrayList<>();
+    }
+
+    // Thời lượng các tiết học thành phần (Đơn vị tín chỉ tiết học)
+    @Column(name = "section_duration")
+    private String sectionDurationString;
+
+    @Transient
+    private SectionDuration sectionDuration;
+
+    @Transient
+    public SectionDuration getSectionDuration(){
+        if(this.sectionDurationString != null && !this.sectionDurationString.isEmpty()) {
+            return new Gson().fromJson(this.sectionDurationString, new TypeToken<SectionDuration>(){}.getType());
+        }
+
+        return new SectionDuration();
+    }
+
+    //Học kì có thể đăng ký được học phần này
+    @Column(name = "term_register")
+    private String termRegisterString;
+
+    @Transient
+    private List<TermType> termRegister;
+
+    @Transient
+    public List<TermType> getTermRegister(){
+        if(this.termRegisterString != null && !this.termRegisterString.isEmpty()) {
+            return new Gson().fromJson(this.termRegisterString, new TypeToken<List<TermType>>(){}.getType());
+        }
+
+        return new ArrayList<>();
+    }
+
+    // Danh sách các điều kiện tiên quyết
+    @Column(name = "require_section")
+    private String requireSectionString;
+
+    @Transient
+    public RequireSection requireSection;
+
+    @Transient
+    public RequireSection getRequireSection(){
+        if(this.requireSectionString != null && !this.requireSectionString.isEmpty()) {
+            return new Gson().fromJson(this.requireSectionString, new TypeToken<RequireSection>(){}.getType());
+        }
+
+        return new RequireSection();
+    }
+
+    // Tín chỉ học tập (Tích luỹ cho chương trình đào tạo sau khi hoàn thành học phần)
+    @Column(name = "credits")
+    private Integer credits;
+
+    // Tín chỉ học phí (Tín chỉ để tín ra học phí cho học phần)
+    @Column(name = "cost_credits")
+    private Double costCredits;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

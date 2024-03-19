@@ -5,8 +5,10 @@ import com.google.gson.reflect.TypeToken;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
 import iuh.fit.trainingsystembackend.model.Course;
 import iuh.fit.trainingsystembackend.model.Section;
+import iuh.fit.trainingsystembackend.model.Specialization;
 import iuh.fit.trainingsystembackend.model.Term;
 import iuh.fit.trainingsystembackend.repository.CourseRepository;
+import iuh.fit.trainingsystembackend.repository.SpecializationRepository;
 import iuh.fit.trainingsystembackend.repository.TermRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,35 +21,40 @@ import java.util.stream.Collectors;
 @Service("sectionMapper")
 @AllArgsConstructor
 public class SectionMapper {
-    private CourseRepository courseRepository;
-    private TermRepository termRepository;
-
+    private SpecializationRepository specializationRepository;
     public SectionDTO mapToDTO(Section section) {
-        Course course = null;
-        Term term = null;
-        if (section.getCourseId() != null) {
-            course = courseRepository.findById(section.getCourseId()).orElse(null);
+
+        Specialization specialization = null;
+        if(section.getSpecializationId() != null){
+            specialization = specializationRepository.findById(section.getSpecializationId()).orElse(null);
         }
 
-        if (section.getTermId() != null) {
-            term = termRepository.findById(section.getTermId()).orElse(null);
-        }
 
+//        if(section.getRequireSection().getPrerequisite() != null && !section.getRequireSection().getPrerequisite().isEmpty()){
+//            for(String sectionId : section.getRequireSection().getPrerequisite()){
+//
+//            }
+//        }
 
         return SectionDTO.builder()
                 .id(section.getId())
-                .courseId(course != null ? course.getId() : null)
-                .courseName(course != null ? course.getName() : "")
-                .courseCode(course != null ? course.getCode() : "")
-                .credit(course != null ? course.getCredit() : null)
-                .requireCourse(course != null ? course.getPrerequisite() : new ArrayList<>())
-                .termId(term != null ? term.getId() : null)
-                .termName(term != null ? term.getName() : "")
+                .specializationId(section.getSpecializationId())
+                .specializationName(specialization != null ? specialization.getName() : "")
+                .specializationCode(specialization != null ? specialization.getCode() : "")
+                .courseIds(section.getCourseIds())
                 .name(section.getName())
+                .description(section.getDescription())
                 .code(section.getCode())
-                .theoryPeriods(section.getTheoryPeriods())
-                .practicePeriods(section.getPracticePeriods())
-                .sectionType(section.getSectionType().getValue() )
+                .theory(section.getSectionDuration().getTheory())
+                .practice(section.getSectionDuration().getPractice())
+                .discussionExercises(section.getSectionDuration().getDiscussionExercises())
+                .selfLearning(section.getSectionDuration().getSelfLearning())
+                .termRegister(section.getTermRegister())
+                .credits(section.getCredits())
+                .costCredits(section.getCostCredits())
+                .sectionType(section.getSectionType())
+                .requireSection(section.getRequireSection())
+                .sectionDuration(section.getSectionDuration())
                 .createdAt(section.getCreatedAt())
                 .updatedAt(section.getUpdatedAt())
                 .deletedAt(section.getDeletedAt())

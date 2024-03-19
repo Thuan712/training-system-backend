@@ -1,11 +1,15 @@
 package iuh.fit.trainingsystembackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import iuh.fit.trainingsystembackend.enums.TrainingLevel;
 import iuh.fit.trainingsystembackend.enums.TypeOfEducation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -32,6 +36,12 @@ public class Student implements Serializable {
 
     @Column(name = "user_id")
     private Long userId;
+
+    @ManyToOne
+    @JoinFormula(value = "user_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private UserEntity userEntity;
 
     @Column(name = "school_year")
     private String schoolYear;

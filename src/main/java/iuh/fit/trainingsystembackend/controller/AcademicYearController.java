@@ -114,7 +114,7 @@ public class AcademicYearController {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
         firstTerm.setAcademicYearId(toSave.getId());
-        firstTerm.setName(data.getFirstTermName());
+        firstTerm.setName(data.getFirstTermName() + "(" + toSave.getName() + ")");
         firstTerm.setCostPerCredit(data.getCostFirstTerm());
         try {
             firstTerm.setTermStart(data.getFirstTermStart());
@@ -145,7 +145,7 @@ public class AcademicYearController {
         }
 
         secondTerm.setAcademicYearId(toSave.getId());
-        secondTerm.setName(data.getSecondTermName());
+        secondTerm.setName(data.getSecondTermName() + "(" + toSave.getName() + ")");
         secondTerm.setCostPerCredit(data.getCostSecondTerm());
         try {
             secondTerm.setTermStart(data.getSecondTermStart());
@@ -177,7 +177,7 @@ public class AcademicYearController {
         }
 
         thirdTerm.setAcademicYearId(toSave.getId());
-        thirdTerm.setName(data.getThirdTermName());
+        thirdTerm.setName(data.getThirdTermName() + "(" + toSave.getName() + ")");
         thirdTerm.setCostPerCredit(data.getCostThirdTerm());
         try {
             thirdTerm.setTermStart(data.getThirdTermStart());

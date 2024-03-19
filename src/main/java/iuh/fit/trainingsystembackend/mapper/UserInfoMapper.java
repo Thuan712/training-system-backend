@@ -31,7 +31,6 @@ public class UserInfoMapper {
         Student student = null;
         Specialization specialization = null;
         SpecializationClass specializationClass = null;
-        AcademicYear academicYear = null;
 
         if (userEntity.getSystemRole() == SystemRole.lecturer) {
             lecturer = lecturerRepository.getLecturersByUserId(userEntity.getId());

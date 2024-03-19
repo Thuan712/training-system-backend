@@ -6,10 +6,10 @@ import iuh.fit.trainingsystembackend.dto.CourseDTO;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.CourseMapper;
 import iuh.fit.trainingsystembackend.model.Course;
-import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.model.Specialization;
 import iuh.fit.trainingsystembackend.repository.CourseRepository;
+import iuh.fit.trainingsystembackend.repository.SpecializationRepository;
 import iuh.fit.trainingsystembackend.request.CourseRequest;
-import iuh.fit.trainingsystembackend.request.UserRequest;
 import iuh.fit.trainingsystembackend.specification.CourseSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import iuh.fit.trainingsystembackend.utils.StringUtils;
@@ -31,6 +31,7 @@ public class CourseController {
     private CourseRepository courseRepository;
     private CourseSpecification courseSpecification;
     private CourseMapper courseMapper;
+    private SpecializationRepository specializationRepository;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId", required = false) Long userId, @RequestBody CourseBean data) {
         Course toSave = null;
@@ -60,28 +61,6 @@ public class CourseController {
         toSave.setName(data.getName());
         toSave.setDescription(data.getDescription());
 
-        if(data.getCredit() == null || data.getCredit() < 1){
-            throw new ValidationException("Tín chỉ của môn học phải lớn hơn 0!");
-        }
-
-        toSave.setCredit(data.getCredit());
-
-        boolean isError = false;
-        for(Long courseId : data.getPrerequisite()){
-            Course course = courseRepository.findById(courseId).orElse(null);
-
-            if(course == null){
-                isError = true;
-                break;
-            }
-        }
-
-        if(isError){
-            throw new ValidationException("Không tìm thấy môn học tiên quyết !");
-        }
-
-        toSave.setPrerequisiteString(new Gson().toJson(data.getPrerequisite()));
-        toSave.setCourseType(data.getCourseType());
         toSave = courseRepository.saveAndFlush(toSave);
 
         if(toSave.getId() == null){
@@ -126,7 +105,7 @@ public class CourseController {
         return ResponseEntity.ok(courseDTOS);
     }
 
-        @PostMapping("/getList")
+    @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody CourseRequest filterRequest) {
         List<Course> courses = courseRepository.findAll(courseSpecification.getFilter(filterRequest));
         List<CourseDTO> courseDTOS = courseMapper.mapToDTO(courses);

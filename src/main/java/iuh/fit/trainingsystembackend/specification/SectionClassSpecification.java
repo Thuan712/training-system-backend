@@ -18,13 +18,11 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
     @Override
     public Specification<SectionClass> getFilter(SectionClassRequest request) {
         return (root, query, criteriaBuilder) ->
-                Specification.where(attributeEqual("lecturerId", request.getLecturerId()))
+                Specification.where(attributeEqual("termId", request.getLecturerId()))
                         .and(attributeEqual("sectionId", request.getSectionId()))
                         .and(attributeStudentIdEqual(request.getStudentId()))
-                        .and(attributeContains("classCode", request.getClassCode()))
-                        .and(attributeContains("room", request.getRoom()))
-                        .and(attributeEqual("periodFrom", request.getPeriodFrom()))
-                        .and(attributeEqual("periodTo", request.getPeriodTo()))
+                        .and(attributeContains("code", request.getCode()))
+                        .and(attributeEqual("sectionClassType", request.getSectionClassType()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 

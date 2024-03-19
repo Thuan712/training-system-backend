@@ -13,7 +13,6 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
     public Specification<Section> getFilter(SectionRequest request) {
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("courseId", request.getCourseId()))
-                        .and(attributeEqual("termId", request.getTermId()))
                         .and(attributeContains("code", request.getCode()))
                         .and(attributeEqual("theoryPeriods", request.getTheoryPeriods()))
                         .and(attributeEqual("practicePeriods", request.getPracticePeriods()))
@@ -39,4 +38,5 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
             return criteriaBuilder.equal(root.get(key), value);
         });
     }
+
 }

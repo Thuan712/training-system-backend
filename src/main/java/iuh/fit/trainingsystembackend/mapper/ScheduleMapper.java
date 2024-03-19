@@ -30,14 +30,6 @@ public class ScheduleMapper {
         if (schedule.getSectionClass() != null) {
             section = schedule.getSectionClass().getSection();
 
-            if(schedule.getSectionClass().getPeriodTo() >= 1 &&  schedule.getSectionClass().getPeriodTo() <= 3 || schedule.getSectionClass().getPeriodTo() >= 4 &&  schedule.getSectionClass().getPeriodTo() <= 6){
-                date = "morning";
-            } else if(schedule.getSectionClass().getPeriodTo() >= 7 &&  schedule.getSectionClass().getPeriodTo() <= 9 || schedule.getSectionClass().getPeriodTo() >= 10 &&  schedule.getSectionClass().getPeriodTo() <= 12){
-                date = "afternoon";
-            } else {
-                date = "evening";
-            }
-
             if (schedule.getSectionClass().getLecturerId() != null) {
                 lecturer = lecturerRepository.findById(schedule.getSectionClass().getLecturerId()).orElse(null);
 
@@ -47,26 +39,16 @@ public class ScheduleMapper {
             }
         }
 
-
-
-
         return ScheduleDTO.builder()
                 .id(schedule.getId())
                 .sectionClassId(schedule.getSectionClass() != null ? schedule.getSectionClass().getId() : null)
                 .lecturerId(lecturer != null ? lecturer.getId() : null)
                 .lecturerName(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
                 .sectionId(section != null ? section.getId() : null)
-                .sectionName(section != null ? section.getName() : "")
                 .sectionCode(section != null ? section.getCode() : "")
-                .classCode(schedule.getSectionClass() != null ? schedule.getSectionClass().getClassCode() : "")
-                .room(schedule.getSectionClass() != null ? schedule.getSectionClass().getRoom() : "")
-                .periodFrom(schedule.getSectionClass() != null ? schedule.getSectionClass().getPeriodFrom() : null)
-                .periodTo(schedule.getSectionClass() != null ? schedule.getSectionClass().getPeriodTo() : null)
                 .numberOfStudents(schedule.getSectionClass() != null ? schedule.getSectionClass().getNumberOfStudents() : null)
-                .dayInWeek(schedule.getSectionClass() != null ? schedule.getSectionClass().getDayInWeek().name() : "")
                 .note(schedule.getSectionClass() != null ? schedule.getSectionClass().getNote() : "")
                 .sectionClassType(schedule.getSectionClass() != null ? schedule.getSectionClass().getSectionClassType().name() : "")
-                .startedAt(schedule.getSectionClass() != null ? schedule.getSectionClass().getStartedAt() : null)
                 .learningDate(schedule.getLearningDate())
                 .dateTime(date)
                 .build();

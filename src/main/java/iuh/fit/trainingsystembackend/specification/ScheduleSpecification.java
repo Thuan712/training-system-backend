@@ -7,7 +7,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-
 public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleRequest> {
     @Override
     public Specification<Schedule> getFilter(ScheduleRequest request) {

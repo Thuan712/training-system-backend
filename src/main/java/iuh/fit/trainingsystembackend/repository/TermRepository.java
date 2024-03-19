@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface TermRepository extends JpaRepository<Term, Long> {
     Term findDistinctByName(String name);
-
     List<Term> findByAcademicYearId(Long academicYearId);
 }

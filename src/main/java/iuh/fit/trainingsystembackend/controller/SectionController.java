@@ -1,9 +1,13 @@
 package iuh.fit.trainingsystembackend.controller;
 
+import com.google.gson.Gson;
+import feign.Response;
 import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
+import iuh.fit.trainingsystembackend.data.RequireSection;
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
+import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.SectionClassMapper;
@@ -12,11 +16,13 @@ import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.request.SectionClassRequest;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
+import iuh.fit.trainingsystembackend.service.ScheduleService;
 import iuh.fit.trainingsystembackend.specification.SectionClassSpecification;
 import iuh.fit.trainingsystembackend.specification.SectionSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
+import org.json.HTTP;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,18 +31,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -45,17 +41,20 @@ public class SectionController {
 
     private SectionRepository sectionRepository;
     private CourseRepository courseRepository;
-    private TermRepository termRepository;
+    private SpecializationRepository specializationRepository;
     private SectionSpecification sectionSpecification;
     private LecturerRepository lecturerRepository;
     private SectionClassRepository sectionClassRepository;
     private SectionClassSpecification sectionClassSpecification;
-    private StudentSectionClassRepository studentSectionClassRepository;
-    private StudentRepository studentRepository;
-    private ScheduleRepository scheduleRepository;
+    private TermRepository termRepository;
     private SectionMapper sectionMapper;
     private SectionClassMapper sectionClassMapper;
-
+    private TimeAndPlaceRepository timeAndPlaceRepository;
+    private StudentSectionClassRepository studentSectionClassRepository;
+    private UserRepository userRepository;
+    private StudentRepository studentRepository;
+    private ScheduleService scheduleService;
+    private ScheduleRepository scheduleRepository;
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
         Section toSave = null;
@@ -64,60 +63,103 @@ public class SectionController {
             toSave = sectionRepository.findById(data.getId()).orElse(null);
 
             if (toSave == null) {
-                throw new ValidationException("Section is not found !!");
+                throw new ValidationException("Không tìm thấy học phần !!");
             }
-        }
-
-        if (data.getCourseId() == null) {
-            throw new ValidationException("Course ID is required !!");
-        }
-
-        Course course = courseRepository.findById(data.getCourseId()).orElse(null);
-
-        if (course == null) {
-            throw new ValidationException("Course is not found !!");
-        }
-
-        if (data.getTermId() == null) {
-            throw new ValidationException("Term ID is required !!");
-        }
-
-        Term term = termRepository.findById(data.getTermId()).orElse(null);
-
-        if (term == null) {
-            throw new ValidationException("Term is not found !!");
         }
 
         if (toSave == null) {
             toSave = new Section();
-            toSave.setCourseId(course.getId());
-            toSave.setTermId(term.getId());
+            boolean isExist = true;
+            String code = "";
 
+            while (isExist) {
+                code = StringUtils.randomNumberGenerate(12);
+                Section section = sectionRepository.findSectionByCode(code);
+
+                isExist = section != null;
+            }
+
+            toSave.setCode(code);
+        }
+
+        if (data.getSpecializationId() == null) {
+            throw new ValidationException("Chuyên ngành của học phần không được để trống !!");
+        }
+
+        Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
+
+        if (specialization == null) {
+            throw new ValidationException("Không tìm thấy chuyên ngành của học phần !!");
+        }
+
+        toSave.setSpecializationId(specialization.getId());
+
+        if (data.getName() == null || data.getName().isEmpty()) {
+            throw new ValidationException("Tên của học phần không được để trống !!");
         }
 
         toSave.setName(data.getName());
-        boolean isExist = true;
-        String code = "";
+        toSave.setDescription(data.getDescription());
 
-        while (isExist) {
-            code = StringUtils.randomNumberGenerate(12);
-            Section section = sectionRepository.findSectionByCode(code);
+        if (data.getCourseIds() == null || data.getCourseIds().isEmpty()) {
+            throw new ValidationException("Học phần phải bao gồm ít nhất một môn học cấu thành !!");
+        } else {
+            for (Long courseId : data.getCourseIds()) {
+                Course course = courseRepository.findById(courseId).orElse(null);
 
-            if (section != null) {
-                isExist = true;
-            } else {
-                isExist = false;
+                if (course == null) {
+                    throw new ValidationException("Không tìm thấy môn học có ID là " + courseId + "!!");
+                }
             }
+
+            toSave.setCourseIdsString(new Gson().toJson(data.getCourseIds()));
         }
 
-        toSave.setCode(code);
-        if (data.getTheoryPeriods() == null || data.getTheoryPeriods() < 1) {
-            throw new ValidationException("Theory Periods should be greater than 2 !");
+        if (data.getSectionType() == null) {
+            throw new ValidationException("Loại học phần không được để trống !!");
         }
-
-        toSave.setTheoryPeriods(data.getTheoryPeriods());
-        toSave.setPracticePeriods(data.getPracticePeriods());
         toSave.setSectionType(data.getSectionType());
+
+        if (data.getTermRegister() == null || data.getTermRegister().isEmpty()) {
+            throw new ValidationException("Học kì để đăng ký học phần không được để trống !!");
+        }
+
+        toSave.setTermRegisterString(new Gson().toJson(data.getTermRegister()));
+
+        if (data.getCredits() != null) {
+            if (data.getCredits() < 0) {
+                throw new ValidationException("Số tín chỉ học tập của học phần phải lớn hơn bằng 0 !!");
+            }
+
+            toSave.setCredits(data.getCredits());
+        } else {
+            toSave.setCredits(0);
+        }
+
+        if (data.getCostCredits() == null || data.getCostCredits() < 1) {
+            throw new ValidationException("Số tín chỉ học phí không được để trống và phải lớn hơn 0 !!");
+        }
+
+        toSave.setCostCredits(data.getCostCredits());
+
+        if (data.getSectionDuration() == null) {
+            throw new ValidationException("Thời lương tín chỉ của các công việc trong học phần không được để trống !!");
+        }
+
+        if (data.getSectionDuration().getTheory() < 0
+            || data.getSectionDuration().getPractice() < 0
+            || data.getSectionDuration().getDiscussionExercises() < 0
+            || data.getSectionDuration().getSelfLearning() < 0
+            || (data.getSectionDuration().getTheory() == 0
+                && data.getSectionDuration().getPractice() == 0
+                && data.getSectionDuration().getDiscussionExercises() == 0
+                && data.getSectionDuration().getSelfLearning() == 0)) {
+            throw new ValidationException("Tín chỉ thời lượng của tiết học phải lớn hơn hoặc bằng 0");
+        }
+
+        toSave.setSectionDurationString(new Gson().toJson(data.getSectionDuration()));
+
+        toSave.setRequireSectionString(new Gson().toJson(data.getRequireSection() != null ? data.getRequireSection() : new RequireSection()));
 
         toSave = sectionRepository.saveAndFlush(toSave);
         if (toSave.getId() == null) {
@@ -141,7 +183,19 @@ public class SectionController {
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SectionRequest filterRequest) {
+
         List<Section> sections = sectionRepository.findAll(sectionSpecification.getFilter(filterRequest));
+
+        if(filterRequest.getTermId() != null){
+            Term term = termRepository.findById(filterRequest.getTermId()).orElse(null);
+
+            if(term == null){
+                throw new ValidationException("Không tìm thấy dữ liệu học kì này !!");
+            }
+
+            sections = sections.stream().filter(section -> section.getTermRegister().contains(term.getTermType())).collect(Collectors.toList());
+        }
+
         List<SectionDTO> sectionDTOS = sectionMapper.mapToDTO(sections);
         return ResponseEntity.ok(sectionDTOS);
     }
@@ -154,76 +208,90 @@ public class SectionController {
             toSave = sectionClassRepository.findById(data.getId()).orElse(null);
 
             if (toSave == null) {
-                throw new ValidationException("Section Class is not found !!");
+                throw new ValidationException("Không tìm thấy lớp học phần !!");
             }
         }
+
+        if(data.getTermId() == null){
+            throw new ValidationException("Mã học kỳ của lớp học phần không được để trống !!");
+        }
+
+        Term term = termRepository.findById(data.getTermId()).orElse(null);
+
+        if(term == null){
+            throw new ValidationException("Không tìm thấy học kỳ !!");
+        }
+
+        if (data.getSectionId() == null) {
+            throw new ValidationException("Mã học phần của lớp học phần không được để trống !");
+        }
+
+        Section section = sectionRepository.findById(data.getSectionId()).orElse(null);
+
+        if (section == null) {
+            throw new ValidationException("Không tìm thấy học phần !");
+        }
+
 
         if (toSave == null) {
             toSave = new SectionClass();
 
-            if (data.getSectionId() == null) {
-                throw new ValidationException("Section ID is require !");
-            }
-
-            Section section = sectionRepository.findById(data.getSectionId()).orElse(null);
-
-            if (section == null) {
-                throw new ValidationException("Section is not found !");
-            }
-
             toSave.setSectionId(section.getId());
 
-            String classCode = "";
+            String code = "";
             boolean isExist = true;
 
             while (isExist) {
-                classCode = StringUtils.randomNumberGenerate(10);
-                isExist = sectionClassRepository.existsSectionClassByClassCode(classCode);
+                code = StringUtils.randomNumberGenerate(10);
+                isExist = sectionClassRepository.existsSectionClassByCode(code);
             }
 
-            toSave.setClassCode(classCode);
+            toSave.setCode(code);
         }
 
         if (data.getLecturerId() == null) {
-            throw new ValidationException("Lecturer ID is require !");
+            throw new ValidationException("Mã giảng viên đảm nhiệm lớp học phần không được để trống !");
         }
 
         Lecturer lecturer = lecturerRepository.findById(data.getLecturerId()).orElse(null);
 
         if (lecturer == null) {
-            throw new ValidationException("Lecturer is not found !!");
+            throw new ValidationException("Không tìm thấy giảng viên chủ nhiệm !!");
         }
 
         toSave.setLecturerId(lecturer.getId());
-
-        if (data.getPeriodTo() == null || data.getPeriodTo() < 1 || data.getPeriodTo() > 15) {
-            throw new ValidationException("Period To is invalid ! \nPeriod should be greater than 0 and lower than 15");
-        }
-
-        toSave.setPeriodTo(data.getPeriodTo());
-
-        if (data.getPeriodFrom() == null || data.getPeriodFrom() < 1 || data.getPeriodFrom() > 15) {
-            throw new ValidationException("Period From is invalid ! \nPeriod should be greater than 0 and lower than 15");
-        }
-
-        toSave.setPeriodFrom(data.getPeriodFrom());
-
-        if (data.getRoom() == null || data.getRoom().isEmpty()) {
-            throw new ValidationException("Room is required !");
-        }
-
-        toSave.setRoom(data.getRoom());
+        toSave.setTermId(term.getId());
         toSave.setNote(data.getNote());
+
+        if (data.getSectionClassType() == null) {
+            throw new ValidationException("Loại lớp học phần không được để trống !!");
+        }
+
+        if (data.getSectionClassType().equals(SectionClassType.practice)) {
+            if (data.getRefId() == null) {
+                throw new ValidationException("Lớp lý thuyết của lớp thực hành không được để trống !!");
+            }
+
+            SectionClass sectionClassThoery = sectionClassRepository.findById(data.getRefId()).orElse(null);
+
+            if (sectionClassThoery == null) {
+                throw new ValidationException("Không tìm thấy lớp lý thuyết cho lớp thực hành này !!");
+            }
+
+            toSave.setRefId(sectionClassThoery.getId());
+        }
+
         toSave.setSectionClassType(data.getSectionClassType());
+
+        if (data.getNumberOfStudents() == null || data.getNumberOfStudents() < 0) {
+            throw new ValidationException("Sĩ số tối đa sinh viên của lớp học phần không được để trống !!");
+        }
         toSave.setNumberOfStudents(data.getNumberOfStudents());
-        toSave.setDayInWeek(data.getDayInWeek());
 
-        String inputModified = data.getStartedAt().replace("T", " ");
 
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSX");
-        LocalDateTime result = LocalDateTime.parse(inputModified, format);
-        Date out = Date.from(result.atZone(ZoneId.systemDefault()).toInstant());
-        toSave.setStartedAt(out);
+        if (data.getSectionClassType() == null) {
+            throw new ValidationException("Loại lớp học phần không được để trống !!");
+        }
 
         toSave = sectionClassRepository.saveAndFlush(toSave);
 
@@ -231,7 +299,80 @@ public class SectionController {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok(toSave);
+        if (data.getTimeAndPlaces() == null || data.getTimeAndPlaces().isEmpty()) {
+            throw new ValidationException("Thời gian học của lớp học phần không được để trống !!!");
+        }
+
+
+        try {
+            List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findBySectionClassId(data.getId());
+            timeAndPlaceRepository.deleteAll(timeAndPlaces);
+
+            List<Schedule> schedules = scheduleRepository.findScheduleBySectionClassId(data.getId());
+            scheduleRepository.deleteAll(schedules);
+        } catch (Exception exception) {
+            System.out.println(exception);
+        }
+
+        int totalSession = 0;
+        if(toSave.getSectionClassType().equals(SectionClassType.theory)){
+            totalSession += section.getSectionDuration().getTheory() * 15;
+        } else if(toSave.getSectionClassType().equals(SectionClassType.practice)){
+            totalSession += section.getSectionDuration().getPractice() * 3 * 15;
+        }
+
+        for (TimeAndPlace timeAndPlace : data.getTimeAndPlaces()) {
+            TimeAndPlace timeAndPlaceToSave = new TimeAndPlace();
+            timeAndPlaceToSave.setSectionClassId(toSave.getId());
+
+            if (timeAndPlace.getRoom() == null || timeAndPlace.getRoom().isEmpty()) {
+                throw new ValidationException("Phòng học của lớp học phần không được để trống !!");
+            }
+
+            timeAndPlaceToSave.setRoom(timeAndPlace.getRoom());
+            timeAndPlaceToSave.setNote(timeAndPlace.getNote());
+
+            if (timeAndPlace.getPeriodStart() == null
+                || timeAndPlace.getPeriodStart() < 1
+                || timeAndPlace.getPeriodStart() > 15
+            ) {
+                throw new ValidationException("Tiết bắt đầu của lớp học phần không được để trống và nằm trong khoảng từ tiết 1 đến 15");
+            }
+
+            timeAndPlaceToSave.setPeriodStart(timeAndPlace.getPeriodStart());
+
+            if (timeAndPlace.getPeriodEnd() == null
+                || timeAndPlace.getPeriodEnd() < 1
+                || timeAndPlace.getPeriodEnd() > 15
+            ) {
+                throw new ValidationException("Tiết kết thúc của lớp học phần không được để trống và nằm trong khoảng từ tiết 1 đến 15");
+            }
+
+            timeAndPlaceToSave.setPeriodEnd(timeAndPlace.getPeriodEnd());
+
+            if (timeAndPlace.getDayOfTheWeek() == null) {
+                throw new ValidationException("Thứ trong ngày học của lớp học phần không được để trống !!");
+            }
+
+            timeAndPlaceToSave.setDayOfTheWeek(timeAndPlace.getDayOfTheWeek());
+
+            timeAndPlaceToSave = timeAndPlaceRepository.saveAndFlush(timeAndPlaceToSave);
+
+            if (timeAndPlaceToSave.getId() == null) {
+                return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Tạo thời khoá biểu cho lớp học phần
+            List<Schedule> schedules = scheduleService.createSchedules(toSave, timeAndPlaceToSave, totalSession);
+
+            if(schedules.isEmpty()){
+                return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        SectionClassDTO sectionClassDTO = sectionClassMapper.mapToDTO(toSave);
+
+        return ResponseEntity.ok(sectionClassDTO);
     }
 
     @PostMapping("/class/getPage")
@@ -251,94 +392,86 @@ public class SectionController {
         List<SectionClassDTO> sectionClassDTOS = sectionClassMapper.mapToDTO(sectionClasses);
         return ResponseEntity.ok(sectionClassDTOS);
     }
-
     @PostMapping("/class/registerSection")
     public ResponseEntity<?> registerSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) {
 
-        List<SectionClass> sectionClasses = sectionClassRepository.findSectionClassBySectionIdAndLecturerId(data.getSectionId(), data.getLecturerId());
-        if(!sectionClasses.isEmpty()){
-            for(SectionClass sectionClass : sectionClasses){
-                StudentSectionClass toSave =new StudentSectionClass();
+        //#region Student - Section Class (Registration Class)
 
-                if (data.getStudentId() == null) {
-                    throw new ValidationException("Student ID is required !");
-                }
+        // Theory
+        StudentSectionClass studentSectionClassTheory = new StudentSectionClass();
 
-                Student student = studentRepository.findById(data.getStudentId()).orElse(null);
-
-                if (student == null) {
-                    throw new ValidationException("Student is not found !!");
-                }
-
-                toSave.setStudentId(student.getId());
-
-
-                int studentsInClass = studentSectionClassRepository.countAllBySectionClassId(sectionClass.getId());
-                if (studentsInClass >= sectionClass.getNumberOfStudents()) {
-                    throw new ValidationException("The number of students in the class taking this section has reached its maximum !!");
-                }
-
-                toSave.setSectionClassId(sectionClass.getId());
-
-                toSave = studentSectionClassRepository.saveAndFlush(toSave);
-
-                if (toSave.getId() == null) {
-                    return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-
-                try {
-                    ExecutorService executor = Executors.newFixedThreadPool(1);
-                    StudentSectionClass finalToSave = toSave;
-                    FutureTask<String> futureTasks = new FutureTask<>(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(sectionClass.getSectionClassType().equals(SectionClassType.theory)){
-                                for (int i = 0; i < sectionClass.getSection().getTheoryPeriods() * 15; i++) {
-                                    Schedule schedule = new Schedule();
-                                    schedule.setSectionClassId(sectionClass.getId());
-                                    Date date = sectionClass.getStartedAt();
-                                    Instant instantDateLearn = Instant.ofEpochMilli(date.getTime());
-                                    schedule.setLearningDate(Date.from(Instant.from(LocalDateTime.ofInstant(instantDateLearn, ZoneId.systemDefault()).toLocalDate().plusDays(i * 7L))));
-                                    schedule.setStudentSectionClassId(finalToSave.getId());
-
-                                    schedule = scheduleRepository.saveAndFlush(schedule);
-
-                                    if (schedule.getId() == null) {
-                                        throw new ValidationException("Create Schedule failed !!");
-                                    }
-
-                                }
-                            } else {
-                                for (int i = 0; i < sectionClass.getSection().getPracticePeriods() * 30; i++) {
-                                    Schedule schedule = new Schedule();
-                                    schedule.setSectionClassId(sectionClass.getId());
-                                    Date date = sectionClass.getStartedAt();
-                                    Instant instantDateLearn = Instant.ofEpochMilli(date.getTime());
-                                    LocalDate localDate = LocalDateTime.ofInstant(instantDateLearn, ZoneId.systemDefault()).toLocalDate().plusDays(i * 7);
-                                    schedule.setLearningDate(Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
-                                    schedule.setStudentSectionClassId(finalToSave.getId());
-                                    schedule = scheduleRepository.saveAndFlush(schedule);
-
-                                    if (schedule.getId() == null) {
-                                        throw new ValidationException("Create Schedule failed !!");
-                                    }
-
-                                }
-
-                            }
-
-                        }
-                    }, "Done");
-
-                    executor.submit(futureTasks);
-                } catch (Exception exception) {
-                    System.out.println("Fail to create schedule !!");
-                }
-
-            }
+        if(data.getSectionClassTheoryId() == null){
+            throw new ValidationException("Lớp học phần lý thuyết của sinh viên không được để trống khi đăng ký !!");
         }
 
+        SectionClass sectionClassTheory = sectionClassRepository.findById(data.getSectionClassTheoryId()).orElse(null);
+
+        if(sectionClassTheory == null){
+            throw new ValidationException("Không tìm thấy lớp học phần lý thuyết này !!");
+        }
+
+        if(sectionClassTheory.getSectionClassStatus().equals(SectionClassStatus.closed)){
+            throw new ValidationException("Lớp học phần lý thuyết đã đóng đăng ký !!");
+        }
+
+        studentSectionClassTheory.setSectionClassId(sectionClassTheory.getId());
+
+        Student student = studentRepository.getStudentByUserId(userId);
+
+        if(student == null){
+            throw new ValidationException("Không tìm thấy sinh viên đăng ký !!");
+        }
+
+        studentSectionClassTheory.setStudentId(student.getId());
+        studentSectionClassTheory = studentSectionClassRepository.saveAndFlush(studentSectionClassTheory);
+
+        if(studentSectionClassTheory.getId() == null){
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // Practice
+        StudentSectionClass studentSectionClassPractice = new StudentSectionClass();
+
+        if(data.getSectionId() == null){
+            throw new ValidationException("Học phần không được để trống khi đăng ký học phần !!");
+        }
+
+        Section section = sectionRepository.findById(data.getSectionId()).orElse(null);
+
+        if(section == null){
+            throw new ValidationException("Không tìm thấy học phần này !!");
+        }
+
+        if(section.getSectionDuration().getPractice() > 0 && data.getSectionClassPracticeId() == null){
+            throw new ValidationException("Hãy chọn lớp thực hành của lớp học phần !!");
+        }
+
+        SectionClass sectionClassPractice = sectionClassRepository.findById(data.getSectionClassPracticeId()).orElse(null);
+
+        if(sectionClassPractice == null){
+            throw new ValidationException("Không tìm thấy lớp thực hành của lớp học phần !!");
+        }
+
+        if(sectionClassPractice.getSectionClassStatus().equals(SectionClassStatus.closed)){
+            throw new ValidationException("Lớp học phần thực hành đã đóng đăng ký !!");
+        }
+
+        studentSectionClassPractice.setSectionClassId(sectionClassPractice.getId());
+        studentSectionClassPractice.setStudentId(student.getId());
+        studentSectionClassPractice = studentSectionClassRepository.saveAndFlush(studentSectionClassPractice);
+
+        if(studentSectionClassPractice.getId() == null){
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        //#endregion
 
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PostMapping("/class/cancelSection")
+    public ResponseEntity<?> cancelSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) {
+
+
+        return ResponseEntity.ok("");
     }
 }

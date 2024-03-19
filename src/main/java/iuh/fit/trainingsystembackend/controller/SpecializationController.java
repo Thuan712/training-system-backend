@@ -39,7 +39,7 @@ public class SpecializationController {
     private SpecializationSpecification specializationSpecification;
     private FacultyRepository facultyRepository;
     private StudentRepository studentRepository;
-    private AcademicYearRepository academicYearRepository;
+    private LecturerRepository lecturerRepository;
     private SpecializationClassRepository specializationClassRepository;
     private StudentSpecification studentSpecification;
     private SpecializationClassSpecification specializationClassSpecification;
@@ -127,6 +127,17 @@ public class SpecializationController {
             throw new ValidationException("Không tìm thấy chuyên ngành !!");
         }
 
+        if(data.getLecturerId() == null){
+            throw new ValidationException("Mã giãng viên chủ nhiệm của lớp chuyên ngành không được để trống !!");
+        }
+
+        Lecturer lecturer = lecturerRepository.findById(data.getLecturerId()).orElse(null);
+
+        if(lecturer == null){
+            throw new ValidationException("Không tìm thấy giảng viên !!");
+        }
+
+        toSave.setLecturerId(lecturer.getId());
         toSave.setSchoolYear(data.getSchoolYear());
         toSave.setSpecializationId(specialization.getId());
 
@@ -174,7 +185,6 @@ public class SpecializationController {
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SpecializationClassRequest filterRequest) {
         List<SpecializationClass> specializationClasses = specializationClassRepository.findAll(specializationClassSpecification.getFilter(filterRequest));
         List<SpecializationClassDTO> specializationClassDTOS = specializationClassMapper.mapToDTO(specializationClasses);
-
         return ResponseEntity.ok(specializationClassDTOS);
     }
 

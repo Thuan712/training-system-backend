@@ -1,11 +1,9 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.CourseDTO;
-import iuh.fit.trainingsystembackend.dto.LecturerDTO;
 import iuh.fit.trainingsystembackend.model.Course;
-import iuh.fit.trainingsystembackend.model.Lecturer;
-import iuh.fit.trainingsystembackend.model.UserEntity;
-import iuh.fit.trainingsystembackend.repository.UserRepository;
+import iuh.fit.trainingsystembackend.model.Specialization;
+import iuh.fit.trainingsystembackend.repository.SpecializationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -16,17 +14,16 @@ import java.util.stream.Collectors;
 @Service("courseMapper")
 @AllArgsConstructor
 public class CourseMapper {
+    private SpecializationRepository specializationRepository;
     public CourseDTO mapToDTO(Course course) {
+        Specialization specialization = null;
+
 
         return CourseDTO.builder()
                 .id(course.getId())
                 .name(course.getName())
                 .code(course.getCode())
                 .description(course.getDescription())
-                .prerequisite(course.getPrerequisite())
-                .specializationId(course.getSpecializationId())
-                .courseType(course.getCourseType())
-                .credit(course.getCredit())
                 .createdAt(course.getCreatedAt())
                 .deletedAt(course.getDeletedAt())
                 .deleted(course.getDeleted())

@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.dto;
 
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
+import iuh.fit.trainingsystembackend.model.TimeAndPlace;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import javax.persistence.Cacheable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -22,6 +23,7 @@ public class SectionClassDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
 
     private Long lecturerId;
     private String lecturerName;
@@ -31,22 +33,12 @@ public class SectionClassDTO {
     private String sectionName;
     private String sectionCode;
 
-    private String classCode;
-
-    private String room;
-
-    private Integer periodFrom;
-
-    private Integer periodTo;
-
+    private Long refId;
+    private String code;
+    private List<TimeAndPlace> timeAndPlaces;
     private Integer numberOfStudents;
-
-    private DayInWeek dayInWeek;
-
     private String note;
 
     private SectionClassType sectionClassType;
-    private Integer registered;
     private SectionClassStatus sectionClassStatus;
-    private Date startedAt;
 }

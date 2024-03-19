@@ -1,5 +1,6 @@
 package iuh.fit.trainingsystembackend.model;
 
+import iuh.fit.trainingsystembackend.enums.TermType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,10 @@ public class Term implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "term_type")
+    @Enumerated(EnumType.STRING)
+    private TermType termType;
 
     @Column(name = "term_start")
     private Date termStart;
