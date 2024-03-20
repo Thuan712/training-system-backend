@@ -6,6 +6,8 @@ import iuh.fit.trainingsystembackend.request.ScheduleRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleRequest> {
     @Override
@@ -14,6 +16,7 @@ public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleR
                 Specification.where(attributeEqual("sectionClassId", request.getSectionClassId()))
                         .and(attributeEqual("learningDate", request.getLearningDate()))
                         .and(attributeEqual("studentSectionClassId", request.getStudentSectionClassId()))
+                        .and(attributeSectionClassIdsIn(request.getSectionClassIds()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 
@@ -33,6 +36,16 @@ public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleR
                 return null;
             }
             return criteriaBuilder.equal(root.get(key), value);
+        });
+    }
+
+    private Specification<Schedule> attributeSectionClassIdsIn(List<Long> sectionClassIds) {
+        return ((root, query, criteriaBuilder) -> {
+            if (sectionClassIds == null || sectionClassIds.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.in(root.get("sectionClassId")).value(sectionClassIds);
         });
     }
 }

@@ -41,18 +41,18 @@ public class ScheduleDTO {
 
     private String room;
 
-    private Integer periodFrom;
-
-    private Integer periodTo;
-
     private Integer numberOfStudents;
 
-    private String dayInWeek;
+    private DayInWeek dayInWeek;
 
     private String note;
 
     private String sectionClassType;
 
     private Date startedAt;
-    private String dateTime;
+
+    // Time And Place
+    private int periodStart;
+
+    private int periodEnd;
 }

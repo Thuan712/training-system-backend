@@ -1,6 +1,8 @@
 package iuh.fit.trainingsystembackend.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
+import iuh.fit.trainingsystembackend.enums.RegistrationType;
 import iuh.fit.trainingsystembackend.model.TimeAndPlace;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import lombok.Data;
@@ -26,10 +28,15 @@ public class SectionClassBean {
 
     // Register Section
     private Long studentId;
+
     private Long sectionClassTheoryId;
+    private Long timeAndPlaceTheoryId;
+
     private Long sectionClassPracticeId;
     private Long timeAndPlacePracticeId;
-    private Long timeAndPlaceTheoryId;
+
+    private RegistrationStatus registrationStatus = RegistrationStatus.registered;
+    private RegistrationType registrationType = RegistrationType.new_learning;
 
     // Cancel Section
     private Long studentSectionClassId;

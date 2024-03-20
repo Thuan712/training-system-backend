@@ -36,6 +36,12 @@ public class Schedule {
     @Column(name = "time_and_place_id")
     private Long timeAndPlaceId;
 
+    @ManyToOne
+    @JoinFormula(value = "time_and_place_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private TimeAndPlace timeAndPlace;
+
     @Column(name = "learning_date")
     private Date learningDate;
 }

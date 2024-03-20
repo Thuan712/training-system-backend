@@ -4,13 +4,12 @@ import iuh.fit.trainingsystembackend.dto.CourseDTO;
 import iuh.fit.trainingsystembackend.dto.RegistrationDTO;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.model.*;
-import iuh.fit.trainingsystembackend.repository.SectionClassRepository;
-import iuh.fit.trainingsystembackend.repository.SpecializationRepository;
-import iuh.fit.trainingsystembackend.repository.StudentRepository;
+import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +18,15 @@ import java.util.stream.Collectors;
 public class RegistrationMapper {
     private SectionClassRepository sectionClassRepository;
     private StudentRepository studentRepository;
+    private TimeAndPlaceRepository timeAndPlaceRepository;
+    private ScheduleRepository scheduleRepository;
     public RegistrationDTO mapToDTO(StudentSectionClass studentSectionClass) {
         SectionClass sectionClass = null;
         Student student = null;
         Section section = null;
         Lecturer lecturer = null;
         double totalCost = 0D;
+        List<Schedule> scheduleList = new ArrayList<>();
 
 
         if(studentSectionClass.getSectionClassId() != null){
@@ -41,6 +43,8 @@ public class RegistrationMapper {
             if(section != null && sectionClass.getTerm() != null){
                 totalCost = section.getCostCredits() * sectionClass.getTerm().getCostPerCredit();
             }
+
+            scheduleList = scheduleRepository.findScheduleBySectionClassId(studentSectionClass.getSectionClassId());
         }
 
         if(studentSectionClass.getStudentId() != null){
@@ -68,6 +72,8 @@ public class RegistrationMapper {
                 .total(totalCost)
                 .status(studentSectionClass.getStatus())
                 .type(studentSectionClass.getRegistrationType())
+
+                .scheduleList(!scheduleList.isEmpty() ? scheduleList : new ArrayList<>())
                 .createdAt(studentSectionClass.getCreatedAt())
                 .build();
     }

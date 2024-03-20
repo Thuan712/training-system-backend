@@ -7,8 +7,10 @@ import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.StudentMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.StudentRepository;
+import iuh.fit.trainingsystembackend.request.DebtRequest;
 import iuh.fit.trainingsystembackend.request.StudentRequest;
 import iuh.fit.trainingsystembackend.request.UserRequest;
+import iuh.fit.trainingsystembackend.service.DebtService;
 import iuh.fit.trainingsystembackend.specification.StudentSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import iuh.fit.trainingsystembackend.utils.StringUtils;
@@ -26,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,7 @@ public class StudentController {
     private StudentRepository studentRepository;
     private StudentSpecification studentSpecification;
     private StudentMapper studentMapper;
+    private DebtService debtService;
     @PostMapping("/getPage")
     public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
                                      @RequestParam("pageNumber") int pageNumber, @RequestParam("pageRows") int pageRows,
@@ -57,5 +61,12 @@ public class StudentController {
     public ResponseEntity<?> getListSchoolYear(@RequestParam(value = "userId", required = false) Long userId) {
         Set<String> schoolYears = studentRepository.findAll().stream().map(Student::getSchoolYear).collect(Collectors.toSet());
         return ResponseEntity.ok(schoolYears);
+    }
+
+    public ResponseEntity<?> getListDebtForStudent(@RequestParam(value = "userId") Long userId, @RequestParam(value = "studentId") Long studentId, @RequestBody DebtRequest filterRequest){
+
+
+        List<Map<String, Object>> debtList = debtService.getDebtList(studentId, filterRequest);
+        return ResponseEntity.ok("");
     }
 }

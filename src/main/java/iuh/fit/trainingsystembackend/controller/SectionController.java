@@ -31,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -194,6 +195,20 @@ public class SectionController {
             }
 
             sections = sections.stream().filter(section -> section.getTermRegister().contains(term.getTermType())).collect(Collectors.toList());
+
+            if(filterRequest.getStudentId() != null){
+                Student student = studentRepository.findById(filterRequest.getStudentId()).orElse(null);
+
+                if(student == null){
+                    throw new ValidationException("Không tìm thấy sinh viên đăng ký học phần !!");
+                }
+
+                List<Long> studentSections = studentSectionClassRepository.findByStudentIdAndTermId(student.getId(), filterRequest.getTermId()).stream().map(studentSectionClass -> studentSectionClass.getSectionClass().getSectionId()).collect(Collectors.toList());
+
+                if(!studentSections.isEmpty()){
+                    sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
+                }
+            }
         }
 
         List<SectionDTO> sectionDTOS = sectionMapper.mapToDTO(sections);
@@ -314,12 +329,6 @@ public class SectionController {
             System.out.println(exception);
         }
 
-        int totalSession = 0;
-        if(toSave.getSectionClassType().equals(SectionClassType.theory)){
-            totalSession += section.getSectionDuration().getTheory() * 15;
-        } else if(toSave.getSectionClassType().equals(SectionClassType.practice)){
-            totalSession += section.getSectionDuration().getPractice() * 3 * 15;
-        }
 
         for (TimeAndPlace timeAndPlace : data.getTimeAndPlaces()) {
             TimeAndPlace timeAndPlaceToSave = new TimeAndPlace();
@@ -362,6 +371,13 @@ public class SectionController {
                 return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
+            int totalSession = 0;
+            if(toSave.getSectionClassType().equals(SectionClassType.theory)){
+                totalSession += section.getSectionDuration().getTheory() * (15 / ((timeAndPlaceToSave.getPeriodEnd() - timeAndPlaceToSave.getPeriodStart()) + 1));
+            } else if(toSave.getSectionClassType().equals(SectionClassType.practice)){
+                totalSession += section.getSectionDuration().getPractice() * 3 *  (15 / ((timeAndPlaceToSave.getPeriodEnd() - timeAndPlaceToSave.getPeriodStart()) + 1));
+            }
+
             // Tạo thời khoá biểu cho lớp học phần
             List<Schedule> schedules = scheduleService.createSchedules(toSave, timeAndPlaceToSave, totalSession);
 
@@ -385,7 +401,6 @@ public class SectionController {
         Page<SectionClassDTO> page = sectionClassMapper.mapToDTO(sectionClasses);
         return ResponseEntity.ok(page);
     }
-
     @PostMapping("/class/getList")
     public ResponseEntity<?> getSectionClassList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody SectionClassRequest filterRequest) {
         List<SectionClass> sectionClasses = sectionClassRepository.findAll(sectionClassSpecification.getFilter(filterRequest));
@@ -396,6 +411,11 @@ public class SectionController {
     public ResponseEntity<?> registerSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) {
 
         //#region Student - Section Class (Registration Class)
+        Student student = studentRepository.getStudentByUserId(userId);
+
+        if(student == null){
+            throw new ValidationException("Không tìm thấy sinh viên đăng ký !!");
+        }
 
         // Theory
         StudentSectionClass studentSectionClassTheory = new StudentSectionClass();
@@ -416,12 +436,9 @@ public class SectionController {
 
         studentSectionClassTheory.setSectionClassId(sectionClassTheory.getId());
 
-        Student student = studentRepository.getStudentByUserId(userId);
 
-        if(student == null){
-            throw new ValidationException("Không tìm thấy sinh viên đăng ký !!");
-        }
-
+        studentSectionClassTheory.setRegistrationType(data.getRegistrationType());
+        studentSectionClassTheory.setStatus(data.getRegistrationStatus());
         studentSectionClassTheory.setStudentId(student.getId());
         studentSectionClassTheory = studentSectionClassRepository.saveAndFlush(studentSectionClassTheory);
 
@@ -442,36 +459,42 @@ public class SectionController {
             throw new ValidationException("Không tìm thấy học phần này !!");
         }
 
-        if(section.getSectionDuration().getPractice() > 0 && data.getSectionClassPracticeId() == null){
-            throw new ValidationException("Hãy chọn lớp thực hành của lớp học phần !!");
+        if(section.getSectionDuration().getPractice() > 0){
+            if(data.getSectionClassPracticeId() == null){
+                throw new ValidationException("Hãy chọn lớp thực hành của lớp học phần !!");
+            }
+
+            SectionClass sectionClassPractice = sectionClassRepository.findById(data.getSectionClassPracticeId()).orElse(null);
+
+            if(sectionClassPractice == null){
+                throw new ValidationException("Không tìm thấy lớp thực hành của lớp học phần !!");
+            }
+
+            if(sectionClassPractice.getSectionClassStatus().equals(SectionClassStatus.closed)){
+                throw new ValidationException("Lớp học phần thực hành đã đóng đăng ký !!");
+            }
+
+            studentSectionClassPractice.setRegistrationType(data.getRegistrationType());
+            studentSectionClassPractice.setStatus(data.getRegistrationStatus());
+            studentSectionClassPractice.setSectionClassId(sectionClassPractice.getId());
+            studentSectionClassPractice.setStudentId(student.getId());
+            studentSectionClassPractice = studentSectionClassRepository.saveAndFlush(studentSectionClassPractice);
+
+            if(studentSectionClassPractice.getId() == null){
+                return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+        //#endregion
 
-        SectionClass sectionClassPractice = sectionClassRepository.findById(data.getSectionClassPracticeId()).orElse(null);
-
-        if(sectionClassPractice == null){
-            throw new ValidationException("Không tìm thấy lớp thực hành của lớp học phần !!");
-        }
-
-        if(sectionClassPractice.getSectionClassStatus().equals(SectionClassStatus.closed)){
-            throw new ValidationException("Lớp học phần thực hành đã đóng đăng ký !!");
-        }
-
-        studentSectionClassPractice.setSectionClassId(sectionClassPractice.getId());
-        studentSectionClassPractice.setStudentId(student.getId());
-        studentSectionClassPractice = studentSectionClassRepository.saveAndFlush(studentSectionClassPractice);
-
-        if(studentSectionClassPractice.getId() == null){
-            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        //#region Create Tuition For Student
+        
         //#endregion
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/class/cancelSection")
-    public ResponseEntity<?> cancelSectionClass(@RequestParam(value = "userId") Long userId, @RequestBody SectionClassBean data) {
-
-
+    public ResponseEntity<?> cancelSectionClass(@RequestParam(value = "userId") Long userId, @RequestParam Long studentSectionClass) {
         return ResponseEntity.ok("");
     }
 }

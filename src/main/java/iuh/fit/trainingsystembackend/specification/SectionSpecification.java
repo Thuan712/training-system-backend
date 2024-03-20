@@ -7,6 +7,8 @@ import iuh.fit.trainingsystembackend.request.SectionRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class SectionSpecification extends BaseSpecification<Section, SectionRequest> {
     @Override
@@ -14,6 +16,7 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("courseId", request.getCourseId()))
                         .and(attributeContains("code", request.getCode()))
+                        .and(attributeIdsNotIn(request.getExcludeIds()))
                         .and(attributeEqual("theoryPeriods", request.getTheoryPeriods()))
                         .and(attributeEqual("practicePeriods", request.getPracticePeriods()))
                         .and(attributeEqual("sectionType", request.getSectionType()))
@@ -39,4 +42,14 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
         });
     }
 
+    private Specification<Section> attributeIdsNotIn(List<Long> excludeIds) {
+        return ((root, query, criteriaBuilder) -> {
+            if (excludeIds == null || excludeIds.size() < 1) {
+                return null;
+            }
+
+
+            return criteriaBuilder.not(criteriaBuilder.in(root.get("id")).value(excludeIds));
+        });
+    }
 }

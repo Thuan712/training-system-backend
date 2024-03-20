@@ -44,7 +44,6 @@ public class ScheduleController {
                                      @RequestParam(value = "sortOrder", required = false, defaultValue = "-1") int sortOrder,
                                      @RequestBody ScheduleRequest filterRequest) {
         Page<Schedule> schedules = scheduleRepository.findAll(scheduleSpecification.getFilter(filterRequest), PageRequest.of(pageNumber, pageRows, Sort.by(sortOrder == 1 ? Sort.Direction.ASC : Sort.Direction.DESC, "id")));
-
         Page<ScheduleDTO> scheduleDTOS = scheduleMapper.mapToDTO(schedules);
         return ResponseEntity.ok(scheduleDTOS);
     }

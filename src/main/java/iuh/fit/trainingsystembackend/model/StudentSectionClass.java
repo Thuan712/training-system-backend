@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
 import iuh.fit.trainingsystembackend.enums.RegistrationType;
 import jdk.jfr.Timestamp;
@@ -8,6 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -30,8 +34,29 @@ public class StudentSectionClass implements Serializable {
     @Column(name = "student_id")
     private Long studentId;
 
+    @ManyToOne
+    @JoinFormula(value = "student_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Student student;
+
     @Column(name = "section_class_id")
     private Long sectionClassId;
+
+    @ManyToOne
+    @JoinFormula(value = "section_class_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private SectionClass sectionClass;
+
+    @Column(name = "term_id")
+    private Long termId;
+
+    @ManyToOne
+    @JoinFormula(value = "term_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Term term;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

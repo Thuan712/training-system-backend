@@ -30,6 +30,8 @@ public class SectionClassMapper {
 
         return SectionClassDTO.builder()
                 .id(sectionClass.getId())
+                .termId(sectionClass.getTermId())
+                .termName(sectionClass.getTerm() != null ? sectionClass.getTerm().getName() : "")
 
                 .lecturerId(sectionClass.getLecturer() != null ? sectionClass.getLecturer().getId() : null)
                 .lecturerName(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
