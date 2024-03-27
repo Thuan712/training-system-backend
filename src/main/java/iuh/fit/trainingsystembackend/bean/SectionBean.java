@@ -5,6 +5,7 @@ import iuh.fit.trainingsystembackend.data.RequireSection;
 import iuh.fit.trainingsystembackend.data.SectionDuration;
 import iuh.fit.trainingsystembackend.enums.SectionType;
 import iuh.fit.trainingsystembackend.enums.TermType;
+import iuh.fit.trainingsystembackend.enums.TypeOfKnowledge;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ public class SectionBean implements Serializable {
 
     private Long specializationId;
 
-    private List<Long> courseIds;
+    private Long courseId;
 
     private String name;
 
@@ -35,6 +36,6 @@ public class SectionBean implements Serializable {
     private Double costCredits;
 
     private SectionType sectionType = SectionType.elective;
-
+    private TypeOfKnowledge typeOfKnowledge = TypeOfKnowledge.general_education;
     private Boolean deleted;
 }

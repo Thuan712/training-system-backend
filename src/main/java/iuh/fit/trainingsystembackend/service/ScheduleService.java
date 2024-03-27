@@ -1,6 +1,8 @@
 package iuh.fit.trainingsystembackend.service;
 
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
+import iuh.fit.trainingsystembackend.enums.ScheduleType;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.Schedule;
 import iuh.fit.trainingsystembackend.model.SectionClass;
 import iuh.fit.trainingsystembackend.model.Term;
@@ -128,12 +130,28 @@ public class ScheduleService {
             }
         }
 
+        if(sectionClass.getSectionClassType().equals(SectionClassType.practice)){
+            if(startDate != null){
+                startDate = startDate.plusDays(14);
+            } else{
+                return new ArrayList<>();
+            }
+        }
+
         List<Schedule> schedules = new ArrayList<>();
         for (int i = 0; i < totalSession; i++) {
             Schedule schedule = new Schedule();
 
-            schedule.setTimeAndPlaceId(timeAndPlace.getId());
             schedule.setSectionClassId(sectionClass.getId());
+            schedule.setScheduleType(ScheduleType.normal);
+            schedule.setRoom(timeAndPlace.getRoom());
+            schedule.setDayOfTheWeek(timeAndPlace.getDayOfTheWeek());
+            schedule.setPeriodStart(timeAndPlace.getPeriodStart());
+            schedule.setPeriodEnd(timeAndPlace.getPeriodEnd());
+            schedule.setNote(timeAndPlace.getNote());
+
+
+            schedule.setLecturerId(sectionClass.getLecturer() != null ? sectionClass.getLecturerId() : null);
 
             if(startDate != null){
                 schedule.setLearningDate(Date.from(Instant.from(startDate.plusDays(i * 7L).atStartOfDay(ZoneId.of("GMT")))));
@@ -149,4 +167,6 @@ public class ScheduleService {
 
         return schedules;
     }
+
+
 }

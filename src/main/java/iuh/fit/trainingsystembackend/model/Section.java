@@ -7,10 +7,14 @@ import iuh.fit.trainingsystembackend.data.SectionDuration;
 import iuh.fit.trainingsystembackend.data.RequireSection;
 import iuh.fit.trainingsystembackend.enums.SectionType;
 import iuh.fit.trainingsystembackend.enums.TermType;
+import iuh.fit.trainingsystembackend.enums.TypeOfKnowledge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -41,24 +45,19 @@ public class Section implements Serializable {
     @Column(name = "description")
     private String description;
 
+    // Loại học phần (Bắt buộc, tự chọn)
     @Column(name = "section_type")
     @Enumerated(EnumType.STRING)
     private SectionType sectionType;
 
-    @Column(name = "course_ids")
-    private String courseIdsString;
+    @Column(name = "course_id")
+    private Long courseId;
 
-    @Transient
-    private List<Long> courseIds;
-
-    @Transient
-    public List<Long> getCourseIds(){
-        if(this.courseIdsString != null && !this.courseIdsString.isEmpty()) {
-            return new Gson().fromJson(this.courseIdsString, new TypeToken<List<Long>>(){}.getType());
-        }
-
-        return new ArrayList<>();
-    }
+    @ManyToOne
+    @JoinFormula(value = "course_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Course course;
 
     // Thời lượng các tiết học thành phần (Đơn vị tín chỉ tiết học)
     @Column(name = "section_duration")
@@ -115,6 +114,11 @@ public class Section implements Serializable {
     // Tín chỉ học phí (Tín chỉ để tín ra học phí cho học phần)
     @Column(name = "cost_credits")
     private Double costCredits;
+
+    // Loại nội dung kiến thức (Đại cương, Chuyên ngành)
+    @Column(name = "type_of_knowlegde")
+    @Enumerated(EnumType.STRING)
+    private TypeOfKnowledge typeOfKnowledge;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

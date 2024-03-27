@@ -61,4 +61,7 @@ public class UserRequest {
 
     private Date entryDate;
     //#endregion
+
+    //Filter
+    private String searchValue;
 }

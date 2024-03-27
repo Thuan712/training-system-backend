@@ -4,7 +4,9 @@ import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
 import iuh.fit.trainingsystembackend.model.SectionClass;
 import iuh.fit.trainingsystembackend.model.Student;
 import iuh.fit.trainingsystembackend.model.StudentSectionClass;
+import iuh.fit.trainingsystembackend.model.UserEntity;
 import iuh.fit.trainingsystembackend.request.StudentRequest;
+import org.apache.catalina.User;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,7 @@ public class StudentSpecification extends BaseSpecification<Student, StudentRequ
                         .and(attributeContains("schoolYear", request.getSchoolYear()))
                         .and(attributeEqual("typeOfEducation", request.getTypeOfEducation()))
                         .and(attributeEqual("specializationId", request.getSpecializationId()))
+                        //Filter
                         .toPredicate(root, criteriaQuery, criteriaBuilder);
     }
 

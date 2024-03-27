@@ -197,82 +197,82 @@ public class AuthenticationController {
     }
     //#endregion
 
-    //#region Forgot Password
-    @PostMapping("/sendVerificationCode")
-    public ResponseEntity sendVerificationCode(
-            @RequestBody Map<String, Object> data,
-            HttpServletRequest request
-    ) {
-        String usernameOrEmail = (String) data.get("usernameOrEmail");
-        if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
-            throw new ValidationException("Username or email is required");
-        }
-
-        UserEntity user = userEntityRepository.findUserEntityByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
-        if (user == null) {
-            throw new ValidationException("User not found");
-        }
-
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new ValidationException("User does not have email");
-        }
-
-        String verificationCode = StringUtils.randomStringGenerate(6).toUpperCase(Locale.ENGLISH);
-
-//        PasswordConfig passwordConfig = user.getPasswordConfig();
-//        passwordConfig.setVerificationCode(verificationCode);
-//        passwordConfig.setVerificationCodeExpiry(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
-//
-//        user.setPasswordConfigString(new Gson().toJson(passwordConfig));
-        user = userEntityRepository.saveAndFlush(user);
-        if (user.getId() == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send verification code");
-        }
-
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @PostMapping("/checkVerificationCode")
-    public ResponseEntity checkVerificationCode(
-            @RequestBody Map<String, Object> data
-    ) {
-        String verificationCode = (String) data.get("verificationCode");
-        if (verificationCode == null || verificationCode.isEmpty()) {
-            throw new ValidationException("Verification code is required");
-        }
-
-        String usernameOrEmail = (String) data.get("usernameOrEmail");
-        if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
-            throw new ValidationException("Username or email is required");
-        }
-
-        UserEntity user = userEntityRepository.findUserEntityByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
-        if (user == null) {
-            throw new ValidationException("User not found");
-        }
-
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new ValidationException("User does not have email");
-        }
-
-//        PasswordConfig passwordConfig = user.getPasswordConfig();
-//        if (!passwordConfig.getVerificationCode().equals(verificationCode)) {
-//            throw new ValidationException("Verification code is not correct");
+//    //#region Forgot Password
+//    @PostMapping("/sendVerificationCode")
+//    public ResponseEntity sendVerificationCode(
+//            @RequestBody Map<String, Object> data,
+//            HttpServletRequest request
+//    ) {
+//        String usernameOrEmail = (String) data.get("usernameOrEmail");
+//        if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
+//            throw new ValidationException("Username or email is required");
 //        }
 //
-//        if (passwordConfig.getVerificationCodeExpiry() != null && !passwordConfig.getVerificationCodeExpiry().isEmpty()) {
-//            try {
-//                Date verificationCodeExpiry = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(passwordConfig.getVerificationCodeExpiry());
-//                if (verificationCodeExpiry.before(new Date())) {
-//                    throw new ValidationException("Verification code is expired");
-//                }
-//            } catch (Exception e) {
-//                throw new ValidationException("Verification code is expired");
-//            }
+//        UserEntity user = userEntityRepository.findUserEntityByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+//        if (user == null) {
+//            throw new ValidationException("User not found");
 //        }
-
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
+//
+//        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+//            throw new ValidationException("User does not have email");
+//        }
+//
+//        String verificationCode = StringUtils.randomStringGenerate(6).toUpperCase(Locale.ENGLISH);
+//
+////        PasswordConfig passwordConfig = user.getPasswordConfig();
+////        passwordConfig.setVerificationCode(verificationCode);
+////        passwordConfig.setVerificationCodeExpiry(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
+////
+////        user.setPasswordConfigString(new Gson().toJson(passwordConfig));
+//        user = userEntityRepository.saveAndFlush(user);
+//        if (user.getId() == null) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send verification code");
+//        }
+//
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
+//
+//    @PostMapping("/checkVerificationCode")
+//    public ResponseEntity checkVerificationCode(
+//            @RequestBody Map<String, Object> data
+//    ) {
+//        String verificationCode = (String) data.get("verificationCode");
+//        if (verificationCode == null || verificationCode.isEmpty()) {
+//            throw new ValidationException("Verification code is required");
+//        }
+//
+//        String usernameOrEmail = (String) data.get("usernameOrEmail");
+//        if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
+//            throw new ValidationException("Username or email is required");
+//        }
+//
+//        UserEntity user = userEntityRepository.findUserEntityByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+//        if (user == null) {
+//            throw new ValidationException("User not found");
+//        }
+//
+//        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+//            throw new ValidationException("User does not have email");
+//        }
+//
+////        PasswordConfig passwordConfig = user.getPasswordConfig();
+////        if (!passwordConfig.getVerificationCode().equals(verificationCode)) {
+////            throw new ValidationException("Verification code is not correct");
+////        }
+////
+////        if (passwordConfig.getVerificationCodeExpiry() != null && !passwordConfig.getVerificationCodeExpiry().isEmpty()) {
+////            try {
+////                Date verificationCodeExpiry = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(passwordConfig.getVerificationCodeExpiry());
+////                if (verificationCodeExpiry.before(new Date())) {
+////                    throw new ValidationException("Verification code is expired");
+////                }
+////            } catch (Exception e) {
+////                throw new ValidationException("Verification code is expired");
+////            }
+////        }
+//
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
 
     @PostMapping("/changePassword")
     public ResponseEntity changePassword(

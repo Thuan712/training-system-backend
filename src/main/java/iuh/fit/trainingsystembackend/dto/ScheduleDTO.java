@@ -3,6 +3,7 @@ package iuh.fit.trainingsystembackend.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.annotations.Expose;
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
+import iuh.fit.trainingsystembackend.enums.ScheduleType;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.Section;
 import lombok.Builder;
@@ -24,35 +25,28 @@ public class ScheduleDTO {
     @Expose
     private Long id;
     private Long sectionClassId;
+    private String sectionClassCode;
     private Date learningDate;
+
+    // Term
+    private Long termId;
+    private String termName;
 
     // Section Class
     private Long lecturerId;
-
     private String lecturerName;
 
     private Long sectionId;
-
     private String sectionName;
-
     private String sectionCode;
 
-    private String classCode;
-
     private String room;
-
     private Integer numberOfStudents;
-
     private DayInWeek dayInWeek;
-
     private String note;
-
     private String sectionClassType;
-
-    private Date startedAt;
-
+    private ScheduleType scheduleType;
     // Time And Place
     private int periodStart;
-
     private int periodEnd;
 }

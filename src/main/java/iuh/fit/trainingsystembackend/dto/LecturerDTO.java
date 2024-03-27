@@ -23,4 +23,7 @@ public class LecturerDTO {
     private Title title = Title.unknown;
     private Position position = Position.teacher;
     private Date entryDate = new Date();
+
+    // Options
+    private String fullName;
 }

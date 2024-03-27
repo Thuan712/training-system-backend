@@ -3,6 +3,7 @@ package iuh.fit.trainingsystembackend.dto;
 import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
 import iuh.fit.trainingsystembackend.enums.RegistrationType;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.Schedule;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,9 @@ public class RegistrationDTO {
     private Long id;
     private Long studentId;
 
+    private Long termId;
+    private String termName;
+
     private Long sectionId;
     private String sectionName;
     private String sectionCode;
@@ -29,9 +33,14 @@ public class RegistrationDTO {
     private Long sectionClassId;
     private String sectionClassCode;
     private SectionClassStatus sectionClassStatus;
+    private SectionClassType sectionClassType;
 
     private Long lecturerId;
     private String lecturerName;
+    private String lecturerCode;
+
+    private Long timeAndPlaceId;
+    private String timeAndPlaceName;
 
     private Double total;
     private RegistrationStatus status;

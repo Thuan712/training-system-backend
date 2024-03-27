@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SectionClassRequest {
@@ -15,4 +17,9 @@ public class SectionClassRequest {
     private String note;
     private SectionClassType sectionClassType;
 
+    // Filter
+    private String searchValue;
+    private List<Long> sectionIds;
+    private List<Long> lecturerIds;
+    private List<Long> termIds;
 }

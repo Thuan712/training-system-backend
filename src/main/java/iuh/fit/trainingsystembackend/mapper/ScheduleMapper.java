@@ -42,20 +42,29 @@ public class ScheduleMapper {
 
         return ScheduleDTO.builder()
                 .id(schedule.getId())
-                .sectionClassId(schedule.getSectionClass() != null ? schedule.getSectionClass().getId() : null)
+                .termId(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getId() : null)
+                .termName(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getName() : "")
+
                 .lecturerId(lecturer != null ? lecturer.getId() : null)
                 .lecturerName(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
+
                 .sectionId(section != null ? section.getId() : null)
                 .sectionName(section != null ? section.getName() : "")
                 .sectionCode(section != null ? section.getCode() : "")
+
+                .sectionClassId(schedule.getSectionClass() != null ? schedule.getSectionClass().getId() : null)
+                .sectionClassCode(schedule.getSectionClass() != null ? schedule.getSectionClass().getCode() : "")
                 .numberOfStudents(schedule.getSectionClass() != null ? schedule.getSectionClass().getNumberOfStudents() : null)
                 .note(schedule.getSectionClass() != null ? schedule.getSectionClass().getNote() : "")
                 .sectionClassType(schedule.getSectionClass() != null ? schedule.getSectionClass().getSectionClassType().name() : "")
+
+                .periodStart(schedule.getPeriodStart() != null ? schedule.getPeriodStart() : 0)
+                .periodEnd(schedule.getPeriodEnd() != null ? schedule.getPeriodEnd() : 0)
+                .dayInWeek(schedule.getDayOfTheWeek() != null ? schedule.getDayOfTheWeek() : null)
+                .room(schedule.getRoom() != null  && !schedule.getRoom().isEmpty() ? schedule.getRoom() : "")
+
                 .learningDate(schedule.getLearningDate())
-                .periodStart(schedule.getTimeAndPlace() != null ? schedule.getTimeAndPlace().getPeriodStart() : 0)
-                .periodEnd(schedule.getTimeAndPlace() != null ? schedule.getTimeAndPlace().getPeriodEnd() : 0)
-                .dayInWeek(schedule.getTimeAndPlace() != null ? schedule.getTimeAndPlace().getDayOfTheWeek() : null)
-                .room(schedule.getTimeAndPlace() != null ? schedule.getTimeAndPlace().getRoom() : "")
+                .scheduleType(schedule.getScheduleType())
                 .build();
     }
 

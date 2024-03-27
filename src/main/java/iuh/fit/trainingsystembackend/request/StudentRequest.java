@@ -13,4 +13,6 @@ public class StudentRequest {
     private Long specializationId;
     private String schoolYear;
     private TypeOfEducation typeOfEducation;
+
+    private String searchValue;
 }

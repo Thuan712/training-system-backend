@@ -17,5 +17,6 @@ public class Constants {
     public static final String RESULT_ENDPOINT = "result";
     public static final String SPECIALIZATION_ENDPOINT = "specialization";
     public static final String REGISTRATION_ENDPOINT = "registration";
+    public static final String TIME_AND_PLACE_ENDPOINT = "timeAndPlace";
     //#endregion
 }

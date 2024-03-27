@@ -22,7 +22,11 @@ public class LecturerMapper {
     private UserRepository userRepository;
     public LecturerDTO mapToDTO(Lecturer lecturer) {
         UserEntity userEntity = userRepository.findById(lecturer.getUserId()).orElse(null);
+        String fullName = "";
 
+        if(userEntity != null){
+            fullName = userEntity.getFirstName() + " " + userEntity.getLastName() + " - " + userEntity.getCode();
+        }
         return LecturerDTO.builder()
                 .id(lecturer.getId())
                 .userId(userEntity != null ? userEntity.getId() : null)
@@ -32,6 +36,7 @@ public class LecturerMapper {
                 .title(lecturer.getTitle())
                 .position(lecturer.getPosition())
                 .entryDate(lecturer.getEntryDate())
+                .fullName(fullName)
                 .build();
     }
 

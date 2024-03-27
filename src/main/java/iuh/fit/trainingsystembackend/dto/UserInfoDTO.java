@@ -73,16 +73,18 @@ public class UserInfoDTO implements Serializable {
     //#endregion
 
     //#region Student
+    private Long studentId;
     private Long specializationClassId;
     private String specializationClassName;
 
     private TrainingLevel trainingLevel;
 
-    private String typeOfEducation;
+    private TypeOfEducation typeOfEducation;
     private String schoolYear;
     //#endregion
 
     //#region Lecturer
+    private Long lecturerId;
     private Long specializationId;
     private String specializationName;
 

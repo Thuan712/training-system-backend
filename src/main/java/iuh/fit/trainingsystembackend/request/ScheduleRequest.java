@@ -10,7 +10,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ScheduleRequest {
     private List<Long> sectionClassIds;
-    private Long  sectionClassId;
+    private List<Long> lecturerIds;
+
+    private Long lecturerId;
+    private Long termId;
+    private Long sectionClassId;
     private Long studentSectionClassId;
     private Date learningDate;
 }

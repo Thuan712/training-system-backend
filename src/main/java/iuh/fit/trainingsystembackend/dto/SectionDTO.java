@@ -31,7 +31,7 @@ public class SectionDTO {
 
     private String specializationCode;
 
-    private List<Long> courseIds;
+    private Long courseId;
 
     private String name;
 

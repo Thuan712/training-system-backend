@@ -1,10 +1,7 @@
 package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
-import iuh.fit.trainingsystembackend.model.Lecturer;
-import iuh.fit.trainingsystembackend.model.SectionClass;
-import iuh.fit.trainingsystembackend.model.StudentSectionClass;
-import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.request.SectionClassRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -12,17 +9,23 @@ import org.springframework.stereotype.Component;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
+import java.util.List;
 
 @Component
 public class SectionClassSpecification extends BaseSpecification<SectionClass, SectionClassRequest> {
     @Override
     public Specification<SectionClass> getFilter(SectionClassRequest request) {
         return (root, query, criteriaBuilder) ->
-                Specification.where(attributeEqual("termId", request.getLecturerId()))
+                Specification.where(attributeEqual("termId", request.getTermId()))
                         .and(attributeEqual("sectionId", request.getSectionId()))
                         .and(attributeStudentIdEqual(request.getStudentId()))
                         .and(attributeContains("code", request.getCode()))
                         .and(attributeEqual("sectionClassType", request.getSectionClassType()))
+                        // Filter
+                        .and(attributeContains("code", request.getSearchValue()))
+                        .and(attributeSectionIdsIn( request.getSectionIds()))
+                        .and(attributeLecturerIdsIn(request.getLecturerIds()))
+                        .and(attributeTermIdsIn(request.getTermIds()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 
@@ -57,6 +60,36 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
             subquery.select(subqueryRoot.get("sectionClassId")).where(studentPredicate);
 
             return criteriaBuilder.in(root.get("id")).value(subquery);
+        });
+    }
+
+    private Specification<SectionClass> attributeLecturerIdsIn(List<Long> lecturerIds) {
+        return ((root, query, criteriaBuilder) -> {
+            if (lecturerIds == null || lecturerIds.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.in(root.get("lecturerId")).value(lecturerIds);
+        });
+    }
+
+    private Specification<SectionClass> attributeSectionIdsIn(List<Long> sectionIds) {
+        return ((root, query, criteriaBuilder) -> {
+            if (sectionIds == null || sectionIds.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.in(root.get("sectionId")).value(sectionIds);
+        });
+    }
+
+    private Specification<SectionClass> attributeTermIdsIn(List<Long> termIds) {
+        return ((root, query, criteriaBuilder) -> {
+            if (termIds == null || termIds.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.in(root.get("termId")).value(termIds);
         });
     }
 }

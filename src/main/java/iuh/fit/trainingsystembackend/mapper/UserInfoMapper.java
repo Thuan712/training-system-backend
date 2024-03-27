@@ -84,12 +84,14 @@ public class UserInfoMapper {
                 .phone(userAddress != null ? userAddress.getPhone() : "")
                 .formattedAddress(userAddress != null ? userAddress.getFormattedAddress() : "")
                 // Student
-                .typeOfEducation(student != null ? student.getTypeOfEducation().getValue() : "")
+                .studentId(student != null ? student.getId() : null)
+                .typeOfEducation(student != null ? student.getTypeOfEducation() : null)
                 .specializationId(specialization != null ? specialization.getId() : null)
                 .specializationName(specialization != null ? specialization.getName() : "")
                 .specializationClassName(specializationClass != null ? specializationClass.getName() : "")
                 .schoolYear(student != null ? student.getSchoolYear() : "")
                 // Lecturer
+                .lecturerId(lecturer != null ? lecturer.getId() : null)
                 .titleValue(lecturer != null ? lecturer.getTitle().getValue() : "")
                 .title(lecturer != null ? lecturer.getTitle() : null)
                 .positionValue(lecturer != null ? lecturer.getPosition().getValue() : "")

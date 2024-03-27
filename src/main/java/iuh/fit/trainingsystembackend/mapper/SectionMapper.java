@@ -29,19 +29,12 @@ public class SectionMapper {
             specialization = specializationRepository.findById(section.getSpecializationId()).orElse(null);
         }
 
-
-//        if(section.getRequireSection().getPrerequisite() != null && !section.getRequireSection().getPrerequisite().isEmpty()){
-//            for(String sectionId : section.getRequireSection().getPrerequisite()){
-//
-//            }
-//        }
-
         return SectionDTO.builder()
                 .id(section.getId())
                 .specializationId(section.getSpecializationId())
                 .specializationName(specialization != null ? specialization.getName() : "")
                 .specializationCode(specialization != null ? specialization.getCode() : "")
-                .courseIds(section.getCourseIds())
+                .courseId(section.getCourseId())
                 .name(section.getName())
                 .description(section.getDescription())
                 .code(section.getCode())
