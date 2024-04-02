@@ -4,6 +4,7 @@ import iuh.fit.trainingsystembackend.dto.CourseDTO;
 import iuh.fit.trainingsystembackend.dto.RegistrationDTO;
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
+import iuh.fit.trainingsystembackend.enums.TuitionStatus;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,6 @@ public class RegistrationMapper {
         Lecturer lecturer = null;
         double totalCost = 0D;
         List<Schedule> scheduleList = new ArrayList<>();
-
 
         if(studentSectionClass.getSectionClassId() != null){
             sectionClass = sectionClassRepository.findById(studentSectionClass.getSectionClassId()).orElse(null);
@@ -70,6 +70,22 @@ public class RegistrationMapper {
             dayInWeek += "Chủ Nhật";
         }
 
+        // Tuition
+        Tuition tuition = null;
+        double total = 0;
+        double debt = 0;
+
+        if(studentSectionClass.getTuition() != null){
+            tuition = studentSectionClass.getTuition();
+
+            total =(tuition.getInitialFee() - tuition.getDiscountFee()) + tuition.getPlusDeductions() - tuition.getMinusDeductions();
+            if(tuition.getStatus().equals(TuitionStatus.paid)){
+                debt = 0D;
+            } else {
+                debt = total;
+            }
+        }
+
         return RegistrationDTO.builder()
                 .id(studentSectionClass.getId())
 
@@ -96,12 +112,23 @@ public class RegistrationMapper {
                 .timeAndPlaceId(studentSectionClass.getTimeAndPlaceId())
                 .timeAndPlaceName(studentSectionClass.getTimeAndPlace().getRoom() + " ("+ dayInWeek + " " + studentSectionClass.getTimeAndPlace().getPeriodStart() + "-" + studentSectionClass.getTimeAndPlace().getPeriodEnd() + ")")
 
-                .total(totalCost)
                 .status(studentSectionClass.getStatus())
                 .type(studentSectionClass.getRegistrationType())
 
                 .scheduleList(!scheduleList.isEmpty() ? scheduleList : new ArrayList<>())
                 .createdAt(studentSectionClass.getCreatedAt())
+
+                // TODO: Tuition
+                .tuitionId(tuition != null ? tuition.getId() : null)
+                .initialFee(tuition != null ? tuition.getInitialFee() : null)
+                .debt(debt)
+                .discountAmount(tuition != null ? tuition.getDiscountAmount() : null)
+                .discountFee(tuition != null ? tuition.getDiscountFee() : null)
+                .minusDeductions(tuition != null ? tuition.getMinusDeductions() : null)
+                .otherInformation(tuition != null ? tuition.getOtherInformation() : null)
+                .plusDeductions(tuition != null ? tuition.getPlusDeductions() : null)
+                .tuitionStatus(tuition != null ? tuition.getStatus() : null)
+                .total(total)
                 .build();
     }
 

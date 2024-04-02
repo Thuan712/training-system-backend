@@ -12,6 +12,6 @@ public interface SectionClassRepository extends JpaRepository<SectionClass, Long
     boolean existsSectionClassByCode(String code);
     boolean existsSectionClassByLecturerIdAndSectionId(Long lecturerId, Long sectionId);
     boolean existsBySectionIdAndTermId(Long sectionId, Long termId);
-
+    List<SectionClass> findByRefId(Long refId);
     List<SectionClass> findSectionClassBySectionIdAndLecturerId(Long sectionId, Long lecturerId);
 }

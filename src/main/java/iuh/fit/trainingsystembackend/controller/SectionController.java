@@ -9,6 +9,7 @@ import iuh.fit.trainingsystembackend.dto.SectionDTO;
 import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
+import iuh.fit.trainingsystembackend.enums.TuitionStatus;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.SectionClassMapper;
 import iuh.fit.trainingsystembackend.mapper.SectionMapper;
@@ -54,6 +55,7 @@ public class SectionController {
     private StudentRepository studentRepository;
     private ScheduleService scheduleService;
     private ScheduleRepository scheduleRepository;
+    private TuitionRepository tuitionRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -126,6 +128,11 @@ public class SectionController {
         if (data.getCredits() != null) {
             if (data.getCredits() < 0) {
                 throw new ValidationException("Số tín chỉ học tập của học phần phải lớn hơn bằng 0 !!");
+            } else {
+                int totalCreditsDuration = data.getSectionDuration().getTheory() + data.getSectionDuration().getPractice();
+                if(!data.getCredits().equals(totalCreditsDuration)) {
+                    throw new ValidationException("Tổng hệ số thời lượng tiết học thực hành và lý thuyết không được vượt quá hoặc thấp hơn số tín chỉ học tập !!");
+                }
             }
 
             toSave.setCredits(data.getCredits());
@@ -182,27 +189,34 @@ public class SectionController {
 
         List<Section> sections = sectionRepository.findAll(sectionSpecification.getFilter(filterRequest));
 
-        if (filterRequest.getTermId() != null) {
-            Term term = termRepository.findById(filterRequest.getTermId()).orElse(null);
+//
 
-            if (term == null) {
-                throw new ValidationException("Không tìm thấy dữ liệu học kì này !!");
+        if (filterRequest.getStudentId() != null) {
+            Term term = null;
+            if (filterRequest.getTermId() != null) {
+                term = termRepository.findById(filterRequest.getTermId()).orElse(null);
+
+                if (term == null) {
+                    throw new ValidationException("Không tìm thấy dữ liệu học kì này !!");
+                }
             }
 
-            sections = sections.stream().filter(section -> section.getTermRegister().contains(term.getTermType())).collect(Collectors.toList());
+            Student student = studentRepository.findById(filterRequest.getStudentId()).orElse(null);
 
-            if (filterRequest.getStudentId() != null) {
-                Student student = studentRepository.findById(filterRequest.getStudentId()).orElse(null);
+            if (student == null) {
+                throw new ValidationException("Không tìm thấy sinh viên đăng ký học phần !!");
+            }
 
-                if (student == null) {
-                    throw new ValidationException("Không tìm thấy sinh viên đăng ký học phần !!");
-                }
+            List<Long> studentSections;
 
-                List<Long> studentSections = studentSectionClassRepository.findByStudentId(student.getId()).stream().map(studentSectionClass -> studentSectionClass.getSectionClass().getSectionId()).collect(Collectors.toList());
+            if(term ==  null){
+                studentSections = studentSectionClassRepository.findByStudentId(student.getId()).stream().map(studentSectionClass -> studentSectionClass.getSectionClass().getSectionId()).collect(Collectors.toList());
+            } else {
+                studentSections = studentSectionClassRepository.findByStudentIdAndTermId(student.getId(), term.getId()).stream().map(studentSectionClass -> studentSectionClass.getSectionClass().getSectionId()).collect(Collectors.toList());
+            }
 
-                if (!studentSections.isEmpty()) {
-                    sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
-                }
+            if (!studentSections.isEmpty()) {
+                sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
             }
         }
 
@@ -286,6 +300,10 @@ public class SectionController {
 
             if (sectionClassTheory == null) {
                 throw new ValidationException("Không tìm thấy lớp lý thuyết cho lớp thực hành này !!");
+            }
+
+            if(sectionClassTheory.getSection().getSectionDuration().getPractice() < 1){
+                throw new ValidationException("Môn học này không có yêu cầu thực hành nên không thể tạo lớp thực hành !!");
             }
 
             toSave.setRefId(sectionClassTheory.getId());
@@ -469,11 +487,7 @@ public class SectionController {
         studentSectionClassTheory.setRegistrationType(data.getRegistrationType());
         studentSectionClassTheory.setStatus(RegistrationStatus.registered);
         studentSectionClassTheory.setStudentId(student.getId());
-        studentSectionClassTheory = studentSectionClassRepository.saveAndFlush(studentSectionClassTheory);
 
-        if (studentSectionClassTheory.getId() == null) {
-            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
         // Practice
         StudentSectionClass studentSectionClassPractice = new StudentSectionClass();
@@ -529,7 +543,29 @@ public class SectionController {
         //#endregion
 
         //#region Create Tuition For Student
+        Tuition tuitionSave = new Tuition();
+        Double fee = term.getCostPerCredit() * section.getCostCredits();
+        tuitionSave.setInitialFee(fee);
 
+        // Later
+        tuitionSave.setDiscountAmount(0D);
+        tuitionSave.setDiscountFee(0D);
+        tuitionSave.setPlusDeductions(0D);
+        tuitionSave.setMinusDeductions(0D);
+        tuitionSave.setStatus(TuitionStatus.unpaid);
+        tuitionSave.setInvestigateStatus(false);
+        tuitionSave = tuitionRepository.saveAndFlush(tuitionSave);
+
+        if(tuitionSave.getId() == null){
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        studentSectionClassTheory.setTuitionId(tuitionSave.getId());
+        studentSectionClassTheory = studentSectionClassRepository.saveAndFlush(studentSectionClassTheory);
+
+        if (studentSectionClassTheory.getId() == null) {
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         //#endregion
 
         return ResponseEntity.ok(HttpStatus.OK);

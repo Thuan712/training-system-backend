@@ -67,6 +67,15 @@ public class StudentSectionClass implements Serializable {
     @JsonIgnore
     private TimeAndPlace timeAndPlace;
 
+    @Column(name = "tuition_fee_id")
+    private Long tuitionId;
+
+    @ManyToOne
+    @JoinFormula(value = "tuition_fee_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Tuition tuition;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private RegistrationStatus status;

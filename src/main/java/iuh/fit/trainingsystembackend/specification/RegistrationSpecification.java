@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.SectionClass;
 import iuh.fit.trainingsystembackend.model.StudentSectionClass;
 import iuh.fit.trainingsystembackend.request.RegistrationRequest;
@@ -19,11 +20,14 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("studentId",request.getStudentId())
                         .and(attributeEqual("sectionClassId", request.getSectionClassId()))
+                        .and(attributeEqual("termId", request.getTermId()))
 
                         .and(attributeTermIdIn(request.getTermIds()))
                         .and(attributeLecturerIdIn(request.getLecturerIds()))
                         .and(attributeSectionIdIn(request.getSectionIds()))
                         .and(attributeContainsSectionClass(request.getSearchValue()))
+
+                        .and(attributeEqualSectionClassType(request.getSectionClassType()))
                 ).toPredicate(root, query, criteriaBuilder);
     }
 
@@ -45,8 +49,24 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
             Subquery<SectionClass> subquery = query.subquery(SectionClass.class);
             Root<SectionClass> subqueryRoot = subquery.from(SectionClass.class);
 
-            Predicate sectionClasssPredicate = criteriaBuilder.like(criteriaBuilder.lower(subqueryRoot.get("code")), containsLowerCase(value));
-            subquery.select(subqueryRoot.get("id")).where(sectionClasssPredicate);
+            Predicate sectionClassPredicate = criteriaBuilder.like(criteriaBuilder.lower(subqueryRoot.get("code")), containsLowerCase(value));
+            subquery.select(subqueryRoot.get("id")).where(sectionClassPredicate);
+
+            return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
+        });
+    }
+
+    private Specification<StudentSectionClass> attributeEqualSectionClassType(SectionClassType value) {
+        return((root, query, criteriaBuilder) -> {
+            if(value == null){
+                return null;
+            }
+
+            Subquery<SectionClass> subquery = query.subquery(SectionClass.class);
+            Root<SectionClass> subqueryRoot = subquery.from(SectionClass.class);
+
+            Predicate sectionClassPredicate = criteriaBuilder.equal(subqueryRoot.get("sectionClassType"), value);
+            subquery.select(subqueryRoot.get("id")).where(sectionClassPredicate);
 
             return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
         });

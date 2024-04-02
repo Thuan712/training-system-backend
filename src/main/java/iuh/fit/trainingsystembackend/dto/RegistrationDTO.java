@@ -1,15 +1,13 @@
 package iuh.fit.trainingsystembackend.dto;
 
-import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
-import iuh.fit.trainingsystembackend.enums.RegistrationType;
-import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
-import iuh.fit.trainingsystembackend.enums.SectionClassType;
+import iuh.fit.trainingsystembackend.enums.*;
 import iuh.fit.trainingsystembackend.model.Schedule;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import java.util.Date;
 import java.util.List;
 
@@ -42,10 +40,27 @@ public class RegistrationDTO {
     private Long timeAndPlaceId;
     private String timeAndPlaceName;
 
-    private Double total;
     private RegistrationStatus status;
     private RegistrationType type;
 
     private List<Schedule> scheduleList;
     private Date createdAt;
+
+    // Tuition
+    private Long tuitionId;
+
+    private Double initialFee;
+    private Double debt;
+    private Double discountAmount;
+    private Double discountFee;
+
+    private Double plusDeductions;
+
+    private Double minusDeductions;
+
+    private String otherInformation;
+
+    private TuitionStatus tuitionStatus;
+
+    private Double total;
 }

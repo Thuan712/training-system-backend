@@ -39,7 +39,6 @@ public class ScheduleService {
         }
         // Tìm ngày bắt đầu của học kỳ
         LocalDate localDateStartTerm = term.getTermStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
         DayOfWeek dayOfWeek = localDateStartTerm.getDayOfWeek();
 
         // Xác định ngày bắt đầu học
@@ -48,85 +47,97 @@ public class ScheduleService {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue());
             } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
-                startDate = localDateStartTerm.plusDays(1 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
             } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
-                startDate = localDateStartTerm.plusDays(2 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
             } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
-                startDate = localDateStartTerm.plusDays(3 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
             } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(4 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
             } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
-                startDate = localDateStartTerm.plusDays(5 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 6);
             }
         } else if (timeAndPlace.getDayOfTheWeek().equals(DayInWeek.tuesday)) {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 6);
             } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue());
             } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
-                startDate = localDateStartTerm.plusDays(1 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
             } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
-                startDate = localDateStartTerm.plusDays(2 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
             } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(3 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
             } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
-                startDate = localDateStartTerm.plusDays(4 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
             }
         } else if (timeAndPlace.getDayOfTheWeek().equals(DayInWeek.wednesday)) {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
             } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 6);
             } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue());
             } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
-                startDate = localDateStartTerm.plusDays(1 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
             } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(2 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
             } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
-                startDate = localDateStartTerm.plusDays(3 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
             }
         } else if (timeAndPlace.getDayOfTheWeek().equals(DayInWeek.thursday)) {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
             } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
             } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 6);
             } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue());
             } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(1 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
             } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
-                startDate = localDateStartTerm.plusDays(2 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
             }
         } else if (timeAndPlace.getDayOfTheWeek().equals(DayInWeek.friday)) {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
-            } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
+            } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
             } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
             } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 6);
             } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(1 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue());
             } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
-                startDate = localDateStartTerm.plusDays(2 - dayOfWeek.getValue());
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
             }
         } else if (timeAndPlace.getDayOfTheWeek().equals(DayInWeek.saturday)) {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
-            } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
-            } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
-            } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 2);
+            } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 3);
+            } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 4);
+            } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 5);
             } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 6);
             } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
                 startDate = localDateStartTerm.plusDays(dayOfWeek.getValue());
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(dayOfWeek.getValue() + 1);
             }
         }
 
