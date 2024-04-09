@@ -1,8 +1,6 @@
 package iuh.fit.trainingsystembackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import lombok.AllArgsConstructor;
@@ -12,11 +10,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 @Data
 @Table(name = "section_class")
@@ -40,15 +38,6 @@ public class SectionClass implements Serializable {
     @JsonIgnore
     private Lecturer lecturer;
 
-    @Column(name = "term_id")
-    private Long termId;
-
-    @ManyToOne
-    @JoinFormula(value = "term_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JsonIgnore
-    private Term term;
-
     @Column(name = "section_id")
     private Long sectionId;
 
@@ -57,24 +46,58 @@ public class SectionClass implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
     private Section section;
-    
+
+    // Lớp lý thuyết mà lớp thực hành thuộc về
     @Column(name = "ref_id")
     private Long refId;
+
+    @ManyToOne
+    @JoinFormula(value = "ref_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private SectionClass sectionClass;
 
     @Column(name = "code")
     private String code;
 
-    @Column(name = "number_of_students")
-    private Integer numberOfStudents;
+    @Column(name = "max_students")
+    private Integer maxStudents;
+
+    @Column(name = "min_students")
+    private Integer minStudents;
 
     @Column(name = "note")
     private String note;
 
+    // Loại lớp học phần
     @Column(name = "section_class_type")
     @Enumerated(EnumType.STRING)
     private SectionClassType sectionClassType = SectionClassType.theory;
 
+    // Trạng thái lớp học phần
     @Column(name = "section_class_status")
     @Enumerated(EnumType.STRING)
     private SectionClassStatus sectionClassStatus = SectionClassStatus.open;
+
+    // Trạng thái tạo lớp học phần
+    @Column(name = "create_status")
+    private Boolean createStatus;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+    private Date createdAt = new Date();
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+    private Date updatedAt;
+
+    @Column(name = "deleted_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+    private Date deletedAt;
+
+    @Column(name = "deleted")
+    private Boolean deleted = false;
 }

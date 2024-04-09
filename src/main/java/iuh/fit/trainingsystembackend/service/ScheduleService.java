@@ -3,11 +3,10 @@ package iuh.fit.trainingsystembackend.service;
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
 import iuh.fit.trainingsystembackend.enums.ScheduleType;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
-import iuh.fit.trainingsystembackend.model.Schedule;
-import iuh.fit.trainingsystembackend.model.SectionClass;
-import iuh.fit.trainingsystembackend.model.Term;
-import iuh.fit.trainingsystembackend.model.TimeAndPlace;
+import iuh.fit.trainingsystembackend.model.*;
+import iuh.fit.trainingsystembackend.repository.LecturerRepository;
 import iuh.fit.trainingsystembackend.repository.ScheduleRepository;
+import iuh.fit.trainingsystembackend.repository.SectionRepository;
 import iuh.fit.trainingsystembackend.repository.TermRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,13 +24,27 @@ import java.util.List;
 public class ScheduleService {
     private TermRepository termRepository;
     private ScheduleRepository scheduleRepository;
+    private final SectionRepository sectionRepository;
+    private final LecturerRepository lecturerRepository;
 
     public List<Schedule> createSchedules(SectionClass sectionClass, TimeAndPlace timeAndPlace, int totalSession) {
         if (sectionClass == null || timeAndPlace == null) {
             return new ArrayList<>();
         }
 
-        Term term = termRepository.findById(sectionClass.getTermId()).orElse(null);
+        Section section = sectionRepository.findById(sectionClass.getSectionId()).orElse(null);
+
+        if(section == null){
+            return new ArrayList<>();
+        }
+
+        Lecturer lecturer = lecturerRepository.findById(sectionClass.getLecturerId()).orElse(null);
+
+        if(lecturer == null){
+            return new ArrayList<>();
+        }
+
+        Term term = termRepository.findById(section.getTermId()).orElse(null);
 
         if (term == null) {
             System.out.println("Không tìm thấy học kỳ để tạo thời khoá biểu !!");
@@ -141,39 +154,37 @@ public class ScheduleService {
             }
         }
 
-        if(sectionClass.getSectionClassType().equals(SectionClassType.practice)){
+        if(sectionClass.getSectionClassType().equals(SectionClassType.practice) && sectionClass.getRefId() != null){
             if(startDate != null){
                 startDate = startDate.plusDays(14);
-            } else{
-                return new ArrayList<>();
             }
         }
 
         List<Schedule> schedules = new ArrayList<>();
-        for (int i = 0; i < totalSession; i++) {
-            Schedule schedule = new Schedule();
+        if(totalSession > 0){
+            for (int i = 0; i < totalSession; i++) {
+                Schedule schedule = new Schedule();
 
-            schedule.setSectionClassId(sectionClass.getId());
-            schedule.setScheduleType(ScheduleType.normal);
-            schedule.setRoom(timeAndPlace.getRoom());
-            schedule.setDayOfTheWeek(timeAndPlace.getDayOfTheWeek());
-            schedule.setPeriodStart(timeAndPlace.getPeriodStart());
-            schedule.setPeriodEnd(timeAndPlace.getPeriodEnd());
-            schedule.setNote(timeAndPlace.getNote());
+                schedule.setSectionClassId(sectionClass.getId());
+                schedule.setScheduleType(ScheduleType.normal);
+                schedule.setLecturerId(lecturer.getId());
+                schedule.setRoom(timeAndPlace.getRoom());
+                schedule.setDayOfTheWeek(timeAndPlace.getDayOfTheWeek());
+                schedule.setPeriodStart(timeAndPlace.getPeriodStart());
+                schedule.setPeriodEnd(timeAndPlace.getPeriodEnd());
+                schedule.setNote(timeAndPlace.getNote());
 
+                if(startDate != null){
+                    schedule.setLearningDate(Date.from(Instant.from(startDate.plusDays(i * 7L).atStartOfDay(ZoneId.of("GMT")))));
+                }
 
-            schedule.setLecturerId(sectionClass.getLecturer() != null ? sectionClass.getLecturerId() : null);
+                schedule = scheduleRepository.saveAndFlush(schedule);
 
-            if(startDate != null){
-                schedule.setLearningDate(Date.from(Instant.from(startDate.plusDays(i * 7L).atStartOfDay(ZoneId.of("GMT")))));
+                if(schedule.getId() == null){
+                    return new ArrayList<>();
+                }
+                schedules.add(schedule);
             }
-
-            schedule = scheduleRepository.saveAndFlush(schedule);
-
-            if(schedule.getId() == null){
-                return new ArrayList<>();
-            }
-            schedules.add(schedule);
         }
 
         return schedules;

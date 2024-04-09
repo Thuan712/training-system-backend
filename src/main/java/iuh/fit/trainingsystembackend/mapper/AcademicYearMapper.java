@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.AcademicYearDTO;
 import iuh.fit.trainingsystembackend.dto.LecturerDTO;
+import iuh.fit.trainingsystembackend.enums.TermType;
 import iuh.fit.trainingsystembackend.model.AcademicYear;
 import iuh.fit.trainingsystembackend.model.Lecturer;
 import iuh.fit.trainingsystembackend.model.Term;
@@ -21,19 +22,18 @@ import java.util.stream.Collectors;
 @Service("academicYearMapper")
 @AllArgsConstructor
 public class AcademicYearMapper {
-    private AcademicYearRepository academicYearRepository;
     private TermRepository termRepository;
 
     public AcademicYearDTO mapToDTO(AcademicYear academicYear) {
 
-        Term firstTerm = termRepository.findById(academicYear.getFirstTermId()).orElse(null);
-        Term secondTerm = termRepository.findById(academicYear.getSecondTermId()).orElse(null);
-        Term thirdTerm = termRepository.findById(academicYear.getThirdTermId()).orElse(null);
-
-
+        Term firstTerm = termRepository.findByAcademicYearIdAndTermType(academicYear.getId(), TermType.first_term);
+        Term secondTerm = termRepository.findByAcademicYearIdAndTermType(academicYear.getId(), TermType.second_term);
+        Term thirdTerm = termRepository.findByAcademicYearIdAndTermType(academicYear.getId(), TermType.summer_term);
+        int yearEnd = academicYear.getYearStart() + 1;
         return AcademicYearDTO.builder()
                 .id(academicYear.getId())
-                .academicYearName(academicYear.getName())
+                .name(academicYear.getYearStart() != null ? (academicYear.getYearStart() + "-" + yearEnd) : "")
+                .yearStart(academicYear.getYearStart())
 
                 .firstTermId(firstTerm != null ? firstTerm.getId() : null)
                 .firstTermName(firstTerm != null ? firstTerm.getName() : "")
@@ -49,7 +49,6 @@ public class AcademicYearMapper {
                 .thirdTermName(thirdTerm != null ? thirdTerm.getName() : "")
                 .thirdTermStart(thirdTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
                 .thirdTermEnd(thirdTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-
                 .build();
     }
 

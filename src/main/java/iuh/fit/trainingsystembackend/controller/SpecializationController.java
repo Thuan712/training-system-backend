@@ -15,6 +15,7 @@ import iuh.fit.trainingsystembackend.specification.SpecializationClassSpecificat
 import iuh.fit.trainingsystembackend.specification.SpecializationSpecification;
 import iuh.fit.trainingsystembackend.specification.StudentSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
+import iuh.fit.trainingsystembackend.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,12 +58,36 @@ public class SpecializationController {
             }
         }
 
+        boolean isCreate = toSave == null;
         if (toSave == null) {
             toSave = new Specialization();
         }
 
         toSave.setName(data.getName());
-        toSave.setCode(data.getCode());
+
+        if(isCreate){
+            if (data.getCode() == null || data.getCode().isEmpty()) {
+                boolean isExist = true;
+                String code = "";
+
+                while(isExist){
+                    code = StringUtils.randomNumberGenerate(8);
+                    isExist = specializationRepository.existsByCode(code);
+                }
+
+                toSave.setCode(code);
+            } else {
+                boolean isDuplicate = specializationRepository.existsByCode(data.getCode());
+
+                if(isDuplicate){
+                    throw new ValidationException("Mã chuyên ngành đã tồn tại !!");
+                } else {
+                    toSave.setCode(data.getCode());
+                }
+            }
+        }
+
+
         if (data.getFacultyId() == null) {
             throw new ValidationException("Mã khoa không dược để trống !");
         }
@@ -167,7 +192,9 @@ public class SpecializationController {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok(toSave);
+        SpecializationClassDTO specializationClassDTO = specializationClassMapper.mapToDTO(toSave);
+
+        return ResponseEntity.ok(specializationClassDTO);
     }
 
     @PostMapping("/class/getPage")

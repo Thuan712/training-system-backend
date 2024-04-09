@@ -16,6 +16,9 @@ public class SectionClassRequest {
     private String code;
     private String note;
     private SectionClassType sectionClassType;
+    private Boolean sectionClassRef;
+    private Long sectionClassId;
+    private Boolean createStatus;
 
     // Filter
     private String searchValue;

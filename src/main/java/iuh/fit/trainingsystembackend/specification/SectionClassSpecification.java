@@ -21,11 +21,14 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
                         .and(attributeStudentIdEqual(request.getStudentId()))
                         .and(attributeContains("code", request.getCode()))
                         .and(attributeEqual("sectionClassType", request.getSectionClassType()))
+                        .and(attributeEqual("createStatus", request.getCreateStatus()))
+
+                        // Select Section Class
+                        .and(attributeEqual("id", request.getSectionClassId()).or(attributeEqual("refId", request.getSectionClassId())))
                         // Filter
                         .and(attributeContains("code", request.getSearchValue()))
                         .and(attributeSectionIdsIn( request.getSectionIds()))
                         .and(attributeLecturerIdsIn(request.getLecturerIds()))
-                        .and(attributeTermIdsIn(request.getTermIds()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 
@@ -80,16 +83,6 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
             }
 
             return criteriaBuilder.in(root.get("sectionId")).value(sectionIds);
-        });
-    }
-
-    private Specification<SectionClass> attributeTermIdsIn(List<Long> termIds) {
-        return ((root, query, criteriaBuilder) -> {
-            if (termIds == null || termIds.isEmpty()) {
-                return null;
-            }
-
-            return criteriaBuilder.in(root.get("termId")).value(termIds);
         });
     }
 }

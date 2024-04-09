@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RequireSection {
+public class RequireCourse {
     private List<String> studyFirst = new ArrayList<>();
     private List<String> parallel = new ArrayList<>();
     private List<String> prerequisite = new ArrayList<>();

@@ -3,6 +3,7 @@ package iuh.fit.trainingsystembackend.specification;
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.SectionClass;
+import iuh.fit.trainingsystembackend.model.StudentSection;
 import iuh.fit.trainingsystembackend.model.StudentSectionClass;
 import iuh.fit.trainingsystembackend.request.RegistrationRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,24 +15,20 @@ import javax.persistence.criteria.Subquery;
 import java.util.List;
 
 @Component
-public class RegistrationSpecification  extends BaseSpecification<StudentSectionClass, RegistrationRequest> {
+public class RegistrationSpecification  extends BaseSpecification<StudentSection, RegistrationRequest> {
     @Override
-    public Specification<StudentSectionClass> getFilter(RegistrationRequest request) {
+    public Specification<StudentSection> getFilter(RegistrationRequest request) {
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("studentId",request.getStudentId())
                         .and(attributeEqual("sectionClassId", request.getSectionClassId()))
-                        .and(attributeEqual("termId", request.getTermId()))
-
-                        .and(attributeTermIdIn(request.getTermIds()))
                         .and(attributeLecturerIdIn(request.getLecturerIds()))
                         .and(attributeSectionIdIn(request.getSectionIds()))
                         .and(attributeContainsSectionClass(request.getSearchValue()))
-
                         .and(attributeEqualSectionClassType(request.getSectionClassType()))
                 ).toPredicate(root, query, criteriaBuilder);
     }
 
-    private Specification<StudentSectionClass> attributeContains(String key, String value) {
+    private Specification<StudentSection> attributeContains(String key, String value) {
         return((root, query, criteriaBuilder) -> {
             if(value == null || value.isEmpty()){
                 return null;
@@ -40,7 +37,7 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
         });
     }
 
-    private Specification<StudentSectionClass> attributeContainsSectionClass(String value) {
+    private Specification<StudentSection> attributeContainsSectionClass(String value) {
         return((root, query, criteriaBuilder) -> {
             if(value == null || value.isEmpty()){
                 return null;
@@ -56,7 +53,7 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
         });
     }
 
-    private Specification<StudentSectionClass> attributeEqualSectionClassType(SectionClassType value) {
+    private Specification<StudentSection> attributeEqualSectionClassType(SectionClassType value) {
         return((root, query, criteriaBuilder) -> {
             if(value == null){
                 return null;
@@ -72,7 +69,7 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
         });
     }
 
-    private Specification<StudentSectionClass> attributeEqual(String key, Object value) {
+    private Specification<StudentSection> attributeEqual(String key, Object value) {
         return((root, query, criteriaBuilder) -> {
             if(value == null){
                 return null;
@@ -81,23 +78,7 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
         });
     }
 
-    private Specification<StudentSectionClass> attributeTermIdIn(List<Long> termIds) {
-        return((root, query, criteriaBuilder) -> {
-            if (termIds == null || termIds.isEmpty()) {
-                return null;
-            }
-
-            Subquery<SectionClass> subquery = query.subquery(SectionClass.class);
-            Root<SectionClass> subqueryRoot = subquery.from(SectionClass.class);
-
-            Predicate sectionClassPredicate = criteriaBuilder.in(subqueryRoot.get("termId")).value(termIds);
-            subquery.select(subqueryRoot.get("id")).where(sectionClassPredicate);
-
-            return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
-        });
-    }
-
-    private Specification<StudentSectionClass> attributeLecturerIdIn(List<Long> lecturerIds) {
+    private Specification<StudentSection> attributeLecturerIdIn(List<Long> lecturerIds) {
         return((root, query, criteriaBuilder) -> {
             if (lecturerIds == null || lecturerIds.isEmpty()) {
                 return null;
@@ -113,7 +94,7 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
         });
     }
 
-    private Specification<StudentSectionClass> attributeSectionIdIn(List<Long> sectionIds) {
+    private Specification<StudentSection> attributeSectionIdIn(List<Long> sectionIds) {
         return((root, query, criteriaBuilder) -> {
             if (sectionIds == null || sectionIds.isEmpty()) {
                 return null;

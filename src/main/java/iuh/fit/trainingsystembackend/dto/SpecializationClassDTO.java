@@ -17,6 +17,10 @@ public class SpecializationClassDTO {
     private String specializationName;
     private String specializationCode;
 
+    private Long lecturerId;
+    private String lecturerName;
+    private String lecturerCode;
+
     private String schoolYear;
 
     private String name;

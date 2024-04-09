@@ -27,17 +27,8 @@ public class AcademicYear implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "first_term_id")
-    private Long firstTermId;
-
-    @Column(name = "second_term_id")
-    private Long secondTermId;
-
-    @Column(name = "third_term_id")
-    private Long thirdTermId;
+    @Column(name = "year_start")
+    private Integer yearStart;
 
     @Column(name = "created_at")
     @CreatedDate

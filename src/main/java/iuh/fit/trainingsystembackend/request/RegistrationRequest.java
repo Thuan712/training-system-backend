@@ -16,6 +16,7 @@ public class RegistrationRequest {
     private Long sectionClassId;
     private Long termId;
     private Date today = new Date();
+    private Boolean sectionClassRef;
 
     // Filter
     private List<Long> lecturerIds;

@@ -22,28 +22,17 @@ public class RegistrationDTO {
     private Long termId;
     private String termName;
 
-    private Long sectionId;
-    private String sectionName;
-    private String sectionCode;
+    private Long courseId;
+    private String courseName;
+    private String courseCode;
     private int credits;
     private Double costCredits;
 
-    private Long sectionClassId;
-    private String sectionClassCode;
-    private SectionClassStatus sectionClassStatus;
-    private SectionClassType sectionClassType;
+    private Long sectionId;
+    private String sectionName;
+    private String sectionCode;
 
-    private Long lecturerId;
-    private String lecturerName;
-    private String lecturerCode;
-
-    private Long timeAndPlaceId;
-    private String timeAndPlaceName;
-
-    private RegistrationStatus status;
-    private RegistrationType type;
-
-    private List<Schedule> scheduleList;
+    private RegistrationStatus registrationStatus;
     private Date createdAt;
 
     // Tuition
@@ -54,13 +43,11 @@ public class RegistrationDTO {
     private Double discountAmount;
     private Double discountFee;
 
+
+    // Tuition Student
     private Double plusDeductions;
-
     private Double minusDeductions;
-
     private String otherInformation;
-
-    private TuitionStatus tuitionStatus;
-
+    private Date paymentDeadline;
     private Double total;
 }

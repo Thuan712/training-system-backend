@@ -34,6 +34,9 @@ public class Student implements Serializable {
     @Column(name = "specialization_id")
     private Long specializationId;
 
+    @Column(name = "program_id")
+    private Long programId;
+
     @Column(name = "user_id")
     private Long userId;
 

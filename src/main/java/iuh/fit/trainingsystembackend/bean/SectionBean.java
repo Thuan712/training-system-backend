@@ -1,41 +1,26 @@
 package iuh.fit.trainingsystembackend.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import iuh.fit.trainingsystembackend.data.RequireSection;
-import iuh.fit.trainingsystembackend.data.SectionDuration;
-import iuh.fit.trainingsystembackend.enums.SectionType;
-import iuh.fit.trainingsystembackend.enums.TermType;
-import iuh.fit.trainingsystembackend.enums.TypeOfKnowledge;
+import iuh.fit.trainingsystembackend.enums.CourseType;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Date;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SectionBean implements Serializable {
-
+    //Section
     private Long id;
-
-    private Long specializationId;
-
+    private Long termId;
     private Long courseId;
-
     private String name;
-
     private String description;
-
-    private SectionDuration sectionDuration;
-
-    private List<TermType> termRegister;
-
-    public RequireSection requireSection;
-
-    private Integer credits;
-
-    private Double costCredits;
-
-    private SectionType sectionType = SectionType.elective;
-    private TypeOfKnowledge typeOfKnowledge = TypeOfKnowledge.general_education;
     private Boolean deleted;
+
+    // Tuition
+    private Double initialFee;
+    private Double discountAmount = 0D;
+    private Double discountFee = 0D;
+    private Date paymentDeadline;
 }

@@ -6,9 +6,10 @@ import java.util.Date;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AcademicYearBean {
+public class
+AcademicYearBean {
     private Long id;
-    private String name;
+    private Integer yearStart;
     private boolean active = true;
 
     private Long firstTermId;

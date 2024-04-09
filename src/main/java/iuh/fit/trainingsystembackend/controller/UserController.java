@@ -45,7 +45,7 @@ public class UserController {
         UserEntity toSave = null;
 
         if (data == null) {
-            throw new ValidationException("Data is required !");
+            throw new ValidationException("Thông tin sinh viên không được trống !");
         }
 
         if (data.getDob() != null && !data.getDob().isEmpty()) {
@@ -57,10 +57,10 @@ public class UserController {
                 Date date = sdf.parse(data.getDob());
                 Date now = new Date();
                 if (!date.before(now)) {
-                    throw new ValidationException("Date of Birth is greater than current year !");
+                    throw new ValidationException("Ngày sinh của sinh viên không được sau hoặc bằng ngày hiện tại !");
                 }
             } catch (ParseException e) {
-                throw new ValidationException("Invalid Date of Birth !");
+                throw new ValidationException("Ngày sinh không hợp lệ !");
             }
         }
 

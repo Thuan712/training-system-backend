@@ -42,8 +42,8 @@ public class ScheduleMapper {
 
         return ScheduleDTO.builder()
                 .id(schedule.getId())
-                .termId(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getId() : null)
-                .termName(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getName() : "")
+//                .termId(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getId() : null)
+//                .termName(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getName() : "")
 
                 .lecturerId(lecturer != null ? lecturer.getId() : null)
                 .lecturerName(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
@@ -54,7 +54,6 @@ public class ScheduleMapper {
 
                 .sectionClassId(schedule.getSectionClass() != null ? schedule.getSectionClass().getId() : null)
                 .sectionClassCode(schedule.getSectionClass() != null ? schedule.getSectionClass().getCode() : "")
-                .numberOfStudents(schedule.getSectionClass() != null ? schedule.getSectionClass().getNumberOfStudents() : null)
                 .note(schedule.getSectionClass() != null ? schedule.getSectionClass().getNote() : "")
                 .sectionClassType(schedule.getSectionClass() != null ? schedule.getSectionClass().getSectionClassType().name() : "")
 

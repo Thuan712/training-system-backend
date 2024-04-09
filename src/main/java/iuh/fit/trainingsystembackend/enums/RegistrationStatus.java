@@ -1,7 +1,8 @@
 package iuh.fit.trainingsystembackend.enums;
 
 public enum RegistrationStatus {
-    registered,
-    canceled,
-    waiting;
+    new_learning,
+    again_learning,
+    improve_learning,
+    cancel_register;
 }

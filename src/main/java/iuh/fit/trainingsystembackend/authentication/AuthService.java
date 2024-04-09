@@ -66,9 +66,9 @@ private LecturerRepository lecturerRepository;
                 existingCachedData.setPreviousIpAddresses(previousIpAddresses);
 
                 if (userEntity.getSystemRole().equals(SystemRole.admin)) {
-                    existingCachedData.setUserRole(SystemRole.admin);
+                    existingCachedData.setUserRole(SystemRole.admin.getValue());
                 } else if (userEntity.getSystemRole().equals(SystemRole.lecturer)) {
-                    existingCachedData.setUserRole(SystemRole.lecturer);
+                    existingCachedData.setUserRole(SystemRole.lecturer.getValue());
 
                     Lecturer lecturer = lecturerRepository.getLecturersByUserId(userEntity.getId());
 
@@ -77,7 +77,7 @@ private LecturerRepository lecturerRepository;
                     }
 
                 } else if (userEntity.getSystemRole().equals(SystemRole.student)) {
-                    existingCachedData.setUserRole(SystemRole.student);
+                    existingCachedData.setUserRole(SystemRole.student.getValue());
 
                     Student student = studentRepository.getStudentByUserId(userEntity.getId());
 

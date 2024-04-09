@@ -1,19 +1,17 @@
 package iuh.fit.trainingsystembackend.dto;
 
 import com.google.gson.annotations.Expose;
-import iuh.fit.trainingsystembackend.data.RequireSection;
-import iuh.fit.trainingsystembackend.data.SectionDuration;
-import iuh.fit.trainingsystembackend.enums.SectionType;
+import iuh.fit.trainingsystembackend.data.RequireCourse;
+import iuh.fit.trainingsystembackend.data.CourseDuration;
+import iuh.fit.trainingsystembackend.enums.CourseType;
 import iuh.fit.trainingsystembackend.enums.TermType;
+import iuh.fit.trainingsystembackend.enums.TypeOfKnowledge;
+import iuh.fit.trainingsystembackend.model.Term;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.List;
 
@@ -24,52 +22,36 @@ import java.util.List;
 public class SectionDTO {
     @Expose
     private Long id;
+    private String name;
+    private String fullName;
+    private String code;
+    private String description;
+    private Date createdAt;
+    private Date updatedAt;
+    private Date deletedAt;
+    private Boolean deleted;
 
+    // Term
+    private Long termId;
+    private String termName;
+
+    // Specialization
     private Long specializationId;
-
     private String specializationName;
-
     private String specializationCode;
 
+    // Course
     private Long courseId;
-
-    private String name;
-
-    private String code;
-
-    private String description;
-
-    private List<String> prerequisite;
-
-    private List<String> studyFirst;
-
-    private List<String> parallel;
-
-    private RequireSection requireSection;
-
-    private SectionDuration sectionDuration;
-
-    private int theory;
-
-    private int practice;
-
-    private int discussionExercises;
-
-    private int selfLearning;
-
+    private String courseName;
+    private String courseCode;
+    private CourseDuration courseDuration;
+    private String courseDurationValue;
     private List<TermType> termRegister;
-
+    private RequireCourse requireCourse;
     private Integer credits;
-
     private Double costCredits;
+    private TypeOfKnowledge typeOfKnowledge;
+    private CourseType courseType;
 
-    private SectionType sectionType;
 
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    private Date deletedAt;
-
-    private Boolean deleted;
 }

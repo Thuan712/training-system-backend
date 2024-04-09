@@ -13,6 +13,7 @@ public class ScheduleRequest {
     private List<Long> lecturerIds;
 
     private Long lecturerId;
+    private Long studentId;
     private Long termId;
     private Long sectionClassId;
     private Long studentSectionClassId;

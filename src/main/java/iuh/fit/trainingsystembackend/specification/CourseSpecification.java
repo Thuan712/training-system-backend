@@ -1,20 +1,29 @@
 package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
+import iuh.fit.trainingsystembackend.enums.TermType;
 import iuh.fit.trainingsystembackend.model.Course;
+import iuh.fit.trainingsystembackend.model.Section;
 import iuh.fit.trainingsystembackend.request.CourseRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class CourseSpecification extends BaseSpecification<Course, CourseRequest> {
     @Override
     public Specification<Course> getFilter(CourseRequest request) {
-        return (root, query, criteriaBuilder) -> Specification.where(attributeContains("name", request.getName()))
+        return (root, query, criteriaBuilder) -> Specification
+                .where(attributeEqual("specializationId", request.getSpecializationId()))
+                .and(attributeContains("name", request.getName()))
                 .and(attributeContains("code", request.getCode()))
-                .and(attributeEqual("credit", request.getCredit()))
+
+                .and(attributeEqual("credits", request.getCredits()))
+                .and(attributeEqual("costCredits", request.getCostCredits()))
+                .and(attributeEqual("typeOfKnowledge", request.getTypeOfKnowledge()))
+
                 .and(attributeEqual("deleted", request.getDeleted()))
-                //TODO: Attribute course require in
                 .toPredicate(root, query, criteriaBuilder);
     }
 
@@ -33,6 +42,16 @@ public class CourseSpecification extends BaseSpecification<Course, CourseRequest
                 return null;
             }
             return criteriaBuilder.equal(root.get(key), value);
+        });
+    }
+
+    private Specification<Course> attributeTermRegisterIn(List<TermType> termTypes) {
+        return ((root, query, criteriaBuilder) -> {
+            if (termTypes == null || termTypes.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.in(root.get("termType")).value(termTypes);
         });
     }
 }

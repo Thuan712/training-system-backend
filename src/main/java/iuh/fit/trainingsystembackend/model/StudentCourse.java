@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,42 +11,48 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Data
-@Table(name = "specialization_class")
+@Table(name = "student_section")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class SpecializationClass implements Serializable {
-
+public class StudentCourse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "lecturer_id")
-    private Long lecturerId;
+    @Column(name = "course_id")
+    private Long courseId;
 
     @ManyToOne
-    @JoinFormula(value = "lecturer_id")
+    @JoinFormula(value = "course_id")
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
-    private Lecturer lecturer;
+    private Course course;
 
-    @Column(name = "specialization_id")
-    private Long specializationId;
+    @Column(name = "student_id")
+    private Long studentId;
 
     @ManyToOne
-    @JoinFormula(value = "specialization_id")
+    @JoinFormula(value = "student_id")
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
-    private Specialization specialization;
+    private Student student;
 
-    @Column(name = "school_year")
-    private String schoolYear;
+    @Column(name = "result_id")
+    private Long resultId;
 
-    @Column(name = "name")
-    private String name;
+    @ManyToOne
+    @JoinFormula(value = "result_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Result result;
+
+    @Column(name = "completed_status")
+    @Enumerated(EnumType.STRING)
+    private CompletedStatus completedStatus;
 }

@@ -13,7 +13,8 @@ import java.util.Date;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AcademicYearDTO {
     private Long id;
-    private String academicYearName;
+    private String name;
+    private Integer yearStart;
 
     private Long firstTermId;
     private String firstTermName;

@@ -39,8 +39,8 @@ public class DebtService {
 
                 if(sectionClass != null){
                     // Học kì đăng ký
-                    result.put("termId", sectionClass.getTerm().getId());
-                    result.put("termName", sectionClass.getTerm().getName());
+//                    result.put("termId", sectionClass.getTerm().getId());
+//                    result.put("termName", sectionClass.getTerm().getName());
 
                     // Học phần của lớp đăng ký
                     result.put("sectionId", sectionClass.getSection().getId());
@@ -51,7 +51,7 @@ public class DebtService {
 
                     // Mức phí ban đầu
                     double initialFee = 0D;
-                    initialFee = sectionClass.getSection().getCostCredits() * sectionClass.getTerm().getCostPerCredit();
+//                    initialFee = sectionClass.getSection().getCostCredits() * sectionClass.getTerm().getCostPerCredit();
                     result.put("initialFee", initialFee);
 
 

@@ -32,6 +32,7 @@ public class FacultyController {
                 throw new ValidationException("Không tìm thấy khoa!");
             }
         }
+        boolean isCreate = toSave == null;
 
         if (toSave == null) {
             toSave = new Faculty();
@@ -41,24 +42,26 @@ public class FacultyController {
             throw new ValidationException("Tên của khoa không được để trống !!");
         }
 
-        if (data.getCode() == null || data.getCode().isEmpty()) {
-            boolean isExist = true;
-            String code = "";
+        if(isCreate){
+            if (data.getCode() == null || data.getCode().isEmpty()) {
+                boolean isExist = true;
+                String code = "";
 
-            while(isExist){
-                code = StringUtils.generateStringCode();
-                isExist = facultyRepository.existsByCode(code);
-            }
+                while(isExist){
+                    code = StringUtils.randomNumberGenerate(8);
+                    isExist = facultyRepository.existsByCode(code);
+                }
 
-            toSave.setCode(code);
+                toSave.setCode(code);
 
-        } else {
-            boolean isDuplicate = facultyRepository.existsByCode(data.getCode());
-
-            if(isDuplicate){
-                throw new ValidationException("Mã khoa đã tồn tại !!");
             } else {
-                toSave.setCode(data.getCode());
+                boolean isDuplicate = facultyRepository.existsByCode(data.getCode());
+
+                if(isDuplicate){
+                    throw new ValidationException("Mã khoa đã tồn tại !!");
+                } else {
+                    toSave.setCode(data.getCode());
+                }
             }
         }
 

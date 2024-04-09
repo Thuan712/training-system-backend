@@ -12,6 +12,7 @@ import lombok.Data;
 public class LecturerRequest {
     private Long userId;
     private Long specificationId;
+    private Long sectionId;
     private Position position;
     private Title title;
 }

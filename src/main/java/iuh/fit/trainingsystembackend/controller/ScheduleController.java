@@ -11,6 +11,7 @@ import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.LecturerRepository;
 import iuh.fit.trainingsystembackend.repository.ScheduleRepository;
 import iuh.fit.trainingsystembackend.repository.SectionClassRepository;
+import iuh.fit.trainingsystembackend.repository.StudentSectionRepository;
 import iuh.fit.trainingsystembackend.request.ScheduleRequest;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
 import iuh.fit.trainingsystembackend.specification.ScheduleSpecification;
@@ -38,9 +39,21 @@ public class ScheduleController {
     private ScheduleMapper scheduleMapper;
     private SectionClassRepository sectionClassRepository;
     private LecturerRepository lecturerRepository;
+    private final StudentSectionRepository studentSectionRepository;
+
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody ScheduleRequest filterRequest) {
         List<Schedule> schedules = scheduleRepository.findAll(scheduleSpecification.getFilter(filterRequest));
+
+        if(filterRequest.getStudentId() != null){
+            List<StudentSection> studentSections = studentSectionRepository.findByStudentId(filterRequest.getStudentId());
+
+            if(!studentSections.isEmpty()){
+                for(StudentSection studentSection : studentSections){
+//                    List<StudentSectionClass>
+                }
+            }
+        }
 
         List<ScheduleDTO> scheduleDTOS = scheduleMapper.mapToDTO(schedules);
 

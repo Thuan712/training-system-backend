@@ -1,9 +1,8 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
-import iuh.fit.trainingsystembackend.model.SectionClass;
-import iuh.fit.trainingsystembackend.model.TimeAndPlace;
-import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
+import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +18,9 @@ public class SectionClassMapper {
     private UserRepository userRepository;
     private StudentSectionClassRepository studentSectionClassRepository;
     private TimeAndPlaceRepository timeAndPlaceRepository;
+    private final SectionRepository sectionRepository;
+    private final CourseRepository courseRepository;
+
     public SectionClassDTO mapToDTO(SectionClass sectionClass) {
 
         UserEntity userEntity = null;
@@ -28,10 +30,26 @@ public class SectionClassMapper {
 
         List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findBySectionClassId(sectionClass.getId());
 
+        int numStudentRegisters = 0;
+
+        // Create Status
+        String createStatus = "";
+        Section section = sectionRepository.findById(sectionClass.getSectionId()).orElse(null);
+
+        if(section != null){
+            Course course = courseRepository.findById(section.getCourseId()).orElse(null);
+
+           if(course != null){
+               if(course.getCourseDuration().getPractice() > 0 && course.getCourseDuration().getTheory() > 0){
+                    if(sectionClass.getSectionClassType().equals(SectionClassType.theory)){
+
+                    }
+               }
+           }
+        }
+
         return SectionClassDTO.builder()
                 .id(sectionClass.getId())
-                .termId(sectionClass.getTermId())
-                .termName(sectionClass.getTerm() != null ? sectionClass.getTerm().getName() : "")
 
                 .lecturerId(sectionClass.getLecturer() != null ? sectionClass.getLecturer().getId() : null)
                 .lecturerName(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
@@ -41,14 +59,18 @@ public class SectionClassMapper {
                 .sectionName(sectionClass.getSection() != null ? sectionClass.getSection().getName() : "")
                 .sectionCode(sectionClass.getSection() != null ? sectionClass.getSection().getCode() : "")
 
-                .name((sectionClass.getSection() != null ? sectionClass.getSection().getName() : "") + " - " + (sectionClass.getSection() != null ? sectionClass.getSection().getCode() : "") + " (" + (userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "") + ")")
+                .name((sectionClass.getSection() != null ? sectionClass.getSection().getName() : "") + " - " + (sectionClass.getCode() != null && !sectionClass.getCode().isEmpty() ? sectionClass.getCode() : "") + " (" + (userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "") + ")")
                 .code(sectionClass.getCode() != null && !sectionClass.getCode().isEmpty() ? sectionClass.getCode() : "")
                 .refId(sectionClass.getRefId() != null ? sectionClass.getRefId() : null)
-                .numberOfStudents(sectionClass.getNumberOfStudents() != null ? sectionClass.getNumberOfStudents() : 0)
                 .note(sectionClass.getNote())
                 .sectionClassType(sectionClass.getSectionClassType())
                 .sectionClassStatus(sectionClass.getSectionClassStatus())
+                .minStudents(sectionClass.getMinStudents())
+                .maxStudents(sectionClass.getMaxStudents())
                 .timeAndPlaces(timeAndPlaces != null && !timeAndPlaces.isEmpty() ? timeAndPlaces : new ArrayList<>())
+
+                .numberOfStudents(numStudentRegisters)
+                .createStatus(sectionClass.getCreateStatus())
                 .build();
     }
 

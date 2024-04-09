@@ -1,10 +1,9 @@
 package iuh.fit.trainingsystembackend.model;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
 import iuh.fit.trainingsystembackend.enums.RegistrationType;
-import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,19 +18,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@Table(name = "student_section_class")
+@Table(name = "student_section")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class StudentSectionClass implements Serializable {
+public class StudentSection implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    // Sinh viên đăng ký lớp học phần
+    // Sinh viên đăng ký
     @Column(name = "student_id")
     private Long studentId;
 
@@ -41,33 +40,38 @@ public class StudentSectionClass implements Serializable {
     @JsonIgnore
     private Student student;
 
-    // Lớp học phần sinh viên đăng ký
-    @Column(name = "section_class_id")
-    private Long sectionClassId;
-
-    @ManyToOne
-    @JoinFormula(value = "section_class_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JsonIgnore
-    private SectionClass sectionClass;
-
-    // Lịch học của lớp học phần đó
-    @Column(name = "time_and_place_id")
-    private Long timeAndPlaceId;
-
-    @ManyToOne
-    @JoinFormula(value = "time_and_place_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JsonIgnore
-    private TimeAndPlace timeAndPlace;
-
     // Học phần đăng ký
-    @Column(name = "student_section_id")
-    private Long studentSectionId;
+    @Column(name = "section_id")
+    private Long sectionId;
 
     @ManyToOne
-    @JoinFormula(value = "student_section_id")
+    @JoinFormula(value = "section_id")
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
-    private StudentSection studentSection;
+    private Section section;
+
+    // Kết quả
+    @Column(name = "result_id")
+    private Long resultId;
+
+    @ManyToOne
+    @JoinFormula(value = "result_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Result result;
+
+    // Trạng thái đăng ký
+    @Column(name = "registration_status")
+    @Enumerated(EnumType.STRING)
+    private RegistrationStatus registrationStatus;
+
+    // Trạng thái hoàn thành học phần
+    @Column(name = "completed_status")
+    @Enumerated(EnumType.STRING)
+    private CompletedStatus completedStatus;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+    private Date createdAt = new Date();
 }

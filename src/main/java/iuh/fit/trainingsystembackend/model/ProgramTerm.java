@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import iuh.fit.trainingsystembackend.enums.ProgramTermType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,42 +11,37 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Data
-@Table(name = "specialization_class")
+@Table(name = "program_term")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class SpecializationClass implements Serializable {
+public class ProgramTerm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "lecturer_id")
-    private Long lecturerId;
+    @Column(name = "program_id")
+    private Long programId;
 
     @ManyToOne
-    @JoinFormula(value = "lecturer_id")
+    @JoinFormula(value = "program_id")
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
-    private Lecturer lecturer;
+    private Program program;
 
-    @Column(name = "specialization_id")
-    private Long specializationId;
+    @Column(name = "total_elective")
+    private Integer totalElective;
 
-    @ManyToOne
-    @JoinFormula(value = "specialization_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JsonIgnore
-    private Specialization specialization;
+    @Column(name = "total_compulsory")
+    private Integer totalCompulsory;
 
-    @Column(name = "school_year")
-    private String schoolYear;
-
-    @Column(name = "name")
-    private String name;
+    @Column(name = "program_term")
+    @Enumerated(EnumType.STRING)
+    private ProgramTermType programTermType;
 }

@@ -1,7 +1,6 @@
 package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
-import iuh.fit.trainingsystembackend.model.Lecturer;
 import iuh.fit.trainingsystembackend.model.Section;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,11 +14,11 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
     public Specification<Section> getFilter(SectionRequest request) {
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("courseId", request.getCourseId()))
+                        .and(attributeEqual("termId", request.getTermId()))
+                        .and(attributeContains("name", request.getName()))
                         .and(attributeContains("code", request.getCode()))
                         .and(attributeIdsNotIn(request.getExcludeIds()))
-                        .and(attributeEqual("theoryPeriods", request.getTheoryPeriods()))
-                        .and(attributeEqual("practicePeriods", request.getPracticePeriods()))
-                        .and(attributeEqual("sectionType", request.getSectionType()))
+                        .and(attributeEqual("sectionType", request.getCourseType()))
                         .and(attributeEqual("deleted", request.getDeleted()))
                         .toPredicate(root, query, criteriaBuilder);
     }
@@ -44,7 +43,7 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
 
     private Specification<Section> attributeIdsNotIn(List<Long> excludeIds) {
         return ((root, query, criteriaBuilder) -> {
-            if (excludeIds == null || excludeIds.size() < 1) {
+            if (excludeIds == null || excludeIds.isEmpty()) {
                 return null;
             }
 

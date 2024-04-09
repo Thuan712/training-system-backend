@@ -1,11 +1,14 @@
 package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
-import iuh.fit.trainingsystembackend.model.Lecturer;
-import iuh.fit.trainingsystembackend.model.UserEntity;
+import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.request.LecturerRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 @Component
 public class LecturerSpecification extends BaseSpecification<Lecturer, LecturerRequest> {
@@ -37,4 +40,5 @@ public class LecturerSpecification extends BaseSpecification<Lecturer, LecturerR
             return criteriaBuilder.equal(root.get(key), value);
         });
     }
+
 }

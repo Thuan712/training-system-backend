@@ -12,8 +12,8 @@ import java.util.List;
 public interface StudentSectionClassRepository extends JpaRepository<StudentSectionClass, Long>, JpaSpecificationExecutor<StudentSectionClass> {
     int countAllBySectionClassId(Long sectionClassId);
     boolean existsByStudentIdAndSectionClassId(Long studentId, Long sectionClassId);
-
-    List<StudentSectionClass> findByStudentIdAndTermId(Long studentId, Long termId);
     StudentSectionClass findByStudentIdAndSectionClassId(Long studentId, Long sectionClassId);
     List<StudentSectionClass> findByStudentId(Long studentId);
+    List<StudentSectionClass> findByStudentSectionId(Long studentSectionId);
+
 }

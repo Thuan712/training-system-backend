@@ -10,12 +10,22 @@ import java.io.Serializable;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegistrationSectionBean implements Serializable {
+    // Section Registration
     private Long id;
     private Long termId;
+    private Long studentId;
+
     private Long sectionId;
+    private RegistrationStatus registrationStatus;
+
+    // Change Status
+    private RegistrationStatus status;
+
+    // Section Class Registration
+    private Long sectionClassRefId;
+    private Long timeAndPlaceRefId;
+
     private Long sectionClassId;
     private Long timeAndPlaceId;
-    private RegistrationType type;
-    private RegistrationStatus status;
-    private Long studentId;
+
 }

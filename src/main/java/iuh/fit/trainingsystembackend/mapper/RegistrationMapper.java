@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,101 +23,63 @@ public class RegistrationMapper {
     private StudentRepository studentRepository;
     private TimeAndPlaceRepository timeAndPlaceRepository;
     private ScheduleRepository scheduleRepository;
-    public RegistrationDTO mapToDTO(StudentSectionClass studentSectionClass) {
-        SectionClass sectionClass = null;
-        Student student = null;
-        Section section = null;
-        Lecturer lecturer = null;
-        double totalCost = 0D;
-        List<Schedule> scheduleList = new ArrayList<>();
+    private final SectionRepository sectionRepository;
+    private final CourseRepository courseRepository;
+    private final TuitionRepository tuitionRepository;
+    private final StudentSectionClassRepository studentSectionClassRepository;
+    private final TermRepository termRepository;
 
-        if(studentSectionClass.getSectionClassId() != null){
-            sectionClass = sectionClassRepository.findById(studentSectionClass.getSectionClassId()).orElse(null);
+    public RegistrationDTO mapToDTO(StudentSection studentSection) {
+        Course course = null;
+        Tuition tuition = null;
+        Term term = null;
 
-            if(sectionClass != null && sectionClass.getSection() != null){
-                section = sectionClass.getSection();
-            }
-
-            if(section != null && sectionClass.getLecturer() != null){
-                lecturer = sectionClass.getLecturer();
-            }
-
-            if(section != null && sectionClass.getTerm() != null){
-                totalCost = section.getCostCredits() * sectionClass.getTerm().getCostPerCredit();
-            }
-
-            scheduleList = scheduleRepository.findScheduleBySectionClassId(studentSectionClass.getSectionClassId());
-        }
-
-        if(studentSectionClass.getStudentId() != null){
-            student = studentRepository.findById(studentSectionClass.getStudentId()).orElse(null);
-        }
-
-        String dayInWeek = "";
-
-        if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.monday)){
-            dayInWeek += "Thứ Hai";
-        } else if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.tuesday)){
-            dayInWeek += "Thứ Ba";
-        }else if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.wednesday)){
-            dayInWeek += "Thứ Tư";
-        }else if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.thursday)){
-            dayInWeek += "Thứ Năm";
-        }else if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.friday)){
-            dayInWeek += "Thứ Sáu";
-        }else if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.saturday)){
-            dayInWeek += "Thứ Bảy";
-        }else if(studentSectionClass.getTimeAndPlace().getDayOfTheWeek().equals(DayInWeek.sunday)){
-            dayInWeek += "Chủ Nhật";
-        }
+        // Student Section
+        Section section = sectionRepository.findById(studentSection.getSectionId()).orElse(null);
 
         // Tuition
-        Tuition tuition = null;
+        double totalCost = 0D;
+
+        // Student Section Class
+        List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findByStudentSectionId(studentSection.getId());
+
+        // Tuition
         double total = 0;
         double debt = 0;
+        if(section != null){
+            term = termRepository.findById(section.getTermId()).orElse(null);
+            course = courseRepository.findById(section.getCourseId()).orElse(null);
+            tuition = tuitionRepository.findBySectionId(section.getId());
 
-        if(studentSectionClass.getTuition() != null){
-            tuition = studentSectionClass.getTuition();
-
-            total =(tuition.getInitialFee() - tuition.getDiscountFee()) + tuition.getPlusDeductions() - tuition.getMinusDeductions();
-            if(tuition.getStatus().equals(TuitionStatus.paid)){
-                debt = 0D;
-            } else {
-                debt = total;
+            if(tuition != null){
+                total = (tuition.getInitialFee() - tuition.getDiscountFee());
+//                if(tuition.get().equals(TuitionStatus.paid)){
+//                    debt = 0D;
+//                } else {
+//                    debt = total;
+//                }
             }
         }
 
         return RegistrationDTO.builder()
-                .id(studentSectionClass.getId())
-
-                .studentId(student != null ? student.getId() : null)
-
-                .sectionClassId(sectionClass != null ? sectionClass.getId() : null)
-                .sectionClassCode(sectionClass != null ? sectionClass.getCode() : "")
-                .sectionClassStatus(sectionClass != null ? sectionClass.getSectionClassStatus() : SectionClassStatus.open)
-                .sectionClassType(sectionClass != null ? sectionClass.getSectionClassType() : null)
+                .id(studentSection.getId())
+                .registrationStatus(studentSection.getRegistrationStatus())
+                .createdAt(studentSection.getCreatedAt())
 
                 .sectionId(section != null ? section.getId() : null)
                 .sectionName(section != null ? section.getName() : "")
                 .sectionCode(section != null ? section.getCode() : "")
-                .credits(section != null ? section.getCredits() : 0)
-                .costCredits(section != null ? section.getCostCredits() : 0)
 
-                .lecturerId(lecturer != null ? lecturer.getId() : null)
-                .lecturerName(lecturer != null && lecturer.getUserEntity() != null ? lecturer.getUserEntity().getFirstName() + " " + lecturer.getUserEntity().getLastName() : "")
-                .lecturerCode(lecturer != null && lecturer.getUserEntity() != null ? lecturer.getUserEntity().getCode() : "")
+                // Course
+                .courseId(course != null ? course.getId() : null)
+                .courseCode(course != null ? course.getCode() : "")
+                .courseName(course != null ? course.getName() : "")
+                .credits(course != null ? course.getCredits() : 0)
+                .costCredits(course != null ? course.getCostCredits() : 0)
 
-                .termId(studentSectionClass.getTermId())
-                .termName(studentSectionClass.getTerm().getName() != null ? studentSectionClass.getTerm().getName() : "")
-
-                .timeAndPlaceId(studentSectionClass.getTimeAndPlaceId())
-                .timeAndPlaceName(studentSectionClass.getTimeAndPlace().getRoom() + " ("+ dayInWeek + " " + studentSectionClass.getTimeAndPlace().getPeriodStart() + "-" + studentSectionClass.getTimeAndPlace().getPeriodEnd() + ")")
-
-                .status(studentSectionClass.getStatus())
-                .type(studentSectionClass.getRegistrationType())
-
-                .scheduleList(!scheduleList.isEmpty() ? scheduleList : new ArrayList<>())
-                .createdAt(studentSectionClass.getCreatedAt())
+                // Term
+                .termId(term != null ? term.getId() : null)
+                .termName(term != null ? term.getName() : "")
 
                 // TODO: Tuition
                 .tuitionId(tuition != null ? tuition.getId() : null)
@@ -124,19 +87,17 @@ public class RegistrationMapper {
                 .debt(debt)
                 .discountAmount(tuition != null ? tuition.getDiscountAmount() : null)
                 .discountFee(tuition != null ? tuition.getDiscountFee() : null)
-                .minusDeductions(tuition != null ? tuition.getMinusDeductions() : null)
-                .otherInformation(tuition != null ? tuition.getOtherInformation() : null)
-                .plusDeductions(tuition != null ? tuition.getPlusDeductions() : null)
-                .tuitionStatus(tuition != null ? tuition.getStatus() : null)
+                .paymentDeadline(tuition != null ? tuition.getPaymentDeadline() : null)
                 .total(total)
+
                 .build();
     }
 
-    public List<RegistrationDTO> mapToDTO(List<StudentSectionClass> studentSectionClasses) {
-        return studentSectionClasses.parallelStream().map(this::mapToDTO).collect(Collectors.toList());
+    public List<RegistrationDTO> mapToDTO(List<StudentSection> studentSections) {
+        return studentSections.parallelStream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    public Page<RegistrationDTO> mapToDTO(Page<StudentSectionClass> studentSectionClassPage) {
-        return studentSectionClassPage.map(this::mapToDTO);
+    public Page<RegistrationDTO> mapToDTO(Page<StudentSection> studentSections) {
+        return studentSections.map(this::mapToDTO);
     }
 }
