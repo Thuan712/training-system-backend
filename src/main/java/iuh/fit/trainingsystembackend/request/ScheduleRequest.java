@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import iuh.fit.trainingsystembackend.enums.ScheduleType;
 import lombok.Data;
 
 import java.util.Date;
@@ -18,4 +19,6 @@ public class ScheduleRequest {
     private Long sectionClassId;
     private Long studentSectionClassId;
     private Date learningDate;
+
+    private ScheduleType scheduleType;
 }

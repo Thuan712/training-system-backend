@@ -13,7 +13,7 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 
 @Data
-@Table(name = "student_section")
+@Table(name = "student_course")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

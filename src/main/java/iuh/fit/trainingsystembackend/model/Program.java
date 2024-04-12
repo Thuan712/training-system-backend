@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -50,7 +52,9 @@ public class Program implements Serializable {
     private String name;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+    private Date createdAt = new Date();
 
     @Column(name = "updated_at")
     private Date updatedAt;

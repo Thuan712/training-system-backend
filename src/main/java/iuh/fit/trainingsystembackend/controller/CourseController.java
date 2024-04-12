@@ -45,16 +45,6 @@ public class CourseController {
             }
         }
 
-        if(data.getSpecializationId() == null) {
-            throw new ValidationException("Mã chuyên ngành không được để trống !!");
-        }
-
-        Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
-
-        if(specialization == null){
-             throw new ValidationException("Không tìm thấy chuyên ngành của môn học này !!");
-        }
-
         if (toSave == null) {
             toSave = new Course();
 
@@ -71,7 +61,15 @@ public class CourseController {
             }
         }
 
-        toSave.setSpecializationId(specialization.getId());
+        if(data.getSpecializationId() != null) {
+            Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
+
+            if(specialization == null){
+                throw new ValidationException("Không tìm thấy chuyên ngành của môn học này !!");
+            }
+
+            toSave.setSpecializationId(specialization.getId());
+        }
 
         if(data.getName() == null || data.getName().isEmpty()){
             throw new ValidationException("Tên môn học không được để trống !!");

@@ -16,7 +16,7 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
     @Override
     public Specification<SectionClass> getFilter(SectionClassRequest request) {
         return (root, query, criteriaBuilder) ->
-                Specification.where(attributeEqual("termId", request.getTermId()))
+                Specification.where(attributeTermIdEqual(request.getTermId()))
                         .and(attributeEqual("sectionId", request.getSectionId()))
                         .and(attributeStudentIdEqual(request.getStudentId()))
                         .and(attributeContains("code", request.getCode()))
@@ -63,6 +63,22 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
             subquery.select(subqueryRoot.get("sectionClassId")).where(studentPredicate);
 
             return criteriaBuilder.in(root.get("id")).value(subquery);
+        });
+    }
+
+    private Specification<SectionClass> attributeTermIdEqual(Long termId) {
+        return ((root, query, criteriaBuilder) -> {
+            if (termId == null) {
+                return null;
+            }
+
+            Subquery<Section> subquery = query.subquery(Section.class);
+            Root<Section> subqueryRoot = subquery.from(Section.class);
+
+            Predicate studentPredicate = criteriaBuilder.in(subqueryRoot.get("termId")).value(termId);
+            subquery.select(subqueryRoot.get("id")).where(studentPredicate);
+
+            return criteriaBuilder.in(root.get("sectionId")).value(subquery);
         });
     }
 

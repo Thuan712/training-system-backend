@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
 import iuh.fit.trainingsystembackend.model.Schedule;
+import iuh.fit.trainingsystembackend.model.Section;
 import iuh.fit.trainingsystembackend.model.SectionClass;
 import iuh.fit.trainingsystembackend.model.StudentSectionClass;
 import iuh.fit.trainingsystembackend.request.ScheduleRequest;
@@ -20,8 +21,10 @@ public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleR
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeEqual("sectionClassId", request.getSectionClassId()))
                         .and(attributeEqual("learningDate", request.getLearningDate()))
+                        .and(attributeTermIdEqual(request.getTermId()))
                         .and(attributeLecturerIdEqual(request.getLecturerId()))
                         .and(attributeSectionClassIdsIn(request.getSectionClassIds()))
+                        .and(attributeEqual("scheduleType", request.getScheduleType()))
                         .toPredicate(root, query, criteriaBuilder);
     }
 
@@ -63,10 +66,31 @@ public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleR
             Subquery<SectionClass> subquery = query.subquery(SectionClass.class);
             Root<SectionClass> subqueryRoot = subquery.from(SectionClass.class);
 
-            Predicate sectionClasssPredicate = criteriaBuilder.in(subqueryRoot.get("leturerId")).value(lecturerId);
+            Predicate sectionClasssPredicate = criteriaBuilder.in(subqueryRoot.get("lecturerId")).value(lecturerId);
             subquery.select(subqueryRoot.get("id")).where(sectionClasssPredicate);
 
             return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
+        });
+    }
+
+    private Specification<Schedule> attributeTermIdEqual(Long termId) {
+        return((root, query, criteriaBuilder) -> {
+            if (termId == null) {
+                return null;
+            }
+
+            Subquery<Section> subquerySection = query.subquery(Section.class);
+            Root<Section> subqueryRootSection = subquerySection.from(Section.class);
+
+            Predicate sectionPredicate = criteriaBuilder.equal(subqueryRootSection.get("termId"), termId);
+            subquerySection.select(subqueryRootSection.get("id")).where(sectionPredicate);
+
+            Subquery<SectionClass> subquerySectionClass = query.subquery(SectionClass.class);
+            Root<SectionClass> subqueryRootSectionClass = subquerySectionClass.from(SectionClass.class);
+
+            subquerySectionClass.select(subqueryRootSectionClass.get("sectionId")).where(sectionPredicate);
+
+            return criteriaBuilder.in(root.get("sectionClassId")).value(subquerySectionClass);
         });
     }
 }

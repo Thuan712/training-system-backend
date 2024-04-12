@@ -31,8 +31,20 @@ public class Student implements Serializable {
     @Column(name = "specialization_class_id")
     private Long specializationClassId;
 
+    @ManyToOne
+    @JoinFormula(value = "specialization_class_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private SpecializationClass specializationClass;
+
     @Column(name = "specialization_id")
     private Long specializationId;
+
+    @ManyToOne
+    @JoinFormula(value = "specialization_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnore
+    private Specialization specialization;
 
     @Column(name = "program_id")
     private Long programId;

@@ -35,13 +35,10 @@ public class ProgramTerm {
     @JsonIgnore
     private Program program;
 
-    @Column(name = "total_elective")
-    private Integer totalElective;
+    @Column(name = "minimum_elective")
+    private Integer minimumElective;
 
-    @Column(name = "total_compulsory")
-    private Integer totalCompulsory;
-
-    @Column(name = "program_term")
+    @Column(name = "term_type")
     @Enumerated(EnumType.STRING)
-    private ProgramTermType programTermType;
+    private ProgramTermType termType;
 }
