@@ -12,10 +12,10 @@ import java.io.Serializable;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResultBean implements Serializable {
-
-
-    // Result
     private Long id;
+
+    private Long resultId;
+
     private Long studentId;
 
     private String studentName;
@@ -23,8 +23,6 @@ public class ResultBean implements Serializable {
     private String studentCode;
 
     private Long sectionId;
-
-    private Long courseId;
 
     private Double regularPoint1;
 
@@ -42,7 +40,7 @@ public class ResultBean implements Serializable {
 
     private Double midtermPoint3;
 
-    private Double finalPoint1;
+    private Double finalPoint;
 
     private Double practicePoint1;
 

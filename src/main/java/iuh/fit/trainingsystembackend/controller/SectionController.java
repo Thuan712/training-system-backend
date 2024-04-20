@@ -4,6 +4,7 @@ import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
+import iuh.fit.trainingsystembackend.dto.UserInfoDTO;
 import iuh.fit.trainingsystembackend.enums.*;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.SectionClassMapper;
@@ -351,5 +352,17 @@ public class SectionController {
     }
 
 
+    @GetMapping("/class/getById")
+    public ResponseEntity<?> getById(@RequestParam(value = "userId", required = false) Long
+                                             userId, @RequestParam(value = "id") Long id) {
+        SectionClass sectionClass = sectionClassRepository.findById(id).orElse(null);
+
+        if(sectionClass == null){
+            throw new ValidationException("Không tìm thấy lớp học phần này !");
+        }
+
+        SectionClassDTO sectionClassDTO = sectionClassMapper.mapToDTO(sectionClass);
+        return ResponseEntity.ok(sectionClassDTO);
+    }
 }
 

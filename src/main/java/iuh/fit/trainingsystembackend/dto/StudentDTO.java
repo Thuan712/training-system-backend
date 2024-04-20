@@ -17,12 +17,13 @@ public class StudentDTO {
     private Long id;
 
     private Long specializationClassId;
-
+    private String specializationClassName;
     private Long specializationId;
 
     private Long userId;
     private String name;
     private String code;
+    private String dob;
 
     private String schoolYear;
 

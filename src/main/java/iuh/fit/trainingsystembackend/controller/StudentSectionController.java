@@ -1,9 +1,11 @@
 package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.bean.RegistrationSectionBean;
+import iuh.fit.trainingsystembackend.bean.ResultBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
 import iuh.fit.trainingsystembackend.dto.CourseDTO;
 import iuh.fit.trainingsystembackend.dto.RegistrationDTO;
+import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
 import iuh.fit.trainingsystembackend.enums.*;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.RegistrationMapper;
@@ -45,6 +47,9 @@ public class StudentSectionController {
     private StudentSectionClassRepository studentSectionClassRepository;
     private TuitionRepository tuitionRepository;
     private StudentTuitionRepository studentTuitionRepository;
+    private final ResultRepository resultRepository;
+    private final StudentCourseRepository studentCourseRepository;
+    private final CourseRepository courseRepository;
 
     @PostMapping("/getPage")
     public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
@@ -107,6 +112,16 @@ public class StudentSectionController {
             throw new ValidationException("Sinh viên đã đăng ký học phần này rồi !!");
         }
 
+        Result result =  new Result();
+        result.setSectionId(section.getId());
+        result.setStudentId(student.getId());
+
+        result = resultRepository.saveAndFlush(result);
+
+        if(result.getId() == null){
+            throw new ValidationException("Khởi tạo kết quả học tập mới cho sinh viên không thành công !!");
+        }
+
         StudentSection studentSection = new StudentSection();
 
         if(data.getRegistrationStatus() == null){
@@ -115,7 +130,9 @@ public class StudentSectionController {
 
         studentSection.setStudentId(student.getId());
         studentSection.setSectionId(section.getId());
+        studentSection.setResultId(result.getId());
         studentSection.setRegistrationStatus(data.getRegistrationStatus());
+        studentSection.setCompletedStatus(CompletedStatus.uncompleted);
 
         studentSection = studentSectionRepository.saveAndFlush(studentSection);
 
@@ -247,6 +264,183 @@ public class StudentSectionController {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         //#endregion
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PostMapping("/inputResult")
+    public ResponseEntity<?> inputResultStudentSection(@RequestParam(value = "userId") Long userId, @RequestBody List<ResultBean> dataList) {
+        if(dataList == null || dataList.isEmpty()){
+            throw new ValidationException("Danh sách nhập điểm của lớp học phần không được để trống !!");
+        }
+
+        for(ResultBean resultBean  : dataList){
+            if(resultBean.getId() != null){
+                StudentSection studentSection = studentSectionRepository.findById(resultBean.getId()).orElse(null);
+
+                if(studentSection == null){
+                    throw new ValidationException("Không tìm thấy sinh viên trong lớp học phần này !!");
+                }
+            }
+
+            Result result = null;
+            if(resultBean.getResultId() != null){
+                result = resultRepository.findById(resultBean.getResultId()).orElseThrow(null);
+
+                if(result == null){
+                    throw new ValidationException("Không tìm thấy kết quả học tập của sinh viên trong học phần");
+                }
+            } else {
+                result = new Result();
+                result.setSectionId(resultBean.getSectionId());
+                result.setStudentId(resultBean.getStudentId());
+            }
+
+            result.setRegularPoint1(resultBean.getRegularPoint1() != null ? resultBean.getRegularPoint1() : null );
+            result.setRegularPoint2(resultBean.getRegularPoint2()!= null ? resultBean.getRegularPoint2() : null);
+            result.setRegularPoint3(resultBean.getRegularPoint3()!= null ? resultBean.getRegularPoint3() : null);
+            result.setRegularPoint4(resultBean.getRegularPoint4()!= null ? resultBean.getRegularPoint4() : null);
+            result.setRegularPoint5(resultBean.getRegularPoint5()!= null ? resultBean.getRegularPoint5() : null);
+
+            result.setMidtermPoint1(resultBean.getMidtermPoint1()!= null ? resultBean.getMidtermPoint1() : null);
+            result.setMidtermPoint2(resultBean.getMidtermPoint2()!= null ? resultBean.getMidtermPoint2() : null);
+            result.setMidtermPoint3(resultBean.getMidtermPoint3()!= null ? resultBean.getMidtermPoint3() : null);
+
+            result.setPracticePoint1(resultBean.getPracticePoint1()!= null ? resultBean.getPracticePoint1() : null);
+            result.setPracticePoint2(resultBean.getPracticePoint2()!= null ? resultBean.getPracticePoint2() : null);
+
+            result.setFinalPoint(resultBean.getFinalPoint()!= null ? resultBean.getFinalPoint() : null);
+
+            result = resultRepository.saveAndFlush(result);
+
+            if(result.getId() == null){
+                throw new ValidationException("Lưu kết quả học tập không thành công !!");
+            }
+        }
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+
+    @PostMapping("/saveResultFinal")
+    public ResponseEntity<?> saveResultFinal (@RequestParam(value = "userId") Long userId, @RequestParam(value = "sectionClassId") Long sectionClassId){
+        if(sectionClassId == null){
+            throw new ValidationException("Mã lớp học phần muốn khoá kết quả không được trống !!");
+        }
+
+        SectionClass sectionClass = sectionClassRepository.findById(sectionClassId).orElse(null);
+
+        if(sectionClass == null){
+            throw new ValidationException("Không tìm thấy lớp học phần này !!");
+        }
+
+        List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findBySectionClassId(sectionClassId);
+
+        if(studentSectionClasses.isEmpty()){
+            throw new ValidationException("Lớp học phần này hiện tại chưa có sinh viên nào !!");
+        }
+
+        List<StudentSection> studentSections = studentSectionRepository.findBySectionId(studentSectionClasses.get(0).getSectionClass().getSectionId());
+
+        if(studentSections.isEmpty()){
+            throw new ValidationException("Không tìm thấy học phần của những sinh viên trong lớp này !!");
+        }
+
+        for(StudentSection studentSection : studentSections){
+            Result result = studentSection.getResult();
+            Course course = courseRepository.findById(studentSection.getSection().getCourseId()).orElse(null);
+
+
+            if(result.getFinalPoint() == null){
+                throw new ValidationException("Chưa nhập đầy đủ cột điểm cuối kỳ để nộp kết quả học tập !!");
+            }
+
+            double totalPoint = 0;
+            if (result.getFinalPoint() > 0) {
+                int totalRegular = 0;
+                int totalRegularPoint = 0;
+                if(result.getRegularPoint1() != null){
+                    totalRegularPoint += result.getRegularPoint1();
+                    totalRegular++;
+                }
+                if(result.getRegularPoint2() != null){
+                    totalRegularPoint += result.getRegularPoint2();
+                    totalRegular++;
+                }
+                if(result.getRegularPoint3() != null){
+                    totalRegularPoint += result.getRegularPoint3();
+                    totalRegular++;
+                }
+                if(result.getRegularPoint4() != null){
+                    totalRegularPoint += result.getRegularPoint4();
+                    totalRegular++;
+                }
+                if(result.getRegularPoint5() != null){
+                    totalRegularPoint += result.getRegularPoint5();
+                    totalRegular++;
+                }
+
+                double regular = (double) totalRegularPoint / totalRegular;
+
+                int totalMidTerm = 0;
+                int totalMidTermPoint = 0;
+                if(result.getMidtermPoint1() != null){
+                    totalMidTermPoint += result.getMidtermPoint1();
+                    totalMidTerm++;
+                }
+                if(result.getMidtermPoint2() != null){
+                    totalMidTermPoint += result.getMidtermPoint2();
+                    totalMidTerm++;
+                }
+                if(result.getMidtermPoint3() != null){
+                    totalMidTermPoint += result.getMidtermPoint3();
+                    totalMidTerm++;
+                }
+                double midterm = (double) totalMidTermPoint / totalMidTerm;
+
+                int totalPractice = 0;
+                int totalPracticePoint = 0;
+                if(result.getPracticePoint1() != null){
+                    totalPracticePoint += result.getPracticePoint1();
+                    totalPractice++;
+                }
+                if(result.getPracticePoint2() != null){
+                    totalPracticePoint += result.getPracticePoint2();
+                    totalPractice++;
+                }
+                double practice = (double) totalPracticePoint / totalPractice;
+
+                double finalPoint = result.getFinalPoint();
+
+                if(totalPractice == 0){
+                    totalPoint = (regular * 20 + midterm * 30 + finalPoint * 50) / 100;
+                } else {
+                    if(course != null){
+                        totalPoint = ((((regular * 20 + midterm * 30 + finalPoint * 50) / 100) * course.getCourseDuration().getTheory()) + (practice * course.getCourseDuration().getPractice())) / course.getCredits();
+                    }
+                }
+            }
+
+            StudentCourse studentCourse = new StudentCourse();
+            studentCourse.setStudentId(studentSection.getStudentId());
+            studentCourse.setCourseId(course.getId());
+            studentCourse.setResultId(result.getId());
+
+            if(totalPoint >= 2){
+                studentCourse.setCompletedStatus(CompletedStatus.completed);
+            } else {
+                studentCourse.setCompletedStatus(CompletedStatus.uncompleted);
+            }
+
+            studentCourse = studentCourseRepository.saveAndFlush(studentCourse);
+        }
+
+        sectionClass.setInputResultEnable(false);
+        sectionClass =  sectionClassRepository.saveAndFlush(sectionClass);
+
+        if(sectionClass.getId() == null){
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return ResponseEntity.ok(HttpStatus.OK);
     }

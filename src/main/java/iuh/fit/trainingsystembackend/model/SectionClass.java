@@ -83,6 +83,9 @@ public class SectionClass implements Serializable {
     @Column(name = "create_status")
     private Boolean createStatus;
 
+    @Column(name = "input_result_enable")
+    private Boolean inputResultEnable = true;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate

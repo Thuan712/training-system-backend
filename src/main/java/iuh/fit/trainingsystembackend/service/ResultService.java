@@ -93,18 +93,6 @@ public class ResultService {
             if(toSave == null){
                 toSave = new Result();
 
-                if(data.getCourseId() == null){
-                    throw new ValidationException("Course ID is required !!");
-                }
-
-                Course course = courseRepository.findById(data.getCourseId()).orElse(null);
-
-                if(course == null){
-                    throw new ValidationException("Course is not found !!");
-                }
-
-                toSave.setCourseId(course.getId());
-
                 if(data.getSectionId() == null){
                     throw new ValidationException("Section ID is not found !!");
                 }
@@ -135,8 +123,6 @@ public class ResultService {
                     throw new ValidationException("User is not found !!");
                 }
 
-                toSave.setStudentName(data.getStudentName());
-                toSave.setStudentCode(data.getStudentCode());
             }
         }
 

@@ -1,6 +1,8 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
+import iuh.fit.trainingsystembackend.dto.StudentDTO;
+import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
@@ -20,7 +22,8 @@ public class SectionClassMapper {
     private TimeAndPlaceRepository timeAndPlaceRepository;
     private final SectionRepository sectionRepository;
     private final CourseRepository courseRepository;
-
+    private StudentMapper studentMapper;
+    private StudentSectionMapper studentSectionMapper;
     public SectionClassDTO mapToDTO(SectionClass sectionClass) {
 
         UserEntity userEntity = null;
@@ -35,18 +38,21 @@ public class SectionClassMapper {
         // Create Status
         String createStatus = "";
         Section section = sectionRepository.findById(sectionClass.getSectionId()).orElse(null);
+//
+//        if(section != null){
+//            Course course = courseRepository.findById(section.getCourseId()).orElse(null);
+//
+//           if(course != null){
+//               if(course.getCourseDuration().getPractice() > 0 && course.getCourseDuration().getTheory() > 0){
+//                    if(sectionClass.getSectionClassType().equals(SectionClassType.theory)){
+//
+//                    }
+//               }
+//           }
+//        }
 
-        if(section != null){
-            Course course = courseRepository.findById(section.getCourseId()).orElse(null);
-
-           if(course != null){
-               if(course.getCourseDuration().getPractice() > 0 && course.getCourseDuration().getTheory() > 0){
-                    if(sectionClass.getSectionClassType().equals(SectionClassType.theory)){
-
-                    }
-               }
-           }
-        }
+        List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
+        List<StudentSectionDTO> studentSectionDTOS = studentSectionMapper.mapToDTO(students);
 
         return SectionClassDTO.builder()
                 .id(sectionClass.getId())
@@ -70,7 +76,9 @@ public class SectionClassMapper {
                 .timeAndPlaces(timeAndPlaces != null && !timeAndPlaces.isEmpty() ? timeAndPlaces : new ArrayList<>())
 
                 .numberOfStudents(numStudentRegisters)
+                .students(studentSectionDTOS)
                 .createStatus(sectionClass.getCreateStatus())
+                .inputResultEnable(sectionClass.getInputResultEnable())
                 .build();
     }
 

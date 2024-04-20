@@ -27,10 +27,12 @@ public class StudentMapper {
                 .specializationId(student.getSpecializationId())
                 .userId(userEntity != null ? userEntity.getId() : null)
                 .name(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
+                .dob(userEntity != null ? userEntity.getDob() : "")
                 .code(userEntity != null ? userEntity.getCode() : "")
                 .schoolYear(student.getSchoolYear())
                 .typeOfEducation(student.getTypeOfEducation())
                 .specializationClassId(student.getSpecializationClassId())
+                .specializationClassName(student.getSpecialization().getName())
                 .entryDate(student.getEntryDate())
                 .build();
     }

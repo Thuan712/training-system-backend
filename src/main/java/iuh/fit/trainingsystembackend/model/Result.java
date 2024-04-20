@@ -33,12 +33,6 @@ public class Result implements Serializable {
     @JsonIgnore
     private Student student;
 
-    @Column(name = "student_name")
-    private String studentName;
-
-    @Column(name = "student_code")
-    private String studentCode;
-
     @Column(name = "section_id")
     private Long sectionId;
 
@@ -47,9 +41,6 @@ public class Result implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
     private Section section;
-
-    @Column(name = "course_id")
-    private Long courseId;
 
     @Column(name = "regular_point_1")
     private Double regularPoint1;

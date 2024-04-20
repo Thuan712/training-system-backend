@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface StudentCourseRepository extends JpaRepository<StudentCourse, Long> {
     List<StudentCourse> findByStudentIdAndCompletedStatus(Long studentId, CompletedStatus completedStatus);
+
+    StudentCourse findByCourseIdAndStudentId(Long courseId, Long studentId);
 }

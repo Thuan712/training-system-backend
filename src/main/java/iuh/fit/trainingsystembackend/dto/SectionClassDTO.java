@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.dto;
 
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
+import iuh.fit.trainingsystembackend.model.Student;
 import iuh.fit.trainingsystembackend.model.TimeAndPlace;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
@@ -44,6 +45,7 @@ public class SectionClassDTO {
     private SectionClassStatus sectionClassStatus;
 
     private Integer numberOfStudents;
+    private List<StudentSectionDTO> students;
 
     private List<TimeAndPlace> timeAndPlaces;
 
@@ -53,4 +55,6 @@ public class SectionClassDTO {
     private Boolean deleted;
 
     private Boolean createStatus;
+    private Boolean inputResultEnable;
+
 }
