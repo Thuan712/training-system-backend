@@ -33,7 +33,10 @@ public class SectionMapper {
             courseDurationValue = course.getCredits() + "(" + course.getCourseDuration().getTheory() + "," +
                                          course.getCourseDuration().getPractice() + "," +
                                          course.getCourseDuration().getSelfLearning() + ")" ;
-            specialization = specializationRepository.findById(course.getSpecializationId()).orElse(null);
+
+            if(course.getSpecializationId() != null){
+                specialization = specializationRepository.findById(course.getSpecializationId()).orElse(null);
+            }
         }
         Term term  = termRepository.findById(section.getTermId()).orElse(null);
 
