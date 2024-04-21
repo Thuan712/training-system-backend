@@ -14,7 +14,7 @@ public class RegistrationSectionBean implements Serializable {
     private Long id;
     private Long termId;
     private Long studentId;
-
+    private Long userId;
     private Long sectionId;
     private RegistrationStatus registrationStatus;
 

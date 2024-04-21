@@ -11,4 +11,6 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
     Student getStudentByUserId(Long userId);
 
     long countBySpecializationClassId(Long specializationClassId);
+
+    Student findByUserId(Long userId);
 }

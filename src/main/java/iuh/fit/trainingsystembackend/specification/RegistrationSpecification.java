@@ -59,13 +59,22 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
                 return null;
             }
 
+            // Section Class type
             Subquery<SectionClass> subquery = query.subquery(SectionClass.class);
             Root<SectionClass> subqueryRoot = subquery.from(SectionClass.class);
 
             Predicate sectionClassPredicate = criteriaBuilder.equal(subqueryRoot.get("sectionClassType"), value);
-            subquery.select(subqueryRoot.get("id")).where(sectionClassPredicate);
+            subquery.select(subqueryRoot.get("id")).where(sectionClassPredicate); // sectionClassId
 
-            return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
+            // Student Section Class get StudentSectionId
+            Subquery<StudentSectionClass> studentSectionClassSubquery = query.subquery(StudentSectionClass.class);
+            Root<StudentSectionClass> studentSectionClassRoot = studentSectionClassSubquery.from(StudentSectionClass.class);
+
+            Predicate studentSectionClassPredicate = criteriaBuilder.in(studentSectionClassRoot.get("sectionClassId")).value(subquery);
+            studentSectionClassSubquery.select(studentSectionClassRoot.get("studentSectionId"))
+                    .where(studentSectionClassPredicate);
+
+            return criteriaBuilder.in(root.get("id")).value(studentSectionClassSubquery);
         });
     }
 
@@ -90,7 +99,15 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
             Predicate sectionClasssPredicate = criteriaBuilder.in(subqueryRoot.get("lecturerId")).value(lecturerIds);
             subquery.select(subqueryRoot.get("id")).where(sectionClasssPredicate);
 
-            return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
+            // Student Section Class get StudentSectionId
+            Subquery<StudentSectionClass> studentSectionClassSubquery = query.subquery(StudentSectionClass.class);
+            Root<StudentSectionClass> studentSectionClassRoot = studentSectionClassSubquery.from(StudentSectionClass.class);
+
+            Predicate studentSectionClassPredicate = criteriaBuilder.in(studentSectionClassRoot.get("sectionClassId")).value(subquery);
+            studentSectionClassSubquery.select(studentSectionClassRoot.get("studentSectionId"))
+                    .where(studentSectionClassPredicate);
+
+            return criteriaBuilder.in(root.get("id")).value(studentSectionClassSubquery);
         });
     }
 
@@ -100,13 +117,7 @@ public class RegistrationSpecification  extends BaseSpecification<StudentSection
                 return null;
             }
 
-            Subquery<SectionClass> subquery = query.subquery(SectionClass.class);
-            Root<SectionClass> subqueryRoot = subquery.from(SectionClass.class);
-
-            Predicate sectionClasssPredicate = criteriaBuilder.in(subqueryRoot.get("sectionId")).value(sectionIds);
-            subquery.select(subqueryRoot.get("id")).where(sectionClasssPredicate);
-
-            return criteriaBuilder.in(root.get("sectionClassId")).value(subquery);
+            return criteriaBuilder.in(root.get("sectionId")).value(sectionIds);
         });
     }
 }
