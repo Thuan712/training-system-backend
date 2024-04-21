@@ -1,9 +1,7 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
-import iuh.fit.trainingsystembackend.dto.StudentDTO;
 import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
-import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
@@ -24,6 +22,8 @@ public class SectionClassMapper {
     private final CourseRepository courseRepository;
     private StudentMapper studentMapper;
     private StudentSectionMapper studentSectionMapper;
+    private final ScheduleRepository scheduleRepository;
+
     public SectionClassDTO mapToDTO(SectionClass sectionClass) {
 
         UserEntity userEntity = null;
@@ -35,21 +35,8 @@ public class SectionClassMapper {
 
         int numStudentRegisters = 0;
 
-        // Create Status
-        String createStatus = "";
-        Section section = sectionRepository.findById(sectionClass.getSectionId()).orElse(null);
-//
-//        if(section != null){
-//            Course course = courseRepository.findById(section.getCourseId()).orElse(null);
-//
-//           if(course != null){
-//               if(course.getCourseDuration().getPractice() > 0 && course.getCourseDuration().getTheory() > 0){
-//                    if(sectionClass.getSectionClassType().equals(SectionClassType.theory)){
-//
-//                    }
-//               }
-//           }
-//        }
+        List<Schedule> schedules = scheduleRepository.findScheduleBySectionClassId(sectionClass.getId()).stream()
+                .sorted((o1, o2) -> Math.toIntExact(o1.getLearningDate().getTime() - o2.getLearningDate().getTime())).collect(Collectors.toList());
 
         List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
         List<StudentSectionDTO> studentSectionDTOS = studentSectionMapper.mapToDTO(students);
@@ -79,6 +66,9 @@ public class SectionClassMapper {
                 .students(studentSectionDTOS)
                 .createStatus(sectionClass.getCreateStatus())
                 .inputResultEnable(sectionClass.getInputResultEnable())
+
+                .startDate(!schedules.isEmpty() ? schedules.get(0).getLearningDate() : null)
+                .endDate(!schedules.isEmpty() ? schedules.get(schedules.size() - 1).getLearningDate() : null)
                 .build();
     }
 

@@ -49,6 +49,9 @@ public class SectionClassDTO {
 
     private List<TimeAndPlace> timeAndPlaces;
 
+    private Date startDate;
+    private Date endDate;
+
     private Date createdAt;
     private Date updatedAt;
     private Date deletedAt;
