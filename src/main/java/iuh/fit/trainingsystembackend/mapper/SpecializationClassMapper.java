@@ -38,6 +38,7 @@ public class SpecializationClassMapper {
                 .id(specializationClass.getId())
                 .schoolYear(specializationClass.getSchoolYear())
                 .name(specializationClass.getName())
+                .numberOfStudents(specializationClass.getNumberOfStudents())
 
                 .lecturerId(specializationClass.getLecturerId())
                 .lecturerName(lecturerFullName)

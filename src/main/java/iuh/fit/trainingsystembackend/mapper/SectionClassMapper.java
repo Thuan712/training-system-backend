@@ -69,6 +69,7 @@ public class SectionClassMapper {
 
                 .startDate(!schedules.isEmpty() ? schedules.get(0).getLearningDate() : null)
                 .endDate(!schedules.isEmpty() ? schedules.get(schedules.size() - 1).getLearningDate() : null)
+                .timeAndPlaceStatus(timeAndPlaces != null && timeAndPlaces.isEmpty())
                 .build();
     }
 

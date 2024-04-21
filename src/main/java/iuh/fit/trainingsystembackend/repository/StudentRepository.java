@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
     Student getStudentByUserId(Long userId);
+
+    long countBySpecializationClassId(Long specializationClassId);
 }

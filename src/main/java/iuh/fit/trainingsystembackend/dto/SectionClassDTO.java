@@ -48,7 +48,7 @@ public class SectionClassDTO {
     private List<StudentSectionDTO> students;
 
     private List<TimeAndPlace> timeAndPlaces;
-
+    private Boolean timeAndPlaceStatus;
     private Date startDate;
     private Date endDate;
 

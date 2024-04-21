@@ -245,9 +245,33 @@ public class SectionController {
         } catch (Exception ignored) {
         }
 
+        Term term = section.getTerm();
+        SectionClassRequest sectionClassRequest = new SectionClassRequest();
+        sectionClassRequest.setLecturerId(toSave.getLecturerId());
+        sectionClassRequest.setTermId(term.getId());
+
+        // SectionClass in this term
+        List<Long> sectionClassIds =  sectionClassRepository.findAll(sectionClassSpecification.getFilter(sectionClassRequest)).stream().map(SectionClass::getId).collect(Collectors.toList());
+
         // Tạo lại lịch học và thời khoá biểu cho lớp
         for (TimeAndPlace timeAndPlace : data.getTimeAndPlaces()) {
+
             TimeAndPlace timeAndPlaceToSave = new TimeAndPlace();
+
+            List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findAll();
+            if(!timeAndPlaces.isEmpty()){
+                for(TimeAndPlace e : timeAndPlaces){
+                    if(sectionClassIds.contains(e.getSectionClassId())){
+                        if((e.getPeriodStart().equals(timeAndPlace.getPeriodStart())
+                           || e.getPeriodStart().equals(timeAndPlace.getPeriodEnd())
+                           || e.getPeriodEnd().equals(timeAndPlace.getPeriodEnd())
+                           || e.getPeriodEnd().equals(timeAndPlace.getPeriodStart())) && e.getDayOfTheWeek().equals(timeAndPlace.getDayOfTheWeek())){
+                            throw new ValidationException("Lịch học của lớp học phần này bị trùng với lớp học phần khác !!");
+                        }
+                    }
+                }
+            }
+
             timeAndPlaceToSave.setSectionClassId(toSave.getId());
 
             if (timeAndPlace.getRoom() == null || timeAndPlace.getRoom().isEmpty()) {
@@ -288,7 +312,7 @@ public class SectionController {
             }
 
             int totalSession = 0;
-            Term term = section.getTerm();
+
             LocalDate localDateStartTerm = term.getTermStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate localDateEndTerm = term.getTermEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -307,6 +331,12 @@ public class SectionController {
             if (schedules.isEmpty()) {
                 return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        }
+
+        toSave = sectionClassRepository.saveAndFlush(toSave);
+
+        if (toSave.getId() == null) {
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         SectionClassDTO sectionClassDTO = sectionClassMapper.mapToDTO(toSave);
@@ -328,7 +358,6 @@ public class SectionController {
             } else {
                 sectionClasses = new PageImpl<>(sectionClasses.map(sectionClass -> sectionClass.getRefId() != null ? sectionClass : null).stream().filter(Objects::nonNull).collect(Collectors.toList()));
             }
-
         }
 
         Page<SectionClassDTO> page = sectionClassMapper.mapToDTO(sectionClasses);

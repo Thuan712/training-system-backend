@@ -9,6 +9,7 @@ import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.request.UserRequest;
 import iuh.fit.trainingsystembackend.service.AddressService;
+import iuh.fit.trainingsystembackend.service.SpecializationService;
 import iuh.fit.trainingsystembackend.specification.UserSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
 import iuh.fit.trainingsystembackend.utils.StringUtils;
@@ -39,7 +40,9 @@ public class UserController {
     private SpecializationRepository specializationRepository;
     private AddressService addressService;
     private UserInfoMapper userInfoMapper;
+    private SpecializationService specializationService;
     private SpecializationClassRepository specializationClassRepository;
+
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId") Long userId, @RequestBody UserBean data) {
         UserEntity toSave = null;
@@ -150,20 +153,39 @@ public class UserController {
         toSave.setCINumber(data.getCINumber());
         toSave.setGender(data.getGender());
 
+        SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
+
+        if (toSave.getSystemRole().equals(SystemRole.lecturer)) {
+
+        } else if (toSave.getSystemRole().equals(SystemRole.student)) {
+            if (data.getSpecializationClassId() != null) {
+
+                if (specializationClass == null) {
+                    throw new ValidationException("Specialization Class is not found !");
+                }
+
+                long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
+
+                if (specializationClass.getNumberOfStudents() >= countStudents) {
+                    throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
+                }
+            }
+        }
+
         toSave = userRepository.saveAndFlush(toSave);
 
         if (toSave.getId() == null) {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if(isCreate){
-            if(data.getSpecializationId() == null){
+        if (isCreate) {
+            if (data.getSpecializationId() == null) {
                 throw new ValidationException("Specialization ID is required !");
             }
 
             Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
 
-            if (specialization == null){
+            if (specialization == null) {
                 throw new ValidationException("Specialization is not found !");
             }
 
@@ -186,12 +208,17 @@ public class UserController {
                 student.setTypeOfEducation(data.getTypeOfEducation());
                 student.setUserId(toSave.getId());
 
-                if(data.getSpecializationClassId() != null){
-                    SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
-
-                    if(specializationClass == null){
+                if (data.getSpecializationClassId() != null) {
+                    if (specializationClass == null) {
                         throw new ValidationException("Specialization Class is not found !");
                     }
+
+                    long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
+
+                    if (specializationClass.getNumberOfStudents() >= countStudents) {
+                        throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
+                    }
+
                     student.setSpecializationClassId(specializationClass.getId());
                 }
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
@@ -222,7 +249,7 @@ public class UserController {
                                              userId, @RequestParam(value = "id") Long id) {
         UserEntity userEntity = userRepository.findById(id).orElse(null);
 
-        if(userEntity == null){
+        if (userEntity == null) {
             throw new ValidationException("User is not found !");
         }
 

@@ -186,6 +186,12 @@ public class SpecializationController {
             toSave.setName(data.getName());
         }
 
+        if(data.getNumberOfStudents() == null || data.getNumberOfStudents() < 1){
+            throw new ValidationException("Sỉ số tối đa sinh viên của lớp chuyên ngành không được để trống và phải lớn hơn 1 !!");
+        }
+
+        toSave.setNumberOfStudents(data.getNumberOfStudents());
+
         toSave = specializationClassRepository.saveAndFlush(toSave);
 
         if (toSave.getId() == null) {

@@ -48,4 +48,7 @@ public class SpecializationClass implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "number_of_students")
+    private Integer numberOfStudents;
 }

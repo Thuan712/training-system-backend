@@ -22,6 +22,7 @@ public class SpecializationClassDTO {
     private String lecturerCode;
 
     private String schoolYear;
+    private Integer numberOfStudents;
 
     private String name;
 }
