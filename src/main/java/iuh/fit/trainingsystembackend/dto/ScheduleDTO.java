@@ -26,7 +26,7 @@ public class ScheduleDTO {
     private Long id;
     private Long sectionClassId;
     private String sectionClassCode;
-    private Date learningDate;
+    private String learningDate;
 
     // Term
     private Long termId;

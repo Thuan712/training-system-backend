@@ -54,6 +54,7 @@ public class Schedule {
     private TimeAndPlace timeAndPlace;
 
     @Column(name = "learning_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date learningDate;
 
     @Column(name = "schedule_type")

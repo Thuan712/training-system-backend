@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,8 @@ public class ScheduleMapper {
             }
         }
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         return ScheduleDTO.builder()
                 .id(schedule.getId())
 //                .termId(schedule.getSectionClass() != null && schedule.getSectionClass().getTerm() != null ? schedule.getSectionClass().getTerm().getId() : null)
@@ -62,7 +65,7 @@ public class ScheduleMapper {
                 .dayInWeek(schedule.getDayOfTheWeek() != null ? schedule.getDayOfTheWeek() : null)
                 .room(schedule.getRoom() != null  && !schedule.getRoom().isEmpty() ? schedule.getRoom() : "")
 
-                .learningDate(schedule.getLearningDate())
+                .learningDate(simpleDateFormat.format(schedule.getLearningDate()))
                 .scheduleType(schedule.getScheduleType())
                 .build();
     }

@@ -8,10 +8,7 @@ import iuh.fit.trainingsystembackend.enums.ScheduleType;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.ScheduleMapper;
 import iuh.fit.trainingsystembackend.model.*;
-import iuh.fit.trainingsystembackend.repository.LecturerRepository;
-import iuh.fit.trainingsystembackend.repository.ScheduleRepository;
-import iuh.fit.trainingsystembackend.repository.SectionClassRepository;
-import iuh.fit.trainingsystembackend.repository.StudentSectionRepository;
+import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.request.ScheduleRequest;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
 import iuh.fit.trainingsystembackend.specification.ScheduleSpecification;
@@ -28,7 +25,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -40,6 +40,7 @@ public class ScheduleController {
     private SectionClassRepository sectionClassRepository;
     private LecturerRepository lecturerRepository;
     private final StudentSectionRepository studentSectionRepository;
+    private final StudentSectionClassRepository studentSectionClassRepository;
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody ScheduleRequest filterRequest) {
@@ -47,13 +48,22 @@ public class ScheduleController {
 
         if(filterRequest.getStudentId() != null){
             List<StudentSection> studentSections = studentSectionRepository.findByStudentId(filterRequest.getStudentId());
-
+            Set<Long> sectionClassIds = new HashSet<>();
             if(!studentSections.isEmpty()){
                 for(StudentSection studentSection : studentSections){
-//                    List<StudentSectionClass>
+                    List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findByStudentSectionId(studentSection.getId());
+
+                    if(!studentSectionClasses.isEmpty()){
+                        sectionClassIds.addAll(studentSectionClasses.stream().map(StudentSectionClass::getSectionClassId).collect(Collectors.toList()));
+                    }
                 }
             }
+
+            if(!sectionClassIds.isEmpty()){
+                schedules = schedules.stream().filter(schedule -> sectionClassIds.contains(schedule.getSectionClassId())).collect(Collectors.toList());
+            }
         }
+
 
         List<ScheduleDTO> scheduleDTOS = scheduleMapper.mapToDTO(schedules);
 
