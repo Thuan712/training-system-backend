@@ -13,4 +13,6 @@ import java.util.List;
 public interface TimeAndPlaceRepository extends JpaRepository<TimeAndPlace, Long>, JpaSpecificationExecutor<TimeAndPlace> {
     List<TimeAndPlace> findBySectionClassId(Long sectionId);
     List<TimeAndPlace> findByRoomAndDayOfTheWeek(String room, DayInWeek dayOfTheWeek);
+
+    boolean existsBySectionClassId(Long sectionClassId);
 }

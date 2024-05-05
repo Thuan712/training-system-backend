@@ -62,11 +62,4 @@ public class StudentController {
         Set<String> schoolYears = studentRepository.findAll().stream().map(Student::getSchoolYear).collect(Collectors.toSet());
         return ResponseEntity.ok(schoolYears);
     }
-
-    public ResponseEntity<?> getListDebtForStudent(@RequestParam(value = "userId") Long userId, @RequestParam(value = "studentId") Long studentId, @RequestBody DebtRequest filterRequest){
-
-
-        List<Map<String, Object>> debtList = debtService.getDebtList(studentId, filterRequest);
-        return ResponseEntity.ok("");
-    }
 }

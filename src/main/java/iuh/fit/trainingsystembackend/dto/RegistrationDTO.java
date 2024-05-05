@@ -18,6 +18,8 @@ import java.util.List;
 public class RegistrationDTO {
     private Long id;
     private Long studentId;
+    private String studentName;
+    private String studentCode;
 
     private Long termId;
     private String termName;
@@ -50,4 +52,26 @@ public class RegistrationDTO {
     private String otherInformation;
     private Date paymentDeadline;
     private Double total;
+    private TuitionStatus tuitionStatus;
+    private Date paymentDate;
+
+    // Result
+    private Long resultId;
+    private Double regularPoint1;
+    private Double regularPoint2;
+    private Double regularPoint3;
+    private Double regularPoint4;
+    private Double regularPoint5;
+
+    private Double midtermPoint1;
+    private Double midtermPoint2;
+    private Double midtermPoint3;
+
+    private Double finalPoint;
+    private Double practicePoint1;
+    private Double practicePoint2;
+
+    private Double totalPoint;
+    private CompletedStatus completedStatus;
+
 }

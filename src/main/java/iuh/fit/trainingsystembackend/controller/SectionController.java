@@ -206,6 +206,14 @@ public class SectionController {
                 }
 
                 toSave.setRefId(sectionClassTheory.getId());
+            } else {
+                List<SectionClass> sectionClassPractices = sectionClassRepository.findByRefId(data.getRefId());
+
+                if (sectionClassPractices.isEmpty()) {
+                    toSave.setCreateStatus(false);
+                } else {
+                    toSave.setCreateStatus(true);
+                }
             }
         }
 
@@ -370,7 +378,12 @@ public class SectionController {
 
         if (filterRequest.getSectionClassRef() != null) {
             if (filterRequest.getSectionClassRef()) {
-                sectionClasses = sectionClasses.stream().filter(sectionClass -> sectionClass.getRefId() == null).collect(Collectors.toList());
+                sectionClasses = sectionClasses.stream().filter(sectionClass -> {
+                    if(sectionClass.getRefId() == null){
+                        return timeAndPlaceRepository.existsBySectionClassId(sectionClass.getId());
+                    }
+                    return false;
+                }).collect(Collectors.toList());
             } else {
                 sectionClasses = sectionClasses.stream().filter(sectionClass -> sectionClass.getRefId() != null).collect(Collectors.toList());
             }

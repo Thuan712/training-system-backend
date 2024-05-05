@@ -9,9 +9,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Table(name = "student_tuition")
@@ -65,4 +67,8 @@ public class StudentTuition implements Serializable {
     // Truy cứu công nợ
     @Column(name = "investigate_status")
     private Boolean investigateStatus;
+
+    @Column(name = "payment_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date paymentDate;
 }

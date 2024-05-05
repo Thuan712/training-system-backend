@@ -23,8 +23,14 @@ public class SectionClassMapper {
     private StudentMapper studentMapper;
     private StudentSectionMapper studentSectionMapper;
     private final ScheduleRepository scheduleRepository;
+    private final TermRepository termRepository;
 
     public SectionClassDTO mapToDTO(SectionClass sectionClass) {
+        Term term = null;
+
+        if(sectionClass.getSection() != null){
+            term = termRepository.findById(sectionClass.getSection().getTermId()).orElse(null);
+        }
 
         UserEntity userEntity = null;
         if (sectionClass.getLecturer() != null) {
@@ -44,6 +50,9 @@ public class SectionClassMapper {
         return SectionClassDTO.builder()
                 .id(sectionClass.getId())
 
+                .termId(term != null ? term.getId() : null)
+                .termName(term != null ? term.getName() : "")
+
                 .lecturerId(sectionClass.getLecturer() != null ? sectionClass.getLecturer().getId() : null)
                 .lecturerName(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
                 .lecturerCode(userEntity != null ? userEntity.getCode() : "")
@@ -62,14 +71,14 @@ public class SectionClassMapper {
                 .maxStudents(sectionClass.getMaxStudents())
                 .timeAndPlaces(timeAndPlaces != null && !timeAndPlaces.isEmpty() ? timeAndPlaces : new ArrayList<>())
 
-                .numberOfStudents(numStudentRegisters)
+                .numberOfStudents(studentSectionDTOS.size())
                 .students(studentSectionDTOS)
                 .createStatus(sectionClass.getCreateStatus())
                 .inputResultEnable(sectionClass.getInputResultEnable())
 
                 .startDate(!schedules.isEmpty() ? schedules.get(0).getLearningDate() : null)
                 .endDate(!schedules.isEmpty() ? schedules.get(schedules.size() - 1).getLearningDate() : null)
-                .timeAndPlaceStatus(timeAndPlaces != null && timeAndPlaces.isEmpty())
+                .timeAndPlaceStatus(timeAndPlaces != null && !timeAndPlaces.isEmpty() && !schedules.isEmpty())
                 .build();
     }
 

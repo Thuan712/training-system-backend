@@ -24,6 +24,9 @@ public class SectionClassDTO {
     private Long id;
     private String name;
 
+    private Long termId;
+    private String termName;
+
     private String code;
     private Integer maxStudents;
     private Integer minStudents;

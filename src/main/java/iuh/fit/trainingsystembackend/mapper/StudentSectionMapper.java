@@ -1,12 +1,10 @@
 package iuh.fit.trainingsystembackend.mapper;
 
+import iuh.fit.trainingsystembackend.dto.RegistrationDTO;
 import iuh.fit.trainingsystembackend.dto.StudentDTO;
 import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
 import iuh.fit.trainingsystembackend.model.*;
-import iuh.fit.trainingsystembackend.repository.CourseRepository;
-import iuh.fit.trainingsystembackend.repository.ResultRepository;
-import iuh.fit.trainingsystembackend.repository.SectionRepository;
-import iuh.fit.trainingsystembackend.repository.StudentRepository;
+import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -23,6 +21,8 @@ public class StudentSectionMapper {
     private StudentMapper studentMapper;
     private final ResultRepository resultRepository;
     private final CourseRepository courseRepository;
+    private final StudentSectionClassRepository studentSectionClassRepository;
+    private RegistrationMapper registrationMapper;
 
     public StudentSectionDTO mapToDTO(StudentSection studentSection) {
         StudentDTO studentDTO = null;

@@ -268,6 +268,20 @@ public class StudentSectionController {
         if (dataList == null || dataList.isEmpty()) {
             throw new ValidationException("Danh sách nhập điểm của lớp học phần không được để trống !!");
         }
+//
+//        SectionClass sectionClass = sectionClassRepository.findById(sectionClassId).orElse(null);
+//
+//        if(sectionClass == null){
+//            throw new ValidationException("Không tìm thấy lớp học phần !!");
+//        }
+//
+//        sectionClass.setInputResultEnable(enable);
+//
+//        sectionClass = sectionClassRepository.saveAndFlush(sectionClass);
+//
+//        if(sectionClass.getId() == null){
+//            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
         for (ResultBean resultBean : dataList) {
             if (resultBean.getId() != null) {

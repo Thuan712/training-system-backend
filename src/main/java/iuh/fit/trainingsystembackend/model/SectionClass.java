@@ -83,6 +83,7 @@ public class SectionClass implements Serializable {
     @Column(name = "create_status")
     private Boolean createStatus;
 
+    // Trạng thái đã nộp kết quả
     @Column(name = "input_result_enable")
     private Boolean inputResultEnable = true;
 
