@@ -15,4 +15,6 @@ public interface TimeAndPlaceRepository extends JpaRepository<TimeAndPlace, Long
     List<TimeAndPlace> findByRoomAndDayOfTheWeek(String room, DayInWeek dayOfTheWeek);
 
     boolean existsBySectionClassId(Long sectionClassId);
+
+    List<TimeAndPlace> findBySectionClassIdNot(Long sectionClassId);
 }

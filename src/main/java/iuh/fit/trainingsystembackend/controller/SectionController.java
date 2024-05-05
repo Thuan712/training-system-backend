@@ -58,6 +58,7 @@ public class SectionController {
     private ScheduleRepository scheduleRepository;
     private SectionService sectionService;
     private StudentSectionRepository studentSectionRepository;
+    private final StudentSectionClassRepository studentSectionClassRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -243,13 +244,17 @@ public class SectionController {
         }
 
         try {
-            // Nếu là cập nhật lớp học phần (Có thể cập nhật lịch học) => Xoá bỏ các lịch học cũ
-            List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findBySectionClassId(data.getId());
-            timeAndPlaceRepository.deleteAll(timeAndPlaces);
-
             // Nếu là cập nhật lớp học phần (Có thể cập nhật lịch học) => Xoá bỏ các thời khoá biểu cũ
             List<Schedule> schedules = scheduleRepository.findScheduleBySectionClassId(data.getId());
-            scheduleRepository.deleteAll(schedules);
+            if(!schedules.isEmpty()){
+                scheduleRepository.deleteAll(schedules);
+            }
+
+            // Nếu là cập nhật lớp học phần (Có thể cập nhật lịch học) => Xoá bỏ các lịch học cũ
+            List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findBySectionClassId(data.getId());
+            if(!timeAndPlaces.isEmpty()){
+                timeAndPlaceRepository.deleteAll(timeAndPlaces);
+            }
         } catch (Exception ignored) {
         }
 
@@ -266,7 +271,7 @@ public class SectionController {
 
             TimeAndPlace timeAndPlaceToSave = new TimeAndPlace();
 
-            List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findAll();
+            List<TimeAndPlace> timeAndPlaces = timeAndPlaceRepository.findBySectionClassIdNot(toSave.getId());
             if(!timeAndPlaces.isEmpty()){
                 for(TimeAndPlace e : timeAndPlaces){
                     if(sectionClassIds.contains(e.getSectionClassId())){
@@ -345,6 +350,14 @@ public class SectionController {
 
         if (toSave.getId() == null) {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findBySectionClassId(toSave.getId());
+
+        if(!studentSectionClasses.isEmpty()){
+            try {
+                studentSectionClassRepository.deleteAll(studentSectionClasses);
+            }catch (Exception ignored){}
         }
 
         SectionClassDTO sectionClassDTO = sectionClassMapper.mapToDTO(toSave);
