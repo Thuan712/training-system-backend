@@ -33,9 +33,7 @@ public class UserInfoDTO implements Serializable {
     private SystemRole systemRole;
     private String gender;
     private String code;
-
     private String dob;
-
     private String CINumber;
 
     private String avatar;

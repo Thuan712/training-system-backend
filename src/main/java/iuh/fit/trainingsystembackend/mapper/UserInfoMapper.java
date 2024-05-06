@@ -88,6 +88,7 @@ public class UserInfoMapper {
                 .typeOfEducation(student != null ? student.getTypeOfEducation() : null)
                 .specializationId(specialization != null ? specialization.getId() : null)
                 .specializationName(specialization != null ? specialization.getName() : "")
+                .specializationClassId(specializationClass != null ? specializationClass.getId() : null)
                 .specializationClassName(specializationClass != null ? specializationClass.getName() : "")
                 .schoolYear(student != null ? student.getSchoolYear() : "")
                 // Lecturer

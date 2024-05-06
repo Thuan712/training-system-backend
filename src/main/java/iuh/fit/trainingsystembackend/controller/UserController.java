@@ -153,7 +153,10 @@ public class UserController {
         toSave.setCINumber(data.getCINumber());
         toSave.setGender(data.getGender());
 
-        SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
+        SpecializationClass specializationClass = null;
+        if (toSave.getSystemRole().equals(SystemRole.student)) {
+            specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
+        }
 
         if (toSave.getSystemRole().equals(SystemRole.lecturer)) {
 
@@ -166,7 +169,7 @@ public class UserController {
 
                 long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
 
-                if (specializationClass.getNumberOfStudents() >= countStudents) {
+                if (countStudents > 0 && countStudents >= specializationClass.getNumberOfStudents()) {
                     throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
                 }
             }
@@ -210,12 +213,12 @@ public class UserController {
 
                 if (data.getSpecializationClassId() != null) {
                     if (specializationClass == null) {
-                        throw new ValidationException("Specialization Class is not found !");
+                        throw new ValidationException("Không tìm thấy lớp chuyên ngành này !");
                     }
 
                     long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
 
-                    if (specializationClass.getNumberOfStudents() >= countStudents) {
+                    if (countStudents > 0 && countStudents >= specializationClass.getNumberOfStudents()) {
                         throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
                     }
 
@@ -227,7 +230,7 @@ public class UserController {
                 student = studentRepository.saveAndFlush(student);
 
                 if (student.getId() == null) {
-                    throw new ValidationException("Create Student fail !");
+                    throw new ValidationException("Cập nhật sinh viên không thành công  !");
                 }
             }
 
