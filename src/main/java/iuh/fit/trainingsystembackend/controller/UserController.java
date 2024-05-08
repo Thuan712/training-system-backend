@@ -136,7 +136,7 @@ public class UserController {
             if (!code.isEmpty()) {
                 toSave.setCode(code);
                 toSave.setUsername(code);
-                toSave.setEmail(code + "." + data.getFirstName().toLowerCase() + "@iuh.edu.com");
+                toSave.setEmail(code + "." + StringUtils.removeAccent(data.getFirstName().toLowerCase()) + "@iuh.edu.com");
             }
 
             String encodedPassword = new BCryptPasswordEncoder().encode("1111");
@@ -164,7 +164,7 @@ public class UserController {
             if (data.getSpecializationClassId() != null) {
 
                 if (specializationClass == null) {
-                    throw new ValidationException("Specialization Class is not found !");
+                    throw new ValidationException("Không tìm thấy lớp chuyên ngành !");
                 }
 
                 long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
