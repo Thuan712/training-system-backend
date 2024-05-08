@@ -66,10 +66,12 @@ public class AcademicYearController {
             throw new ValidationException("Năm học bắt đầu không được để trống !!");
         }
 
-        boolean isExist = academicYearRepository.existsByYearStart(data.getYearStart());
+        if(isCreate){
+            boolean isExist = academicYearRepository.existsByYearStart(data.getYearStart());
 
-        if(isExist){
-            throw new ValidationException("Năm học có năm bắt đầu này đã tồn tại !!");
+            if(isExist){
+                throw new ValidationException("Năm học có năm bắt đầu này đã tồn tại !!");
+            }
         }
 
         toSave.setYearStart(data.getYearStart());
