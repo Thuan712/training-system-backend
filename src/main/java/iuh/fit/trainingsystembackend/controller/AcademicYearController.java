@@ -144,7 +144,7 @@ public class AcademicYearController {
         }
 
         firstTerm.setAcademicYearId(toSave.getId());
-        firstTerm.setName(data.getFirstTermName() + "(" + toSave.getYearStart() + "-" + yearEnd + ")");
+        firstTerm.setName(data.getFirstTermName());
         firstTerm.setTermType(TermType.first_term);
         firstTerm.setCostPerCredit(data.getCostFirstTerm());
         firstTerm.setTermStart(data.getFirstTermStart());
@@ -198,7 +198,7 @@ public class AcademicYearController {
         }
 
         secondTerm.setAcademicYearId(toSave.getId());
-        secondTerm.setName(data.getSecondTermName() + "(" + toSave.getYearStart() + "-" + yearEnd + ")");
+        secondTerm.setName(data.getSecondTermName());
         secondTerm.setTermType(TermType.second_term);
         secondTerm.setCostPerCredit(data.getCostSecondTerm());
         secondTerm.setTermStart(data.getSecondTermStart());
@@ -252,7 +252,7 @@ public class AcademicYearController {
         }
 
         thirdTerm.setAcademicYearId(toSave.getId());
-        thirdTerm.setName(data.getThirdTermName() + "(" + toSave.getYearStart() + "-" + yearEnd + ")");
+        thirdTerm.setName(data.getThirdTermName());
         thirdTerm.setTermType(TermType.summer_term);
         thirdTerm.setCostPerCredit(data.getCostThirdTerm());
         thirdTerm.setTermStart(data.getThirdTermStart());

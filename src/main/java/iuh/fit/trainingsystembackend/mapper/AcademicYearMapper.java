@@ -1,16 +1,11 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.AcademicYearDTO;
-import iuh.fit.trainingsystembackend.dto.LecturerDTO;
 import iuh.fit.trainingsystembackend.enums.TermType;
 import iuh.fit.trainingsystembackend.model.AcademicYear;
-import iuh.fit.trainingsystembackend.model.Lecturer;
 import iuh.fit.trainingsystembackend.model.Term;
-import iuh.fit.trainingsystembackend.model.UserEntity;
-import iuh.fit.trainingsystembackend.repository.AcademicYearRepository;
 import iuh.fit.trainingsystembackend.repository.TermRepository;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -36,19 +31,22 @@ public class AcademicYearMapper {
                 .yearStart(academicYear.getYearStart())
 
                 .firstTermId(firstTerm != null ? firstTerm.getId() : null)
-                .firstTermName(firstTerm != null ? firstTerm.getName() : "")
-                .firstTermStart(firstTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermStart()): new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                .firstTermEnd(firstTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .firstTermName(firstTerm != null ? firstTerm.getName(): "")
+                .costFirstTerm(firstTerm != null ? firstTerm.getCostPerCredit() : 0)
+                .firstTermStart(firstTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .firstTermEnd(firstTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
 
                 .secondTermId(secondTerm != null ? secondTerm.getId() : null)
                 .secondTermName(secondTerm != null ? secondTerm.getName() : "")
-                .secondTermStart(secondTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermStart()): new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                .secondTermEnd(secondTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .costSecondTerm(secondTerm != null ? secondTerm.getCostPerCredit() : 0)
+                .secondTermStart(secondTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .secondTermEnd(secondTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
 
                 .thirdTermId(thirdTerm != null ? thirdTerm.getId() : null)
                 .thirdTermName(thirdTerm != null ? thirdTerm.getName() : "")
-                .thirdTermStart(thirdTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                .thirdTermEnd(thirdTerm != null ?  new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .costThirdTerm(thirdTerm != null ? thirdTerm.getCostPerCredit() : 0)
+                .thirdTermStart(thirdTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .thirdTermEnd(thirdTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
                 .build();
     }
 
