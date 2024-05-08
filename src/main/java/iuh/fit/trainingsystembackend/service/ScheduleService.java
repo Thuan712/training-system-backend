@@ -60,17 +60,17 @@ public class ScheduleService {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
                 startDate = localDateStartTerm.plusDays(0);
             } else if (dayOfWeek.equals(DayOfWeek.TUESDAY)) {
-                startDate = localDateStartTerm.plusDays(1);
-            } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
-                startDate = localDateStartTerm.plusDays(2);
-            } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
-                startDate = localDateStartTerm.plusDays(3);
-            } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
-                startDate = localDateStartTerm.plusDays(4);
-            } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
-                startDate = localDateStartTerm.plusDays(5);
-            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
                 startDate = localDateStartTerm.plusDays(6);
+            } else if (dayOfWeek.equals(DayOfWeek.WEDNESDAY)) {
+                startDate = localDateStartTerm.plusDays(5);
+            } else if (dayOfWeek.equals(DayOfWeek.THURSDAY)) {
+                startDate = localDateStartTerm.plusDays(4);
+            } else if (dayOfWeek.equals(DayOfWeek.FRIDAY)) {
+                startDate = localDateStartTerm.plusDays(3);
+            } else if (dayOfWeek.equals(DayOfWeek.SATURDAY)) {
+                startDate = localDateStartTerm.plusDays(2);
+            } else if (dayOfWeek.equals(DayOfWeek.SUNDAY)) {
+                startDate = localDateStartTerm.plusDays(1);
             }
         } else if (timeAndPlace.getDayOfTheWeek().equals(DayInWeek.tuesday)) {
             if (dayOfWeek.equals(DayOfWeek.MONDAY)) {
