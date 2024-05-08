@@ -34,19 +34,19 @@ public class AcademicYearMapper {
                 .firstTermName(firstTerm != null ? firstTerm.getName(): "")
                 .costFirstTerm(firstTerm != null ? firstTerm.getCostPerCredit() : 0)
                 .firstTermStart(firstTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                .firstTermEnd(firstTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .firstTermEnd(firstTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(firstTerm.getTermEnd()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
 
                 .secondTermId(secondTerm != null ? secondTerm.getId() : null)
                 .secondTermName(secondTerm != null ? secondTerm.getName() : "")
                 .costSecondTerm(secondTerm != null ? secondTerm.getCostPerCredit() : 0)
                 .secondTermStart(secondTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                .secondTermEnd(secondTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .secondTermEnd(secondTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(secondTerm.getTermEnd()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
 
                 .thirdTermId(thirdTerm != null ? thirdTerm.getId() : null)
                 .thirdTermName(thirdTerm != null ? thirdTerm.getName() : "")
                 .costThirdTerm(thirdTerm != null ? thirdTerm.getCostPerCredit() : 0)
                 .thirdTermStart(thirdTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                .thirdTermEnd(thirdTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermStart()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
+                .thirdTermEnd(thirdTerm != null ? new SimpleDateFormat("dd/MM/yyyy").format(thirdTerm.getTermEnd()) : new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
                 .build();
     }
 
