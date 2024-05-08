@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SectionRepository extends JpaRepository<Section, Long>, JpaSpecificationExecutor<Section> {
     Section findSectionByCode(String code);
+
+    Section findByCourseIdAndTermId(Long courseId, Long termId);
 }

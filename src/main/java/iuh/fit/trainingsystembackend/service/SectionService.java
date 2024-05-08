@@ -31,15 +31,7 @@ public class SectionService {
 
     public Section createOrUpdateSection(SectionBean data){
         //#region Create Or Update Section
-        Section toSave = null;
 
-        if (data.getId() != null) {
-            toSave = sectionRepository.findById(data.getId()).orElse(null);
-
-            if (toSave == null) {
-                throw new ValidationException("Không tìm thấy học phần !!");
-            }
-        }
 
         if (data.getCourseId() == null) {
             throw new ValidationException("Học phần phải bao gồm thuộc một môn học nào đó !!");
@@ -58,6 +50,18 @@ public class SectionService {
         if (term == null) {
             throw new ValidationException("Không tìm thấy học kỳ này !!");
         }
+
+        Section toSave = null;
+
+        if (data.getId() != null) {
+            toSave = sectionRepository.findById(data.getId()).orElse(null);
+
+            if (toSave == null) {
+                throw new ValidationException("Không tìm thấy học phần !!");
+            }
+        }
+
+        toSave = sectionRepository.findByCourseIdAndTermId(course.getId(), term.getId());
 
         if (toSave == null) {
             toSave = new Section();
