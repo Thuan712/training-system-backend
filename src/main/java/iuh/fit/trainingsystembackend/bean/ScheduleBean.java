@@ -23,8 +23,7 @@ public class ScheduleBean {
 
     private Date learningDate;
 
-    private ScheduleType scheduleType;
-
+    private ScheduleType scheduleType = ScheduleType.normal;
 
     private String room;
 

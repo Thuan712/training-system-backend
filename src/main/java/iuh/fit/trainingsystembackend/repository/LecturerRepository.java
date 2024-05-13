@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LecturerRepository extends JpaRepository<Lecturer, Long>, JpaSpecificationExecutor<Lecturer> {
     Lecturer getLecturersByUserId(Long userId);
+
+    Lecturer findByUserId(Long userId);
 }

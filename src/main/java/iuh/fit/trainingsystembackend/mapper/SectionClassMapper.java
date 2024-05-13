@@ -42,7 +42,7 @@ public class SectionClassMapper {
         int numStudentRegisters = 0;
 
         List<Schedule> schedules = scheduleRepository.findScheduleBySectionClassId(sectionClass.getId()).stream()
-                .sorted((o1, o2) -> Math.toIntExact(o1.getLearningDate().getTime() - o2.getLearningDate().getTime())).collect(Collectors.toList());
+                .sorted((o1, o2) -> o1.getLearningDate().compareTo(o2.getLearningDate())).collect(Collectors.toList());
 
         List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
         List<StudentSectionDTO> studentSectionDTOS = studentSectionMapper.mapToDTO(students);

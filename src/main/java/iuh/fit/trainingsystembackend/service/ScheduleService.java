@@ -191,7 +191,7 @@ public class ScheduleService {
                 schedule.setNote(timeAndPlace.getNote());
 
                 if(startDate != null){
-                    schedule.setLearningDate(Date.from(Instant.from(startDate.plusDays(i * 7L).atStartOfDay(ZoneId.of("GMT")))));
+                    schedule.setLearningDate(Date.from(Instant.from(startDate.plusDays(i * 7L))));
                 }
 
                 schedule = scheduleRepository.saveAndFlush(schedule);

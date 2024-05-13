@@ -22,7 +22,7 @@ public class ScheduleSpecification extends BaseSpecification<Schedule, ScheduleR
                 Specification.where(attributeEqual("sectionClassId", request.getSectionClassId()))
                         .and(attributeEqual("learningDate", request.getLearningDate()))
                         .and(attributeTermIdEqual(request.getTermId()))
-                        .and(attributeLecturerIdEqual(request.getLecturerId()))
+                        .and(attributeEqual("lecturerId",request.getLecturerId()))
                         .and(attributeSectionClassIdsIn(request.getSectionClassIds()))
                         .and(attributeEqual("scheduleType", request.getScheduleType()))
                         .toPredicate(root, query, criteriaBuilder);

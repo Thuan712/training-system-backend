@@ -22,7 +22,7 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
                         .and(attributeContains("code", request.getCode()))
                         .and(attributeEqual("sectionClassType", request.getSectionClassType()))
                         .and(attributeEqual("createStatus", request.getCreateStatus()))
-
+                        .and(attributeEqual("lecturerId", request.getLecturerId()))
                         // Select Section Class
                         .and(attributeEqual("id", request.getSectionClassId()).or(attributeEqual("refId", request.getSectionClassId())))
                         // Filter

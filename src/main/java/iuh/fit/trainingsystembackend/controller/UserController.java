@@ -158,9 +158,7 @@ public class UserController {
             specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
         }
 
-        if (toSave.getSystemRole().equals(SystemRole.lecturer)) {
-
-        } else if (toSave.getSystemRole().equals(SystemRole.student)) {
+        if (toSave.getSystemRole().equals(SystemRole.student)) {
             if (data.getSpecializationClassId() != null) {
 
                 if (specializationClass == null) {
@@ -181,59 +179,81 @@ public class UserController {
             return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if (isCreate) {
-            if (data.getSpecializationId() == null) {
-                throw new ValidationException("Specialization ID is required !");
-            }
+        if (data.getSpecializationId() == null) {
+            throw new ValidationException("Specialization ID is required !");
+        }
 
-            Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
+        Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
 
-            if (specialization == null) {
-                throw new ValidationException("Specialization is not found !");
-            }
+        if (specialization == null) {
+            throw new ValidationException("Specialization is not found !");
+        }
 
-            if (toSave.getSystemRole().equals(SystemRole.lecturer)) {
-                Lecturer lecturer = new Lecturer();
 
-                lecturer.setPosition(data.getPosition());
-                lecturer.setTitle(data.getTitle());
+        if (toSave.getSystemRole().equals(SystemRole.lecturer)) {
+            Lecturer lecturer = null;
+            if(isCreate){
+                lecturer = new Lecturer();
                 lecturer.setUserId(toSave.getId());
-                lecturer.setSpecializationId(specialization.getId());
+            } else {
+                lecturer = lecturerRepository.findByUserId(toSave.getId());
 
-                lecturer = lecturerRepository.saveAndFlush(lecturer);
-
-                if (lecturer.getId() == null) {
-                    throw new ValidationException("Create lecturer fail");
-                }
-            } else if (toSave.getSystemRole().equals(SystemRole.student)) {
-                Student student = new Student();
-                student.setSpecializationId(specialization.getId());
-                student.setTypeOfEducation(data.getTypeOfEducation());
-                student.setUserId(toSave.getId());
-
-                if (data.getSpecializationClassId() != null) {
-                    if (specializationClass == null) {
-                        throw new ValidationException("Không tìm thấy lớp chuyên ngành này !");
-                    }
-
-                    long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
-
-                    if (countStudents > 0 && countStudents >= specializationClass.getNumberOfStudents()) {
-                        throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
-                    }
-
-                    student.setSpecializationClassId(specializationClass.getId());
-                }
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
-                String year = simpleDateFormat.format(student.getEntryDate());
-                student.setSchoolYear(year);
-                student = studentRepository.saveAndFlush(student);
-
-                if (student.getId() == null) {
-                    throw new ValidationException("Cập nhật sinh viên không thành công  !");
+                if(lecturer == null){
+                    throw new ValidationException("Không tìm thấy giảng viên này !!");
                 }
             }
 
+            lecturer.setPosition(data.getPosition());
+            lecturer.setTitle(data.getTitle());
+            lecturer.setSpecializationId(specialization.getId());
+
+            lecturer = lecturerRepository.saveAndFlush(lecturer);
+
+            if (lecturer.getId() == null) {
+                throw new ValidationException("Create lecturer fail");
+            }
+        } else if (toSave.getSystemRole().equals(SystemRole.student)) {
+            Student student = null;
+            if(isCreate){
+                student = new Student();
+                student.setUserId(toSave.getId());
+            } else {
+                student = studentRepository.findByUserId(toSave.getId());
+
+                if(student == null){
+                    throw new ValidationException("Không tìm thấy sinh viên này !!");
+                }
+
+            }
+
+            student.setTypeOfEducation(data.getTypeOfEducation());
+            student.setSpecializationId(specialization.getId());
+
+            if (data.getSpecializationClassId() != null) {
+                if (specializationClass == null) {
+                    throw new ValidationException("Không tìm thấy lớp chuyên ngành này !");
+                }
+
+                long countStudents = studentRepository.countBySpecializationClassId(specializationClass.getId());
+
+                if (countStudents > 0 && countStudents >= specializationClass.getNumberOfStudents()) {
+                    throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
+                }
+
+                if(!specializationClass.getSpecializationId().equals(specialization.getId())){
+                    throw new ValidationException("Lớp chuyên ngành không thuộc chuyên ngành của sinh viên !!");
+                }
+
+                student.setSpecializationClassId(specializationClass.getId());
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
+            String year = simpleDateFormat.format(student.getEntryDate());
+            student.setSchoolYear(year);
+            student = studentRepository.saveAndFlush(student);
+
+            if (student.getId() == null) {
+                throw new ValidationException("Cập nhật sinh viên không thành công  !");
+            }
         }
 
         //TODO: Create Or Update Address
