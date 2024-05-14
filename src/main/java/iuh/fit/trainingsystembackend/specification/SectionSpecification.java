@@ -2,10 +2,15 @@ package iuh.fit.trainingsystembackend.specification;
 
 import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
 import iuh.fit.trainingsystembackend.model.Section;
+import iuh.fit.trainingsystembackend.model.SectionClass;
+import iuh.fit.trainingsystembackend.model.StudentSectionClass;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.util.List;
 
 @Component
@@ -24,8 +29,8 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
     }
 
     private Specification<Section> attributeContains(String key, String value) {
-        return((root, query, criteriaBuilder) -> {
-            if(value == null || value.isEmpty()){
+        return ((root, query, criteriaBuilder) -> {
+            if (value == null || value.isEmpty()) {
                 return null;
             }
             return criteriaBuilder.like(criteriaBuilder.lower(root.get(key)), containsLowerCase(value));
@@ -33,8 +38,8 @@ public class SectionSpecification extends BaseSpecification<Section, SectionRequ
     }
 
     private Specification<Section> attributeEqual(String key, Object value) {
-        return((root, query, criteriaBuilder) -> {
-            if(value == null){
+        return ((root, query, criteriaBuilder) -> {
+            if (value == null) {
                 return null;
             }
             return criteriaBuilder.equal(root.get(key), value);

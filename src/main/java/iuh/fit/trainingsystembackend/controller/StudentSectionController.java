@@ -164,6 +164,12 @@ public class StudentSectionController {
             throw new ValidationException("Lớp học phần đã bị huỷ mở lớp !!");
         }
 
+        List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClassRef.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
+
+        if(students.size() >= sectionClassRef.getMaxStudents()){
+            throw new ValidationException("Số sinh viên hiện tại của lớp học phần này đã đạt tối đa");
+        }
+
         StudentSectionClass studentSectionClassRef = new StudentSectionClass();
         studentSectionClassRef.setStudentId(student.getId());
         studentSectionClassRef.setStudentSectionId(studentSection.getId());

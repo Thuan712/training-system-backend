@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import iuh.fit.trainingsystembackend.enums.CourseType;
+import iuh.fit.trainingsystembackend.enums.RegistrationType;
 import lombok.Data;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public class SectionRequest {
     private String code;
     private CourseType courseType;
     private Boolean deleted;
+    private Boolean isRegisterBefore;
 }

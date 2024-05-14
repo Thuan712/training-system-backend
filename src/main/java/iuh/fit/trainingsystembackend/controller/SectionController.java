@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -106,6 +107,17 @@ public class SectionController {
 
             if (!studentSections.isEmpty()) {
                 sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
+            }
+
+
+            if(filterRequest.getIsRegisterBefore()){
+                List<Long> studentSectionRegisteredBefore = studentSectionRepository.findByStudentId(student.getId()).stream().map(StudentSection::getSectionId).collect(Collectors.toList());
+
+                if(studentSectionRegisteredBefore.isEmpty()){
+                    return ResponseEntity.ok(new ArrayList<>());
+                } else {
+                    sections = sections.stream().filter(section -> studentSectionRegisteredBefore.contains(section.getId())).collect(Collectors.toList());
+                }
             }
         }
 
