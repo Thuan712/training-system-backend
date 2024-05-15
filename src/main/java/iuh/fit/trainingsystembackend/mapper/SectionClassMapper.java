@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
+import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
@@ -18,9 +19,7 @@ public class SectionClassMapper {
     private UserRepository userRepository;
     private StudentSectionClassRepository studentSectionClassRepository;
     private TimeAndPlaceRepository timeAndPlaceRepository;
-    private final SectionRepository sectionRepository;
-    private final CourseRepository courseRepository;
-    private StudentMapper studentMapper;
+
     private StudentSectionMapper studentSectionMapper;
     private final ScheduleRepository scheduleRepository;
     private final TermRepository termRepository;
@@ -47,6 +46,8 @@ public class SectionClassMapper {
         List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
         List<StudentSectionDTO> studentSectionDTOS = studentSectionMapper.mapToDTO(students);
 
+        String sectionClassType = sectionClass.getSectionClassType().equals(SectionClassType.theory) ? " - Lý thuyết" : " - Thực hành";
+
         return SectionClassDTO.builder()
                 .id(sectionClass.getId())
 
@@ -61,7 +62,7 @@ public class SectionClassMapper {
                 .sectionName(sectionClass.getSection() != null ? sectionClass.getSection().getName() : "")
                 .sectionCode(sectionClass.getSection() != null ? sectionClass.getSection().getCode() : "")
 
-                .name((sectionClass.getSection() != null ? sectionClass.getSection().getName() : "") + " - " + (sectionClass.getCode() != null && !sectionClass.getCode().isEmpty() ? sectionClass.getCode() : "") + " (" + (userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "") + ")")
+                .name((sectionClass.getSection() != null ? sectionClass.getSection().getName() : "") + sectionClassType + " - " + (sectionClass.getCode() != null && !sectionClass.getCode().isEmpty() ? sectionClass.getCode() : "") + " (" + (userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "") + ")")
                 .code(sectionClass.getCode() != null && !sectionClass.getCode().isEmpty() ? sectionClass.getCode() : "")
                 .refId(sectionClass.getRefId() != null ? sectionClass.getRefId() : null)
                 .note(sectionClass.getNote())

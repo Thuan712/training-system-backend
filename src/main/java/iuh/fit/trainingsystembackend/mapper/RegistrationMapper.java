@@ -70,6 +70,8 @@ public class RegistrationMapper {
             studentDTO = studentMapper.mapToDTO(student);
         }
 
+
+
         StudentTuition studentTuition = null;
         if(student != null && tuition != null ){
             studentTuition = studentTuitionRepository.findByStudentIdAndTuitionId(student.getId(), tuition.getId());
@@ -148,6 +150,8 @@ public class RegistrationMapper {
             }
         }
 
+        List<SectionClass> sectionClass = studentSectionClasses.stream().map(StudentSectionClass::getSectionClass).collect(Collectors.toList());
+
         return RegistrationDTO.builder()
                 .id(studentSection.getId())
                 .registrationStatus(studentSection.getRegistrationStatus())
@@ -196,6 +200,8 @@ public class RegistrationMapper {
                 .practicePoint2(result != null ? result.getPracticePoint2() : null)
                 .totalPoint(totalPoint)
                 .completedStatus(studentSection.getCompletedStatus())
+
+                .sectionClasses(sectionClass)
                 .build();
     }
 

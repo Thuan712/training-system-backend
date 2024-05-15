@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,13 +55,14 @@ public class ScheduleController {
                         sectionClassIds.addAll(studentSectionClasses.stream().map(StudentSectionClass::getSectionClassId).collect(Collectors.toList()));
                     }
                 }
+            } else {
+                return ResponseEntity.ok(new ArrayList<>());
             }
 
             if (!sectionClassIds.isEmpty()) {
                 schedules = schedules.stream().filter(schedule -> sectionClassIds.contains(schedule.getSectionClassId())).collect(Collectors.toList());
             }
         }
-
 
         List<ScheduleDTO> scheduleDTOS = scheduleMapper.mapToDTO(schedules);
 

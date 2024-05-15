@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.dto;
 
 import iuh.fit.trainingsystembackend.enums.*;
 import iuh.fit.trainingsystembackend.model.Schedule;
+import iuh.fit.trainingsystembackend.model.SectionClass;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -74,4 +75,6 @@ public class RegistrationDTO {
     private Double totalPoint;
     private CompletedStatus completedStatus;
 
+    // Section Class Code
+    private List<SectionClass> sectionClasses;
 }

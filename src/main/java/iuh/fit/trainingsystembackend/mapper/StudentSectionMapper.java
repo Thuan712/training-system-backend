@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.RegistrationDTO;
+import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.StudentDTO;
 import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
 import iuh.fit.trainingsystembackend.model.*;
@@ -22,7 +23,6 @@ public class StudentSectionMapper {
     private final ResultRepository resultRepository;
     private final CourseRepository courseRepository;
     private final StudentSectionClassRepository studentSectionClassRepository;
-    private RegistrationMapper registrationMapper;
 
     public StudentSectionDTO mapToDTO(StudentSection studentSection) {
         StudentDTO studentDTO = null;
@@ -31,6 +31,10 @@ public class StudentSectionMapper {
         if (student != null) {
             studentDTO = studentMapper.mapToDTO(student);
         }
+
+        List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findByStudentSectionId(studentSection.getSectionId());
+
+        List<SectionClass> sectionClass = studentSectionClasses.stream().map(StudentSectionClass::getSectionClass).collect(Collectors.toList());
 
         Section section = sectionRepository.findById(studentSection.getSectionId()).orElse(null);
         Course course = null;
@@ -116,6 +120,8 @@ public class StudentSectionMapper {
                 .sectionId(section != null ? section.getId() : null)
                 .sectionName(section != null ? section.getName() : "")
                 .sectionCode(section != null ? section.getCode() : "")
+
+                .sectionClasses(sectionClass)
 
                 .termId(section != null ? section.getTermId() : null)
                 .termName(section != null && section.getTerm() != null ? section.getTerm().getName() : "")

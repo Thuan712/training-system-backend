@@ -70,6 +70,7 @@ public class StudentSectionController {
 
     @PostMapping("/registerSection")
     public ResponseEntity<?> registerSection(@RequestParam(value = "userId") Long userId, @RequestBody RegistrationSectionBean data) {
+        // Check Student
         if (data.getStudentId() == null) {
             throw new ValidationException("Mã sinh viên đăng ký không được để trống !!");
         }
@@ -80,6 +81,7 @@ public class StudentSectionController {
             throw new ValidationException("Không tìm thấy sinh viên đăng ký !!");
         }
 
+        // Check Term
         if (data.getTermId() == null) {
             throw new ValidationException("Học kỳ đăng ký học phần không được để trống !!");
         }
@@ -90,7 +92,7 @@ public class StudentSectionController {
             throw new ValidationException("Không tìm thấy học kì đăng ký sinh viên chọn !!");
         }
 
-        //#region Registration Student - Section
+        // Check Section
         if (data.getSectionId() == null) {
             throw new ValidationException("Học phần sinh viên đăng ký không được trống !!");
         }
@@ -101,12 +103,74 @@ public class StudentSectionController {
             throw new ValidationException("Không tìm thấy học phần sinh viên đăng ký !!");
         }
 
+        // Check Đã đăng ký học phần này chưa
         boolean isExistStudentSection = studentSectionRepository.existsByStudentIdAndSectionId(student.getId(), section.getId());
 
         if (isExistStudentSection) {
             throw new ValidationException("Sinh viên đã đăng ký học phần này rồi !!");
         }
 
+        // Check Have Practice Section class
+        if (section.getCourse().getCourseDuration().getPractice() > 0 && section.getCourse().getCourseDuration().getTheory() > 0) {
+            if (data.getSectionClassId() == null) {
+                throw new ValidationException("Xin hãy chọn lớp học phần thực hành thuộc lớp lý thuyết này (Nếu chưa có lịch lớp thực hành cho lớp này xin liên hệ với ban giáo vụ) !!");
+            }
+        }
+
+        // Section Class Theory check
+        if (data.getSectionClassRefId() == null) {
+            throw new ValidationException("Lớp học phần của sinh viên không được để trống khi đăng ký !!");
+        }
+
+        SectionClass sectionClassRef = sectionClassRepository.findById(data.getSectionClassRefId()).orElse(null);
+
+        if (sectionClassRef == null) {
+            throw new ValidationException("Không tìm thấy lớp học phần này !!");
+        }
+
+        if (sectionClassRef.getSectionClassStatus().equals(SectionClassStatus.closed)) {
+            throw new ValidationException("Lớp học phần đã đóng đăng ký !!");
+        } else if (sectionClassRef.getSectionClassStatus().equals(SectionClassStatus.full)) {
+            throw new ValidationException("Lớp học phần đã đạt tối đa sinh viên !!");
+        } else if (sectionClassRef.getSectionClassStatus().equals(SectionClassStatus.canceled)) {
+            throw new ValidationException("Lớp học phần đã bị huỷ mở lớp !!");
+        }
+
+        List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClassRef.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
+
+        if (students.size() >= sectionClassRef.getMaxStudents()) {
+            throw new ValidationException("Số sinh viên hiện tại của lớp học phần này đã đạt tối đa");
+        }
+
+        // Check SectionClass Practice
+        boolean haveSectionClassPractice = section.getCourse().getCourseDuration().getPractice() > 0 && section.getCourse().getCourseDuration().getTheory() > 0;
+        SectionClass sectionClass = null;
+        if (haveSectionClassPractice) {
+            if (data.getSectionClassId() == null) {
+                throw new ValidationException("Lớp học phần thực hành của sinh viên không được để trống khi đăng ký !!");
+            }
+
+            sectionClass = sectionClassRepository.findById(data.getSectionClassId()).orElse(null);
+
+            if (sectionClass == null) {
+                throw new ValidationException("Không tìm thấy lớp học phần thực hành này !!");
+            }
+
+            if (sectionClass.getSectionClassStatus().equals(SectionClassStatus.closed)) {
+                throw new ValidationException("Lớp học phần thực hành đã đóng đăng ký !!");
+            } else if (sectionClass.getSectionClassStatus().equals(SectionClassStatus.full)) {
+                throw new ValidationException("Lớp học phần thực hành đã đạt tối đa sinh viên !!");
+            } else if (sectionClass.getSectionClassStatus().equals(SectionClassStatus.canceled)) {
+                throw new ValidationException("Lớp học phần thực hành đã bị huỷ mở lớp !!");
+            }
+
+            List<StudentSection> studentSections = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
+
+            if (studentSections.size() >= sectionClass.getMaxStudents()) {
+                throw new ValidationException("Số sinh viên hiện tại của lớp học phần này đã đạt tối đa");
+            }
+        }
+        //#region Registration Student - Section
         Result result = new Result();
         result.setSectionId(section.getId());
         result.setStudentId(student.getId());
@@ -139,37 +203,6 @@ public class StudentSectionController {
         //#region Registration Student - Section Class
 
         //#region Section Class (Ref) - Lớp Chính
-        if (section.getCourse().getCourseDuration().getPractice() > 0 && section.getCourse().getCourseDuration().getTheory() > 0) {
-            if (data.getSectionClassId() == null) {
-                throw new ValidationException("Xin hãy chọn lớp học phần thực hành thuộc lớp lý thuyết này (Nếu chưa có lịch lớp thực hành cho lớp này xin liên hệ với ban giáo vụ) !!");
-            }
-        }
-
-        // Section Class check
-        if (data.getSectionClassRefId() == null) {
-            throw new ValidationException("Lớp học phần của sinh viên không được để trống khi đăng ký !!");
-        }
-
-        SectionClass sectionClassRef = sectionClassRepository.findById(data.getSectionClassRefId()).orElse(null);
-
-        if (sectionClassRef == null) {
-            throw new ValidationException("Không tìm thấy lớp học phần này !!");
-        }
-
-        if (sectionClassRef.getSectionClassStatus().equals(SectionClassStatus.closed)) {
-            throw new ValidationException("Lớp học phần đã đóng đăng ký !!");
-        } else if (sectionClassRef.getSectionClassStatus().equals(SectionClassStatus.full)) {
-            throw new ValidationException("Lớp học phần đã đạt tối đa sinh viên !!");
-        } else if (sectionClassRef.getSectionClassStatus().equals(SectionClassStatus.canceled)) {
-            throw new ValidationException("Lớp học phần đã bị huỷ mở lớp !!");
-        }
-
-        List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClassRef.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
-
-        if(students.size() >= sectionClassRef.getMaxStudents()){
-            throw new ValidationException("Số sinh viên hiện tại của lớp học phần này đã đạt tối đa");
-        }
-
         StudentSectionClass studentSectionClassRef = new StudentSectionClass();
         studentSectionClassRef.setStudentId(student.getId());
         studentSectionClassRef.setStudentSectionId(studentSection.getId());
@@ -187,6 +220,7 @@ public class StudentSectionController {
 
         studentSectionClassRef.setTimeAndPlaceId(timeAndPlace.getId());
 
+
         studentSectionClassRef = studentSectionClassRepository.saveAndFlush(studentSectionClassRef);
 
         if (studentSectionClassRef.getId() == null) {
@@ -195,25 +229,7 @@ public class StudentSectionController {
         //#endregion
 
         //#region Section Class (Practice) - Lớp Phụ (Thực hành)
-        if (section.getCourse().getCourseDuration().getPractice() > 0 && section.getCourse().getCourseDuration().getTheory() > 0) {
-            if (data.getSectionClassId() == null) {
-                throw new ValidationException("Lớp học phần thực hành của sinh viên không được để trống khi đăng ký !!");
-            }
-
-            SectionClass sectionClass = sectionClassRepository.findById(data.getSectionClassId()).orElse(null);
-
-            if (sectionClass == null) {
-                throw new ValidationException("Không tìm thấy lớp học phần thực hành này !!");
-            }
-
-            if (sectionClass.getSectionClassStatus().equals(SectionClassStatus.closed)) {
-                throw new ValidationException("Lớp học phần thực hành đã đóng đăng ký !!");
-            } else if (sectionClass.getSectionClassStatus().equals(SectionClassStatus.full)) {
-                throw new ValidationException("Lớp học phần thực hành đã đạt tối đa sinh viên !!");
-            } else if (sectionClass.getSectionClassStatus().equals(SectionClassStatus.canceled)) {
-                throw new ValidationException("Lớp học phần thực hành đã bị huỷ mở lớp !!");
-            }
-
+        if (haveSectionClassPractice) {
             StudentSectionClass studentSectionClassPractice = new StudentSectionClass();
             studentSectionClassPractice.setStudentId(student.getId());
             studentSectionClassPractice.setStudentSectionId(studentSection.getId());
@@ -243,7 +259,6 @@ public class StudentSectionController {
 
         //#region Create Student - Tuition
         Tuition tuition = tuitionRepository.findBySectionId(section.getId());
-
 
         if (tuition != null) {
             StudentTuition studentTuition = new StudentTuition();
@@ -335,7 +350,6 @@ public class StudentSectionController {
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
 
     @PostMapping("/saveResultFinal")
     public ResponseEntity<?> saveResultFinal(@RequestParam(value = "userId") Long userId, @RequestParam(value = "sectionClassId") Long sectionClassId) {
@@ -463,16 +477,15 @@ public class StudentSectionController {
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateRegistration(@RequestParam(value = "userId") Long userId, @RequestBody RegistrationSectionBean data) {
         // Student Check
-        if (data.getUserId() == null) {
+        if (data.getStudentId() == null) {
             throw new ValidationException("Mã sinh viên không được để trống !!");
         }
 
-        Student student = studentRepository.findByUserId(data.getUserId());
+        Student student = studentRepository.findById(data.getStudentId()).orElse(null);
 
         if (student == null) {
             throw new ValidationException("Không tìm thấy sinh viên đăng ký !!");
         }
-
 
         //#region Student Section
         // Section Check
@@ -489,23 +502,35 @@ public class StudentSectionController {
         StudentSection studentSection = studentSectionRepository.findBySectionIdAndStudentId(section.getId(), student.getId());
 
         if (studentSection != null) {
-            throw new ValidationException("Sinh viên đã đăng học phần trong kỳ này rồi !!");
+            if (data.getSectionClassId() != null) {
+                StudentSectionClass studentSectionClass = studentSectionClassRepository.findByStudentSectionIdAndStudentIdAndSectionClassId(studentSection.getId(), student.getId(), data.getSectionClassId());
+
+                if (studentSectionClass != null) {
+                    throw new ValidationException("Sinh viên đã đăng ký lớp học phần này rồi !!");
+                }
+            } else {
+                throw new ValidationException("Sinh viên đã đăng ký học phần này rồi !!");
+            }
+        } else {
+            studentSection = new StudentSection();
         }
 
         // Create new Result for Student Section
+        Result result = resultRepository.findByStudentIdAndSectionId(student.getId(), section.getId());
 
-        Result result = new Result();
-        result.setStudentId(student.getId());
-        result.setSectionId(section.getId());
+        if (result == null) {
+            result = new Result();
+            result.setStudentId(student.getId());
+            result.setSectionId(section.getId());
 
-        result = resultRepository.saveAndFlush(result);
+            result = resultRepository.saveAndFlush(result);
 
-        if(result.getId() != null){
-            throw new ValidationException("Khởi tạo kết quả học tập cho sinh viên không thành công !!");
+            if (result.getId() == null) {
+                throw new ValidationException("Khởi tạo kết quả học tập cho sinh viên không thành công !!");
+            }
         }
 
         // Create student section
-        studentSection = new StudentSection();
         studentSection.setStudentId(student.getId());
         studentSection.setSectionId(section.getId());
         studentSection.setResultId(result.getId());
@@ -514,24 +539,13 @@ public class StudentSectionController {
 
         studentSection = studentSectionRepository.saveAndFlush(studentSection);
 
-        if(studentSection.getId() == null){
+        if (studentSection.getId() == null) {
             throw new ValidationException("khởi tại học phần cho sinh viên không thành công !!");
         }
 
         //#endregion
 
         //#region Student - Section Class (Registration Class)
-
-        StudentSectionClass studentSectionClass = null;
-        if (data.getSectionClassId() != null) {
-            studentSectionClass = studentSectionClassRepository.findByStudentSectionIdAndStudentIdAndSectionClassId(studentSection.getId(), student.getId(), section.getId());
-
-            if (studentSectionClass != null) {
-                throw new ValidationException("Sinh viên đã đăng ký lớp học phần này rồi !!");
-            }
-        }
-
-        studentSectionClass = new StudentSectionClass();
 
         if (data.getSectionClassId() == null) {
             throw new ValidationException("Lớp học phần của sinh viên không được để trống khi đăng ký !!");
@@ -543,11 +557,11 @@ public class StudentSectionController {
             throw new ValidationException("Không tìm thấy lớp học phần này !!");
         }
 
+        StudentSectionClass studentSectionClass = new StudentSectionClass();
+
         if (sectionClassTheory.getSectionClassStatus().equals(SectionClassStatus.closed)) {
             throw new ValidationException("Lớp học phần đã đóng đăng ký !!");
         }
-
-        studentSectionClass.setSectionClassId(sectionClassTheory.getId());
 
         if (data.getTermId() == null) {
             throw new ValidationException("Học kỳ không được để trống !!");
@@ -570,20 +584,28 @@ public class StudentSectionController {
         }
 
         studentSectionClass.setTimeAndPlaceId(timeAndPlaceTheory.getId());
-        studentSectionClass.setTimeAndPlaceId(data.getTimeAndPlaceId());
-//        studentSectionClass.setStatus(RegistrationStatus.registered);
         studentSectionClass.setStudentId(student.getId());
+        studentSectionClass.setSectionClassId(sectionClassTheory.getId());
+        studentSectionClass.setStudentSectionId(studentSection.getId());
 
+        studentSectionClass = studentSectionClassRepository.saveAndFlush(studentSectionClass);
+
+        if (studentSectionClass.getId() == null) {
+            throw new ValidationException("khởi tại lớp học phần cho sinh viên không thành công !!");
+        }
 
         //#region CreateOrUpdate Tuition For Student
-
         Tuition tuition = tuitionRepository.findBySectionId(section.getId());
 
-        if(tuition == null){
+        if (tuition == null) {
             throw new ValidationException("Không tìm thấy học phí của học phần này !!");
         }
 
-        StudentTuition studentTuition = new StudentTuition();
+        StudentTuition studentTuition = studentTuitionRepository.findByStudentIdAndTuitionId(student.getId(), tuition.getId());
+
+        if (studentTuition == null) {
+            studentTuition = new StudentTuition();
+        }
         studentTuition.setStudentId(student.getId());
         studentTuition.setTuitionId(tuition.getId());
         studentTuition.setPlusDeductions(0D);
@@ -605,32 +627,111 @@ public class StudentSectionController {
     @PostMapping("/changeStatus")
     public ResponseEntity<?> changeRegistrationStatus(@RequestParam(value = "userId") Long userId, @RequestBody Map<String, Object> data) {
 
-        if(data.get("id") == null){
+        if (data.get("id") == null) {
             throw new ValidationException("Học phần đăng ký không được trống !!");
         }
 
-        StudentSection studentSection = studentSectionRepository.findById((Long) data.get("id")).orElse(null);
+        StudentSection studentSection = studentSectionRepository.findById(((Integer) data.get("id")).longValue()).orElse(null);
 
-        if(studentSection == null){
+        if (studentSection == null) {
             throw new ValidationException("Không tìm thấy học phần sinh viên đã đăng ký !!");
         }
 
-        studentSection.setRegistrationStatus((RegistrationStatus) data.get("status"));
+        studentSection.setRegistrationStatus((RegistrationStatus.valueOf((String) data.get("status"))));
 
         studentSection = studentSectionRepository.saveAndFlush(studentSection);
 
-        if(studentSection.getId() == null){
+        if (studentSection.getId() == null) {
             throw new ValidationException("Cập nhật trạng thái cho học phần đăng ký sinh viên không thành công !!");
         }
 
-        if(data.get("status").equals(RegistrationStatus.cancel_register)){
+        if (data.get("status").equals(RegistrationStatus.cancel_register)) {
+            // Kiểm tra xoá lớp học phần thuộc học phần cần xoá
             List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findByStudentSectionId(studentSection.getId());
 
-            if(!studentSectionClasses.isEmpty()){
+            if (!studentSectionClasses.isEmpty()) {
                 try {
                     studentSectionClassRepository.deleteAll(studentSectionClasses);
-                } catch(Exception ignored){
+                } catch (Exception ignored) {
                 }
+            }
+
+            // Xoá bảng điểm của sinh viên đã tạo trong học phần này
+            Result result = resultRepository.findByStudentIdAndSectionId(studentSection.getStudentId(), studentSection.getSectionId());
+
+            if (result != null) {
+                try {
+                    resultRepository.delete(result);
+                } catch (Exception ignored) {
+                }
+            }
+
+            // Xoá bỏ công nợ giữa học phần và sinh viên này
+            Tuition tuition = tuitionRepository.findBySectionId(studentSection.getSectionId());
+
+            if (tuition == null) {
+                throw new ValidationException("Không tìm thấy học phí cho học phần này !!");
+            }
+            StudentTuition studentTuition = studentTuitionRepository.findByStudentIdAndTuitionId(studentSection.getStudentId(), tuition.getId());
+
+            if (studentTuition != null) {
+                try {
+                    studentTuitionRepository.delete(studentTuition);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PostMapping("/deletedRegistration")
+    public ResponseEntity<?> deletedRegistration(@RequestParam(value = "userId") Long userId, @RequestParam(value = "id") Long id) {
+
+        // Xoá bỏ đăng ký học phần
+        StudentSection studentSection = studentSectionRepository.findById(id).orElse(null);
+
+        if (studentSection == null) {
+            throw new ValidationException("Không tìm thấy học phần đăng ký của sinh viên !!");
+        }
+
+        try {
+            studentSectionRepository.delete(studentSection);
+        } catch (Exception ignored) {
+        }
+
+        // Kiểm tra xoá lớp học phần thuộc học phần cần xoá
+        List<StudentSectionClass> studentSectionClasses = studentSectionClassRepository.findByStudentSectionId(studentSection.getId());
+
+        if (!studentSectionClasses.isEmpty()) {
+            try {
+                studentSectionClassRepository.deleteAll(studentSectionClasses);
+            } catch (Exception ignored) {
+            }
+        }
+
+        // Xoá bảng điểm của sinh viên đã tạo trong học phần này
+        Result result = resultRepository.findByStudentIdAndSectionId(studentSection.getStudentId(), studentSection.getSectionId());
+
+        if (result != null) {
+            try {
+                resultRepository.delete(result);
+            } catch (Exception ignored) {
+            }
+        }
+
+        // Xoá bỏ công nợ giữa học phần và sinh viên này
+        Tuition tuition = tuitionRepository.findBySectionId(studentSection.getSectionId());
+
+        if (tuition == null) {
+            throw new ValidationException("Không tìm thấy học phí cho học phần này !!");
+        }
+        StudentTuition studentTuition = studentTuitionRepository.findByStudentIdAndTuitionId(studentSection.getStudentId(), tuition.getId());
+
+        if (studentTuition != null) {
+            try {
+                studentTuitionRepository.delete(studentTuition);
+            } catch (Exception ignored) {
             }
         }
 

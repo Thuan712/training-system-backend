@@ -2,12 +2,14 @@ package iuh.fit.trainingsystembackend.dto;
 
 import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
+import iuh.fit.trainingsystembackend.model.SectionClass;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
+import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -46,4 +48,6 @@ public class StudentSectionDTO {
 
     private RegistrationStatus registrationStatus;
     private CompletedStatus completedStatus;
+
+    private List<SectionClass> sectionClasses;
 }
