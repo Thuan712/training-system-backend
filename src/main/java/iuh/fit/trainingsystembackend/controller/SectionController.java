@@ -177,7 +177,7 @@ public class SectionController {
             throw new ValidationException("Không tìm thấy giảng viên chủ nhiệm !!");
         }
 
-        if (!lecturer.getSpecializationId().equals(section.getCourse().getSpecializationId())) {
+        if (section.getCourse().getSpecializationId() != null && !lecturer.getSpecializationId().equals(section.getCourse().getSpecializationId())) {
             throw new ValidationException("Giảng viên này không thuộc chuyên ngành giảng dạy này !!");
         }
 
@@ -236,6 +236,8 @@ public class SectionController {
                     }
                 }
             }
+        } else {
+            toSave.setCreateStatus(true);
         }
 
         if (data.getMaxStudents() == null || data.getMaxStudents() < 0 || data.getMaxStudents() < data.getMinStudents()) {
