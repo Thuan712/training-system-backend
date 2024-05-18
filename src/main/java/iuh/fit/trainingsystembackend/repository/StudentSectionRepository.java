@@ -1,5 +1,6 @@
 package iuh.fit.trainingsystembackend.repository;
 
+import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import iuh.fit.trainingsystembackend.model.Result;
 import iuh.fit.trainingsystembackend.model.StudentSection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,6 @@ public interface StudentSectionRepository extends JpaRepository<StudentSection, 
     StudentSection findBySectionIdAndStudentId(Long sectionId, Long studentId);
 
     List<StudentSection> findByResult(Result result);
+
+    List<StudentSection> findByStudentIdAndCompletedStatus(Long studentId, CompletedStatus completedStatus);
 }

@@ -14,6 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CourseRequest {
     private Long specializationId;
+    private List<Long> specializationIds;
 
     private String name;
     private String code;

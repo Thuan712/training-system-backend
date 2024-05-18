@@ -4,6 +4,7 @@ import iuh.fit.trainingsystembackend.common.specification.BaseSpecification;
 import iuh.fit.trainingsystembackend.enums.TermType;
 import iuh.fit.trainingsystembackend.model.Course;
 import iuh.fit.trainingsystembackend.model.Section;
+import iuh.fit.trainingsystembackend.model.Specialization;
 import iuh.fit.trainingsystembackend.request.CourseRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ public class CourseSpecification extends BaseSpecification<Course, CourseRequest
                 .and(attributeEqual("typeOfKnowledge", request.getTypeOfKnowledge()))
 
                 .and(attributeEqual("deleted", request.getDeleted()))
+                .and(attributeSpecializationIn(request.getSpecializationIds()))
                 .toPredicate(root, query, criteriaBuilder);
     }
 
@@ -52,6 +54,16 @@ public class CourseSpecification extends BaseSpecification<Course, CourseRequest
             }
 
             return criteriaBuilder.in(root.get("termType")).value(termTypes);
+        });
+    }
+
+    private Specification<Course> attributeSpecializationIn(List<Long> SpecializationIds) {
+        return ((root, query, criteriaBuilder) -> {
+            if (SpecializationIds == null || SpecializationIds.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.or(criteriaBuilder.in(root.get("specializationId")).value(SpecializationIds), criteriaBuilder.equal(root.get("specializationId"), null)) ;
         });
     }
 }

@@ -4,6 +4,7 @@ import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
+import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
@@ -11,10 +12,12 @@ import iuh.fit.trainingsystembackend.mapper.SectionClassMapper;
 import iuh.fit.trainingsystembackend.mapper.SectionMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
+import iuh.fit.trainingsystembackend.request.CourseRequest;
 import iuh.fit.trainingsystembackend.request.SectionClassRequest;
 import iuh.fit.trainingsystembackend.request.SectionRequest;
 import iuh.fit.trainingsystembackend.service.ScheduleService;
 import iuh.fit.trainingsystembackend.service.SectionService;
+import iuh.fit.trainingsystembackend.specification.CourseSpecification;
 import iuh.fit.trainingsystembackend.specification.SectionClassSpecification;
 import iuh.fit.trainingsystembackend.specification.SectionSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
@@ -57,6 +60,11 @@ public class SectionController {
     private SectionService sectionService;
     private StudentSectionRepository studentSectionRepository;
     private final StudentSectionClassRepository studentSectionClassRepository;
+    private final SpecializationRepository specializationRepository;
+    private final FacultyRepository facultyRepository;
+    private final StudentCourseRepository studentCourseRepository;
+    private final CourseRepository courseRepository;
+    private CourseSpecification courseSpecification;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -110,14 +118,42 @@ public class SectionController {
             }
 
 
-            if(filterRequest.getIsRegisterBefore()){
-                List<Long> studentSectionRegisteredBefore = studentSectionRepository.findByStudentId(student.getId()).stream().map(StudentSection::getSectionId).collect(Collectors.toList());
+            if (filterRequest.getIsRegisterBefore()) {
+                List<StudentCourse> studentCourse = studentCourseRepository.findByStudentIdAndCompletedStatus(student.getId(), CompletedStatus.completed);
 
-                if(studentSectionRegisteredBefore.isEmpty()){
-                    return ResponseEntity.ok(new ArrayList<>());
+                List<Long> sectionIds = studentCourse.stream().map(x -> x.getResult().getSectionId()).collect(Collectors.toList());
+                if (!studentCourse.isEmpty()) {
+                    sections = sections.stream().filter(section -> sectionIds.contains(section.getId())).collect(Collectors.toList());
                 } else {
-                    sections = sections.stream().filter(section -> studentSectionRegisteredBefore.contains(section.getId())).collect(Collectors.toList());
+                    return ResponseEntity.ok(new ArrayList<>());
                 }
+
+//                List<Long> studentSectionRegisteredBefore = studentSectionRepository.findByStudentIdAndCompletedStatus(student.getId(), CompletedStatus.completed).stream().map(StudentSection::getSectionId).collect(Collectors.toList());
+//
+//                if(studentSectionRegisteredBefore.isEmpty()){
+//                    return ResponseEntity.ok(new ArrayList<>());
+//                } else {
+//                    sections = sections.stream().filter(section -> studentSectionRegisteredBefore.contains(section.getId())).collect(Collectors.toList());
+//                }
+            }
+
+            Specialization specialization = specializationRepository.findById(student.getSpecializationId()).orElse(null);
+
+            if(specialization != null && specialization.getFacultyId() != null){
+                Faculty faculty = facultyRepository.findById(specialization.getFacultyId()).orElse(null);
+
+                if(faculty != null){
+                    List<Specialization> specializations = specializationRepository.findByFacultyId(faculty.getId());
+
+                    if(!specializations.isEmpty()){
+                        CourseRequest request = new CourseRequest();
+                        request.setSpecializationIds(specializations.stream().map(Specialization::getId).collect(Collectors.toList()));
+                        List<Long> courseIds = courseRepository.findAll(courseSpecification.getFilter(request)).stream().map(Course::getId).collect(Collectors.toList());
+
+                        sections = sections.stream().filter(section -> courseIds.contains(section.getCourseId())).collect(Collectors.toList());
+                    }
+                }
+
             }
         }
 
@@ -184,7 +220,7 @@ public class SectionController {
         toSave.setLecturerId(lecturer.getId());
         toSave.setNote(data.getNote());
 
-        if(isCreate){
+        if (isCreate) {
             if (data.getSectionClassType() == null) {
                 throw new ValidationException("Loại lớp học phần không được để trống !!");
             }
@@ -248,15 +284,15 @@ public class SectionController {
             throw new ValidationException("Sĩ số tối thiểu sinh viên của lớp học phần không được để trống !!");
         }
 
-       if(!isCreate) {
-           List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(toSave.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
+        if (!isCreate) {
+            List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(toSave.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
 
-           if(!students.isEmpty()){
-               if(students.size() > data.getMaxStudents()){
-                   throw new ValidationException("Sĩ số tối đa của lớp hiện đang bé hơn số sinh viên đã đăng ký !!");
-               }
-           }
-       }
+            if (!students.isEmpty()) {
+                if (students.size() > data.getMaxStudents()) {
+                    throw new ValidationException("Sĩ số tối đa của lớp hiện đang bé hơn số sinh viên đã đăng ký !!");
+                }
+            }
+        }
 
         toSave.setMinStudents(data.getMinStudents());
         toSave.setMaxStudents(data.getMaxStudents());
@@ -301,11 +337,11 @@ public class SectionController {
         // Tạo lại lịch học và thời khoá biểu cho lớp
         for (TimeAndPlace timeAndPlace : data.getTimeAndPlaces()) {
             TimeAndPlace timeAndPlaceToSave = null;
-            if(timeAndPlace.getId() != null){
+            if (timeAndPlace.getId() != null) {
                 timeAndPlaceToSave = timeAndPlaceRepository.findById(timeAndPlace.getId()).orElse(null);
             }
 
-            if(timeAndPlaceToSave == null){
+            if (timeAndPlaceToSave == null) {
                 timeAndPlaceToSave = new TimeAndPlace();
             }
 
