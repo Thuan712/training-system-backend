@@ -63,7 +63,7 @@ public class CourseSpecification extends BaseSpecification<Course, CourseRequest
                 return null;
             }
 
-            return criteriaBuilder.or(criteriaBuilder.in(root.get("specializationId")).value(SpecializationIds), criteriaBuilder.equal(root.get("specializationId"), null)) ;
+            return criteriaBuilder.or(criteriaBuilder.in(root.get("specializationId")).value(SpecializationIds), criteriaBuilder.isNull(root.get("specializationId"))) ;
         });
     }
 }
