@@ -22,11 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -280,6 +282,24 @@ public class UserController {
         return ResponseEntity.ok(userInfoDTO);
     }
 
+    @GetMapping("/getByStudentId")
+    public ResponseEntity<?> getByStudentId(@RequestParam(value = "userId", required = false) Long
+                                             userId, @RequestParam(value = "id") Long id) {
+        Student student = studentRepository.findById(id).orElse(null);
+
+        if(student == null){
+            throw new ValidationException("Không tìm thấy sinh viên !!");
+        }
+        UserEntity userEntity = userRepository.findById(student.getUserId()).orElse(null);
+
+        if (userEntity == null) {
+            throw new ValidationException("User is not found !");
+        }
+
+        UserInfoDTO userInfoDTO = userInfoMapper.mapToDTO(userEntity);
+        return ResponseEntity.ok(userInfoDTO);
+    }
+
     @PostMapping("/getPage")
     public ResponseEntity<?> getPage(@RequestParam(value = "userId", required = false) Long userId,
                                      @RequestParam("pageNumber") int pageNumber, @RequestParam("pageRows") int pageRows,
@@ -296,5 +316,49 @@ public class UserController {
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody UserRequest filterRequest) {
         List<UserEntity> userEntities = userRepository.findAll(userSpecification.getFilter(filterRequest));
         return ResponseEntity.ok(userEntities);
+    }
+
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity resetPassword(
+            @RequestBody Map<String, Object> data,
+            HttpServletRequest request
+    ) {
+        String newPassword = (String) data.get("newPassword");
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new ValidationException("New password is required");
+        }
+
+        String retypePassword = (String) data.get("retypePassword");
+        if (retypePassword == null || retypePassword.isEmpty()) {
+            throw new ValidationException("Retype password is required");
+        }
+
+        if (!newPassword.equals(retypePassword)) {
+            throw new ValidationException("New password and retype password is not match");
+        }
+
+        String usernameOrEmail = (String) data.get("usernameOrEmail");
+        if (usernameOrEmail == null || usernameOrEmail.isEmpty()) {
+            throw new ValidationException("Username or email is required");
+        }
+
+        UserEntity user = userRepository.findUserEntityByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (user == null) {
+            throw new ValidationException("User not found");
+        }
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new ValidationException("User does not have email");
+        }
+
+        String encodedPassword = new BCryptPasswordEncoder().encode(newPassword);
+        user.setPassword(encodedPassword);
+
+        user = userRepository.saveAndFlush(user);
+        if (user.getId() == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to change password");
+        }
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

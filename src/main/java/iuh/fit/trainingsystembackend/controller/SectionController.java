@@ -110,9 +110,6 @@ public class SectionController {
                 throw new ValidationException("Không tìm thấy sinh viên đăng ký học phần !!");
             }
 
-
-
-
             if (filterRequest.getIsRegisterBefore()) {
                 List<StudentCourse> studentCourse = studentCourseRepository.findByStudentIdAndCompletedStatus(student.getId(), CompletedStatus.completed);
 
@@ -155,7 +152,6 @@ public class SectionController {
                         sections = sections.stream().filter(section -> courseIds.contains(section.getCourseId())).collect(Collectors.toList());
                     }
                 }
-
             }
         }
 
