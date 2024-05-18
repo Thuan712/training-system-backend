@@ -110,20 +110,15 @@ public class SectionController {
                 throw new ValidationException("Không tìm thấy sinh viên đăng ký học phần !!");
             }
 
-            List<Long> studentSections = studentSectionRepository.findByStudentId(student.getId()).stream().map(StudentSection::getSectionId).collect(Collectors.toList());
 
-
-            if (!studentSections.isEmpty()) {
-                sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
-            }
 
 
             if (filterRequest.getIsRegisterBefore()) {
                 List<StudentCourse> studentCourse = studentCourseRepository.findByStudentIdAndCompletedStatus(student.getId(), CompletedStatus.completed);
 
-                List<Long> sectionIds = studentCourse.stream().map(x -> x.getResult().getSectionId()).collect(Collectors.toList());
+                List<Long> sectionIds = studentCourse.stream().map(StudentCourse::getCourseId).collect(Collectors.toList());
                 if (!studentCourse.isEmpty()) {
-                    sections = sections.stream().filter(section -> sectionIds.contains(section.getId())).collect(Collectors.toList());
+                    sections = sections.stream().filter(section -> sectionIds.contains(section.getCourseId())).collect(Collectors.toList());
                 } else {
                     return ResponseEntity.ok(new ArrayList<>());
                 }
@@ -135,6 +130,13 @@ public class SectionController {
 //                } else {
 //                    sections = sections.stream().filter(section -> studentSectionRegisteredBefore.contains(section.getId())).collect(Collectors.toList());
 //                }
+            } else{
+                List<Long> studentSections = studentSectionRepository.findByStudentId(student.getId()).stream().map(StudentSection::getSectionId).collect(Collectors.toList());
+
+
+                if (!studentSections.isEmpty()) {
+                    sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
+                }
             }
 
             Specialization specialization = specializationRepository.findById(student.getSpecializationId()).orElse(null);

@@ -56,7 +56,7 @@ public class ProgramTermMapper {
                 .build();
     }
     public List<ProgramTermDTO> mapToDTO(List<ProgramTerm> programTermList) {
-        return programTermList.parallelStream().map(this::mapToDTO).collect(Collectors.toList());
+        return programTermList.parallelStream().map(this::mapToDTO).collect(Collectors.toList());   
     }
 
     public Page<ProgramTermDTO> mapToDTO(Page<ProgramTerm> programTermPage) {
