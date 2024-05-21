@@ -6,14 +6,8 @@ import iuh.fit.trainingsystembackend.dto.AcademicYearDTO;
 import iuh.fit.trainingsystembackend.enums.TermType;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.AcademicYearMapper;
-import iuh.fit.trainingsystembackend.model.AcademicYear;
-import iuh.fit.trainingsystembackend.model.Course;
-import iuh.fit.trainingsystembackend.model.Section;
-import iuh.fit.trainingsystembackend.model.Term;
-import iuh.fit.trainingsystembackend.repository.AcademicYearRepository;
-import iuh.fit.trainingsystembackend.repository.CourseRepository;
-import iuh.fit.trainingsystembackend.repository.SectionRepository;
-import iuh.fit.trainingsystembackend.repository.TermRepository;
+import iuh.fit.trainingsystembackend.model.*;
+import iuh.fit.trainingsystembackend.repository.*;
 import iuh.fit.trainingsystembackend.service.SectionService;
 import iuh.fit.trainingsystembackend.specification.CourseSpecification;
 import iuh.fit.trainingsystembackend.utils.Constants;
@@ -41,6 +35,7 @@ public class AcademicYearController {
     private CourseSpecification courseSpecification;
     private SectionRepository sectionRepository;
     private SectionService sectionService;
+    private final TuitionRepository tuitionRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateAcademicYear(@RequestParam(value = "userId", required = false) Long userId, @RequestBody AcademicYearBean data) {
@@ -158,26 +153,28 @@ public class AcademicYearController {
 
         //#endregion
 
+        if(isCreate){
+            List<Course> coursesFirstTerm = courseRepository.findAll().stream().filter(course -> course.getTermRegister().contains(TermType.first_term)).collect(Collectors.toList());
 
-        List<Course> coursesFirstTerm = courseRepository.findAll().stream().filter(course -> course.getTermRegister().contains(TermType.first_term)).collect(Collectors.toList());
+            if (!coursesFirstTerm.isEmpty()) {
+                for (Course course : coursesFirstTerm) {
+                    // Section
+                    SectionBean sectionBean = new SectionBean();
+                    sectionBean.setCourseId(course.getId());
+                    sectionBean.setTermId(firstTerm.getId());
+                    sectionBean.setName(course.getName());
+                    sectionBean.setDescription(course.getDescription());
+                    sectionBean.setDeleted(false);
 
-        if (!coursesFirstTerm.isEmpty()) {
-            for (Course course : coursesFirstTerm) {
-                // Section
-                SectionBean sectionBean = new SectionBean();
-                sectionBean.setCourseId(course.getId());
-                sectionBean.setTermId(firstTerm.getId());
-                sectionBean.setName(course.getName());
-                sectionBean.setDescription(course.getDescription());
-                sectionBean.setDeleted(false);
+                    Section section = sectionService.createOrUpdateSection(sectionBean);
 
-                Section section = sectionService.createOrUpdateSection(sectionBean);
-
-                if (section == null) {
-                    System.out.println("Tạo học phần " + sectionBean.getName() + " " + firstTerm.getName() + " không thành công !!");
+                    if (section == null) {
+                        System.out.println("Tạo học phần " + sectionBean.getName() + " " + firstTerm.getName() + " không thành công !!");
+                    }
                 }
             }
         }
+
 
 
         //#region Create or Update Second Term
@@ -211,23 +208,24 @@ public class AcademicYearController {
             throw new ValidationException("Thao tác tạo học kỳ hai không thành công !!");
         }
 
+        if(isCreate){
+            List<Course> coursesSecondTerm = courseRepository.findAll().stream().filter(course -> course.getTermRegister().contains(TermType.second_term)).collect(Collectors.toList());
 
-        List<Course> coursesSecondTerm = courseRepository.findAll().stream().filter(course -> course.getTermRegister().contains(TermType.second_term)).collect(Collectors.toList());
+            if (!coursesSecondTerm.isEmpty()) {
+                for (Course course : coursesSecondTerm) {
+                    // Section
+                    SectionBean sectionBean = new SectionBean();
+                    sectionBean.setCourseId(course.getId());
+                    sectionBean.setTermId(secondTerm.getId());
+                    sectionBean.setName(course.getName());
+                    sectionBean.setDescription(course.getDescription());
+                    sectionBean.setDeleted(false);
 
-        if (!coursesSecondTerm.isEmpty()) {
-            for (Course course : coursesSecondTerm) {
-                // Section
-                SectionBean sectionBean = new SectionBean();
-                sectionBean.setCourseId(course.getId());
-                sectionBean.setTermId(secondTerm.getId());
-                sectionBean.setName(course.getName());
-                sectionBean.setDescription(course.getDescription());
-                sectionBean.setDeleted(false);
+                    Section section = sectionService.createOrUpdateSection(sectionBean);
 
-                Section section = sectionService.createOrUpdateSection(sectionBean);
-
-                if (section == null) {
-                    System.out.println("Tạo học phần " + sectionBean.getName() + " " + secondTerm.getName() + " không thành công !!");
+                    if (section == null) {
+                        System.out.println("Tạo học phần " + sectionBean.getName() + " " + secondTerm.getName() + " không thành công !!");
+                    }
                 }
             }
         }
@@ -264,21 +262,23 @@ public class AcademicYearController {
             throw new ValidationException("Thao tác tạo học kỳ ba không thành công !!");
         }
 
-        List<Course> coursesThirdTerm = courseRepository.findAll().stream().filter(course -> course.getTermRegister().contains(TermType.summer_term)).collect(Collectors.toList());
-        if (!coursesThirdTerm.isEmpty()) {
-            for (Course course : coursesThirdTerm) {
-                // Section
-                SectionBean sectionBean = new SectionBean();
-                sectionBean.setCourseId(course.getId());
-                sectionBean.setTermId(thirdTerm.getId());
-                sectionBean.setName(course.getName());
-                sectionBean.setDescription(course.getDescription());
-                sectionBean.setDeleted(false);
+        if(isCreate){
+            List<Course> coursesThirdTerm = courseRepository.findAll().stream().filter(course -> course.getTermRegister().contains(TermType.summer_term)).collect(Collectors.toList());
+            if (!coursesThirdTerm.isEmpty()) {
+                for (Course course : coursesThirdTerm) {
+                    // Section
+                    SectionBean sectionBean = new SectionBean();
+                    sectionBean.setCourseId(course.getId());
+                    sectionBean.setTermId(thirdTerm.getId());
+                    sectionBean.setName(course.getName());
+                    sectionBean.setDescription(course.getDescription());
+                    sectionBean.setDeleted(false);
 
-                Section section = sectionService.createOrUpdateSection(sectionBean);
+                    Section section = sectionService.createOrUpdateSection(sectionBean);
 
-                if (section == null) {
-                    System.out.println("Tạo học phần " + sectionBean.getName() + " " + thirdTerm.getName() + " không thành công !!");
+                    if (section == null) {
+                        System.out.println("Tạo học phần " + sectionBean.getName() + " " + thirdTerm.getName() + " không thành công !!");
+                    }
                 }
             }
         }
@@ -286,6 +286,23 @@ public class AcademicYearController {
         //#endregion
 
         //#endregion
+
+        //#region Tuition
+        if(!isCreate){
+            List<Section> sections = sectionRepository.findByTermId(firstTerm.getId());
+
+            if(!sections.isEmpty()){
+                for(Section section : sections){
+                    Tuition tuition = tuitionRepository.findBySectionId(section.getId());
+
+                    double initialFee = firstTerm.getCostPerCredit() * section.getCourse().getCostCredits();
+                    tuition.setInitialFee(initialFee);
+                    tuition = tuitionRepository.save(tuition);
+                }
+            }
+        }
+        //#endregion
+
 
         return ResponseEntity.ok(toSave);
     }

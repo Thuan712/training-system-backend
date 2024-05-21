@@ -66,7 +66,7 @@ public class AuthenticationController {
         UserEntity userEntity = userEntityRepository.findByUsername(username);
         try {
             if(userEntity == null){
-                throw new ValidationException("User not found !!");
+                throw new ValidationException("Tài khoản hoặc mật khẩu không đúng !!");
             }
             userAuthCache = userCacheService.getUserAuthCache(username);
         } catch (Exception ex) {
@@ -83,7 +83,7 @@ public class AuthenticationController {
         }
 
         if(userEntity == null ){
-            throw new ValidationException("User not found !!");
+            throw new ValidationException("Không tìm thấy người dùng !!");
         }
 
         if(userEntity.isDeleted()) {

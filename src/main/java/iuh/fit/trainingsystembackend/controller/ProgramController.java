@@ -137,7 +137,7 @@ public class ProgramController implements Serializable {
             throw new ValidationException("Không tìm thấy chuyên ngành của sinh viên này !!");
         }
 
-        Program program = programRepository.findBySpecializationId(specialization.getId());
+        Program program = programRepository.findById(student.getProgramId()).orElse(null);
 
         if(program == null){
             throw new ValidationException("Không tìm thấy chương trình đào tạo của sinh viên này  !!");

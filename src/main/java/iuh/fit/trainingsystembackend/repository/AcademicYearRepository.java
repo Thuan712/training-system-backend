@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AcademicYearRepository extends JpaRepository<AcademicYear, Long> {
     boolean existsByYearStart(int yearStart);
+
+    AcademicYear findByYearStart(Integer yearStart);
 }

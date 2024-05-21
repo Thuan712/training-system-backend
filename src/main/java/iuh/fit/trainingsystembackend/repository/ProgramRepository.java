@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProgramRepository extends JpaRepository<Program, Long>, JpaSpecificationExecutor<Program> {
     Program findBySpecializationId(Long specializationId);
+
+    Program findBySpecializationIdAndAcademicYearId(Long specializationId, Long academicYearId);
+
+    Program findFirstBySpecializationIdOrderByCreatedAtDesc(Long specializationId);
 }

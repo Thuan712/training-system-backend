@@ -170,13 +170,13 @@ public class SpecializationController {
             int numOfSpecializationClass = specializationClassRepository.countBySpecializationId(specialization.getId());
 
             if(numOfSpecializationClass == 0){
-                char key = (char) (67);
+                char key = (char) (65);
                 String endYear = data.getSchoolYear();
                 String nameGenerate = "DH" + specialization.getCode() + endYear + key;
 
                 toSave.setName(nameGenerate);
             } else {
-                char key = (char) (numOfSpecializationClass + 66);
+                char key = (char) (numOfSpecializationClass + 65);
                 String endYear = data.getSchoolYear();
                 String nameGenerate = "DH" + specialization.getCode() + endYear + key;
 

@@ -44,6 +44,7 @@ public class UserController {
     private UserInfoMapper userInfoMapper;
     private SpecializationService specializationService;
     private SpecializationClassRepository specializationClassRepository;
+    private final ProgramRepository programRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId") Long userId, @RequestBody UserBean data) {
@@ -175,12 +176,6 @@ public class UserController {
             }
         }
 
-        toSave = userRepository.saveAndFlush(toSave);
-
-        if (toSave.getId() == null) {
-            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
         if (data.getSpecializationId() == null) {
             throw new ValidationException("Specialization ID is required !");
         }
@@ -191,16 +186,21 @@ public class UserController {
             throw new ValidationException("Specialization is not found !");
         }
 
+        toSave = userRepository.saveAndFlush(toSave);
+
+        if (toSave.getId() == null) {
+            return ResponseEntity.ok(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         if (toSave.getSystemRole().equals(SystemRole.lecturer)) {
             Lecturer lecturer = null;
-            if(isCreate){
+            if (isCreate) {
                 lecturer = new Lecturer();
                 lecturer.setUserId(toSave.getId());
             } else {
                 lecturer = lecturerRepository.findByUserId(toSave.getId());
 
-                if(lecturer == null){
+                if (lecturer == null) {
                     throw new ValidationException("Không tìm thấy giảng viên này !!");
                 }
             }
@@ -216,13 +216,13 @@ public class UserController {
             }
         } else if (toSave.getSystemRole().equals(SystemRole.student)) {
             Student student = null;
-            if(isCreate){
+            if (isCreate) {
                 student = new Student();
                 student.setUserId(toSave.getId());
             } else {
                 student = studentRepository.findByUserId(toSave.getId());
 
-                if(student == null){
+                if (student == null) {
                     throw new ValidationException("Không tìm thấy sinh viên này !!");
                 }
 
@@ -242,15 +242,23 @@ public class UserController {
                     throw new ValidationException("Lớp chuyên ngành đã đủ sỉ số sinh viên !!");
                 }
 
-                if(!specializationClass.getSpecializationId().equals(specialization.getId())){
+                if (!specializationClass.getSpecializationId().equals(specialization.getId())) {
                     throw new ValidationException("Lớp chuyên ngành không thuộc chuyên ngành của sinh viên !!");
                 }
 
                 student.setSpecializationClassId(specializationClass.getId());
             }
+
+            Program program = programRepository.findFirstBySpecializationIdOrderByCreatedAtDesc(specialization.getId());
+
+            if (program == null) {
+                throw new ValidationException("Hiện đang chưa có chương trình đào tạo của chuyên ngành " + specialization.getName());
+            }
+
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
             String year = simpleDateFormat.format(student.getEntryDate());
             student.setSchoolYear(year);
+            student.setProgramId(program.getId());
             student = studentRepository.saveAndFlush(student);
 
             if (student.getId() == null) {
@@ -284,10 +292,10 @@ public class UserController {
 
     @GetMapping("/getByStudentId")
     public ResponseEntity<?> getByStudentId(@RequestParam(value = "userId", required = false) Long
-                                             userId, @RequestParam(value = "id") Long id) {
+                                                    userId, @RequestParam(value = "id") Long id) {
         Student student = studentRepository.findById(id).orElse(null);
 
-        if(student == null){
+        if (student == null) {
             throw new ValidationException("Không tìm thấy sinh viên !!");
         }
         UserEntity userEntity = userRepository.findById(student.getUserId()).orElse(null);
