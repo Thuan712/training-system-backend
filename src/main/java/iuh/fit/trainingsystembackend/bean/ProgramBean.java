@@ -15,5 +15,6 @@ public class ProgramBean implements Serializable {
     private Long academicYearId;
 
     private String name;
+    private Double trainingTime;
     private List<ProgramTermBean> programTerms = new ArrayList<>();
 }

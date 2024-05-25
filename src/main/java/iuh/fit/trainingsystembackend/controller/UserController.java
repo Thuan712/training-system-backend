@@ -4,6 +4,7 @@ import iuh.fit.trainingsystembackend.bean.UserBean;
 import iuh.fit.trainingsystembackend.dto.UserInfoDTO;
 import iuh.fit.trainingsystembackend.enums.SystemRole;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mail.MailService;
 import iuh.fit.trainingsystembackend.mapper.UserInfoMapper;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
@@ -29,6 +30,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 @RestController
 @AllArgsConstructor
@@ -45,6 +49,7 @@ public class UserController {
     private SpecializationService specializationService;
     private SpecializationClassRepository specializationClassRepository;
     private final ProgramRepository programRepository;
+    private MailService mailService;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdate(@RequestParam(value = "userId") Long userId, @RequestBody UserBean data) {
@@ -73,7 +78,7 @@ public class UserController {
         if (data.getId() != null) {
             toSave = userRepository.findById(data.getId()).orElse(null);
             if (toSave == null) {
-                throw new ValidationException("User is not found !");
+                throw new ValidationException("Không tìm thấy người dùng này !");
             }
         }
 
@@ -86,7 +91,7 @@ public class UserController {
                 Lecturer lecturer = lecturerRepository.getLecturersByUserId(toSave.getId());
 
                 if (lecturer == null) {
-                    throw new ValidationException("Lecturer is not found !");
+                    throw new ValidationException("Không tìm thấy giảng viên này !");
                 }
 
                 lecturer.setPosition(data.getPosition());
@@ -95,7 +100,7 @@ public class UserController {
                 Student student = studentRepository.getStudentByUserId(toSave.getId());
 
                 if (student == null) {
-                    throw new ValidationException("Student is not found !");
+                    throw new ValidationException("Không tìm thấy sinh viên này !");
                 }
 
                 student.setTypeOfEducation(data.getTypeOfEducation());
@@ -126,6 +131,14 @@ public class UserController {
                     code = "GV" + StringUtils.randomNumberGenerate(6);
                     isExist = userRepository.existsByCode(code);
                 }
+            } else if (data.getSystemRole().equals(SystemRole.staff)) {
+                code = "NV" + StringUtils.randomNumberGenerate(6);
+
+                boolean isExist = true;
+                while (isExist) {
+                    code = "NV" + StringUtils.randomNumberGenerate(6);
+                    isExist = userRepository.existsByCode(code);
+                }
             } else if (data.getSystemRole().equals(SystemRole.admin)) {
                 code = "AD" + StringUtils.randomNumberGenerate(6);
 
@@ -139,7 +152,7 @@ public class UserController {
             if (!code.isEmpty()) {
                 toSave.setCode(code);
                 toSave.setUsername(code);
-                toSave.setEmail(code + "." + StringUtils.removeAccent(data.getFirstName().toLowerCase()) + "@iuh.edu.com");
+                toSave.setEmail(code + "." + StringUtils.removeAccent(data.getFirstName().toLowerCase()) + "@dt.edu.com");
             }
 
             String encodedPassword = new BCryptPasswordEncoder().encode("1111");
@@ -176,15 +189,29 @@ public class UserController {
             }
         }
 
-        if (data.getSpecializationId() == null) {
-            throw new ValidationException("Specialization ID is required !");
+        Specialization specialization = null;
+        Program program = null;
+
+        if (data.getSpecializationId() == null && !data.getSystemRole().equals(SystemRole.staff)) {
+            throw new ValidationException("Mã chuyên ngành không được để trống !");
         }
 
-        Specialization specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
+        if (!data.getSystemRole().equals(SystemRole.staff)) {
+            specialization = specializationRepository.findById(data.getSpecializationId()).orElse(null);
 
-        if (specialization == null) {
-            throw new ValidationException("Specialization is not found !");
+            if (specialization == null) {
+                throw new ValidationException("Không tìm thấy chuyên ngành này !");
+            }
+
+            if (toSave.getSystemRole().equals(SystemRole.student)) {
+                program = programRepository.findFirstBySpecializationIdOrderByCreatedAtDesc(specialization.getId());
+
+                if (program == null) {
+                    throw new ValidationException("Hiện đang chưa có chương trình đào tạo của chuyên ngành " + specialization.getName());
+                }
+            }
         }
+
 
         toSave = userRepository.saveAndFlush(toSave);
 
@@ -219,17 +246,52 @@ public class UserController {
             if (isCreate) {
                 student = new Student();
                 student.setUserId(toSave.getId());
+
+                student.setProgramId(program.getId());
             } else {
                 student = studentRepository.findByUserId(toSave.getId());
 
                 if (student == null) {
                     throw new ValidationException("Không tìm thấy sinh viên này !!");
                 }
-
             }
 
             student.setTypeOfEducation(data.getTypeOfEducation());
             student.setSpecializationId(specialization.getId());
+
+            if (data.getActivationEmail() == null || data.getActivationEmail().isEmpty()) {
+                throw new ValidationException("Email liên hệ với sinh viên không được để trống");
+            }
+
+            try {
+                ExecutorService executor = Executors.newFixedThreadPool(1);
+                Student finalStudent = student;
+                UserEntity finalToSave = toSave;
+                FutureTask<String> futureTasks = new FutureTask<>(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isCreate) {
+                            mailService.sendEmail(data.getActivationEmail(),
+                                    "Đăng ký thành công tài khoản sinh viên", "Bạn đã đăng ký thành công tài khoản Email cho sinh viên.\n\nThông tin đăng ký như sau:\n" +
+                                                                              "- Email: " + finalToSave.getEmail() + "\n" +
+                                                                              "- MSSV: " + finalToSave.getCode() + "\n" +
+                                                                              "- Mật khẩu (cho lần đăng nhập đầu tiên): 1111\n" +
+                                                                              "- Email lần đầu đăng ký để khôi phục mật khẩu: " + data.getActivationEmail());
+                        } else if (finalStudent.getActivationEmail() != null && !finalStudent.getActivationEmail().isEmpty() && !data.getActivationEmail().equals(finalStudent.getActivationEmail())) {
+                            mailService.sendEmail(data.getActivationEmail(),
+                                    "Đăng ký thành công tài khoản sinh viên", "Bạn đã đăng ký thành công tài khoản Email cho sinh viên.\n\nThông tin đăng ký như sau:\n" +
+                                                                              "- Email: " + finalToSave.getEmail() + "\n" +
+                                                                              "- MSSV: " + finalToSave.getCode() + "\n" +
+                                                                              "- Mật khẩu (cho lần đăng nhập đầu tiên): 1111\n" +
+                                                                              "- Email lần đầu đăng ký để khôi phục mật khẩu: " + data.getActivationEmail());
+                        }
+                    }
+                }, "Success");
+
+                executor.execute(futureTasks);
+            } catch (Exception e) {
+                return ResponseEntity.ok(HttpStatus.BAD_REQUEST);
+            }
 
             if (data.getSpecializationClassId() != null) {
                 if (specializationClass == null) {
@@ -249,16 +311,9 @@ public class UserController {
                 student.setSpecializationClassId(specializationClass.getId());
             }
 
-            Program program = programRepository.findFirstBySpecializationIdOrderByCreatedAtDesc(specialization.getId());
-
-            if (program == null) {
-                throw new ValidationException("Hiện đang chưa có chương trình đào tạo của chuyên ngành " + specialization.getName());
-            }
-
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
             String year = simpleDateFormat.format(student.getEntryDate());
             student.setSchoolYear(year);
-            student.setProgramId(program.getId());
             student = studentRepository.saveAndFlush(student);
 
             if (student.getId() == null) {

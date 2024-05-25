@@ -52,7 +52,7 @@ public class UserInfoMapper {
                 .id(userEntity.getId())
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
-                .fullName(userEntity.getFirstName() + " " + userEntity.getLastName())
+                .fullName(userEntity.getLastName() + " " + userEntity.getFirstName())
                 .email(userEntity.getEmail())
                 .avatar((userEntity.getAvatar()))
                 .username(userEntity.getUsername())

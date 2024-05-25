@@ -2,12 +2,14 @@ package iuh.fit.trainingsystembackend.controller;
 
 import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.bean.SectionClassBean;
+import iuh.fit.trainingsystembackend.dto.ProgramDTO;
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
 import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
+import iuh.fit.trainingsystembackend.mapper.ProgramMapper;
 import iuh.fit.trainingsystembackend.mapper.SectionClassMapper;
 import iuh.fit.trainingsystembackend.mapper.SectionMapper;
 import iuh.fit.trainingsystembackend.model.*;
@@ -65,6 +67,10 @@ public class SectionController {
     private final StudentCourseRepository studentCourseRepository;
     private final CourseRepository courseRepository;
     private CourseSpecification courseSpecification;
+    private final ProgramRepository programRepository;
+    private ProgramMapper programMapper;
+    private final ProgramTermRepository programTermRepository;
+    private final ProgramCourseRepository programCourseRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -129,30 +135,32 @@ public class SectionController {
 //                }
             } else{
                 List<Long> studentSections = studentSectionRepository.findByStudentId(student.getId()).stream().map(StudentSection::getSectionId).collect(Collectors.toList());
-
-
                 if (!studentSections.isEmpty()) {
                     sections = sections.stream().filter(section -> !studentSections.contains(section.getId())).collect(Collectors.toList());
                 }
             }
 
-            Specialization specialization = specializationRepository.findById(student.getSpecializationId()).orElse(null);
+            Program program = programRepository.findById(student.getProgramId()).orElse(null);
+            List<Long> programCourseIds = new ArrayList<>();
+            if(program != null){
+                List<Long> programTermIds = programTermRepository.findByProgramId(program.getId()).stream().map(ProgramTerm::getId).collect(Collectors.toList());
 
-            if(specialization != null && specialization.getFacultyId() != null){
-                Faculty faculty = facultyRepository.findById(specialization.getFacultyId()).orElse(null);
+                if(!programTermIds.isEmpty()){
+                    for(Long programTermId : programTermIds){
+                        List<Long> programCourseWithCourseIds = programCourseRepository.findByProgramTermId(programTermId).stream().map(ProgramCourse::getCourseId).collect(Collectors.toList());
 
-                if(faculty != null){
-                    List<Specialization> specializations = specializationRepository.findByFacultyId(faculty.getId());
-
-                    if(!specializations.isEmpty()){
-                        CourseRequest request = new CourseRequest();
-                        request.setSpecializationIds(specializations.stream().map(Specialization::getId).collect(Collectors.toList()));
-                        List<Long> courseIds = courseRepository.findAll(courseSpecification.getFilter(request)).stream().map(Course::getId).collect(Collectors.toList());
-
-                        sections = sections.stream().filter(section -> courseIds.contains(section.getCourseId())).collect(Collectors.toList());
+                        if(!programCourseWithCourseIds.isEmpty()){
+                            programCourseIds.addAll(programCourseWithCourseIds);
+                        }
                     }
                 }
             }
+
+            sections = sections.stream().filter(section -> programCourseIds.contains(section.getCourseId())).collect(Collectors.toList());
+        }
+
+        if(filterRequest.getSpecializationId() != null){
+            sections = sections.stream().filter(section -> section.getCourse().getSpecializationId().equals(filterRequest.getSpecializationId())).collect(Collectors.toList());
         }
 
         List<SectionDTO> sectionDTOS = sectionMapper.mapToDTO(sections);

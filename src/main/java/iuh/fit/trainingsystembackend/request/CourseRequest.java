@@ -3,6 +3,7 @@ package iuh.fit.trainingsystembackend.request;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import iuh.fit.trainingsystembackend.data.CourseDuration;
 import iuh.fit.trainingsystembackend.data.RequireCourse;
+import iuh.fit.trainingsystembackend.enums.CourseType;
 import iuh.fit.trainingsystembackend.enums.TermType;
 import iuh.fit.trainingsystembackend.enums.TypeOfKnowledge;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.util.List;
 public class CourseRequest {
     private Long specializationId;
     private List<Long> specializationIds;
-
+    private CourseType courseType;
     private String name;
     private String code;
     private String description;

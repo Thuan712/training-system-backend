@@ -19,4 +19,6 @@ public class SectionRequest {
     private CourseType courseType;
     private Boolean deleted;
     private Boolean isRegisterBefore;
+    private Long specializationId;
+    private Long programId;
 }

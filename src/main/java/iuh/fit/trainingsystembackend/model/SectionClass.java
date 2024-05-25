@@ -29,6 +29,9 @@ public class SectionClass implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "specialization_class_id")
+    private Long specializationClassId;
+
     @Column(name = "lecturer_id")
     private Long lecturerId;
 

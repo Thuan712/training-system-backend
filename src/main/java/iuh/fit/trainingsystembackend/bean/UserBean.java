@@ -44,6 +44,7 @@ public class UserBean extends AddressBean implements Serializable {
     //#region Student
     private Long specializationClassId;
     private TypeOfEducation typeOfEducation = TypeOfEducation.general_program;
+    private String activationEmail;
     //#endregion
 
     //#region Lecturer

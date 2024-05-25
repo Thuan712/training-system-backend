@@ -103,6 +103,35 @@ public class StudentSectionController {
             throw new ValidationException("Không tìm thấy học phần sinh viên đăng ký !!");
         }
 
+        // Check Course
+        Course course = courseRepository.findById(section.getCourseId()).orElse(null);
+
+        if(course == null){
+            throw new ValidationException("Không tìm thấy môn học mà học phần này thuộc !!");
+        }
+
+        if(course.getRequireCourse() != null){
+            if(course.getRequireCourse().getPrerequisite() != null && !course.getRequireCourse().getPrerequisite().isEmpty()){
+                for(String courseCode : course.getRequireCourse().getPrerequisite()){
+                    Course courseByCode = courseRepository.findByCode(courseCode);
+
+                    if(courseByCode == null){
+                        throw new ValidationException("Không tìm thấy môn học tiên quyết với mã học phần này");
+                    }
+
+                    StudentCourse studentCourse = studentCourseRepository.findByCourseIdAndStudentId(course.getId(), student.getId());
+
+                    if(studentCourse == null){
+                        throw new ValidationException("Sinh viên chưa hoàn thành điều kiện tiên quyết của môn học !!");
+                    }
+
+                    if(!studentCourse.getCompletedStatus().equals(CompletedStatus.completed)){
+                        throw new ValidationException("Sinh viên chưa hoàn thành điều kiện tiên quyết của môn học !!");
+                    }
+                }
+            }
+        }
+
         // Check Đã đăng ký học phần này chưa
         boolean isExistStudentSection = studentSectionRepository.existsByStudentIdAndSectionId(student.getId(), section.getId());
 

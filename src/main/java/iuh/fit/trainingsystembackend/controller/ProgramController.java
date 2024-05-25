@@ -44,24 +44,6 @@ public class ProgramController implements Serializable {
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateProgram(@RequestParam(value = "userId", required = false) Long userId, @RequestBody ProgramBean data) {
         Program toSave = null;
-        if(data.getId() != null){
-            toSave = programRepository.findById(data.getId()).orElse(null);
-
-            if(toSave == null){
-                throw new ValidationException("Không tìm thấy chương trình đào tạo này !!");
-            }
-
-            toSave.setUpdatedAt(new Date());
-        }
-
-        boolean isCreate = toSave == null;
-        if(toSave == null){
-            toSave = new Program();
-        }
-
-        if(data.getAcademicYearId() == null){
-            throw new ValidationException("Năm học của chương trình đào tạo không được để trống !!");
-        }
 
         AcademicYear academicYear = academicYearRepository.findById(data.getAcademicYearId()).orElse(null);
 
@@ -69,7 +51,6 @@ public class ProgramController implements Serializable {
             throw new ValidationException("Không tìm thấy năm học của chương trình đào tạo này !!");
         }
 
-        toSave.setAcademicYearId(academicYear.getId());
 
         if (data.getSpecializationId() == null){
             throw  new ValidationException("Chuyên ngành của chương trình đào tạo không được để trống !!");
@@ -81,13 +62,35 @@ public class ProgramController implements Serializable {
             throw new ValidationException("Không tìm thấy chuyên ngành này của chương trinh đào tạo !!");
         }
 
-        if(data.getProgramTerms().isEmpty() || data.getProgramTerms().size() < 8){
-            throw new ValidationException("Chương trình đào tạo phải bao gồm từ 8 học kỳ đào tạo trở lên !!");
+        if(data.getId() != null){
+            toSave = programRepository.findById(data.getId()).orElse(null);
+
+            if(toSave == null){
+                throw new ValidationException("Không tìm thấy chương trình đào tạo này !!");
+            }
+
+            toSave.setUpdatedAt(new Date());
+        } else {
+            toSave = programRepository.findByAcademicYearIdAndSpecializationId(academicYear.getId(), specialization.getId());
+
+            if(toSave != null){
+                throw new ValidationException("Chương trình đào tạo của chuyên ngành niên khoá này đã tồn tại !!");
+            }
         }
 
+        boolean isCreate = toSave == null;
+        if(toSave == null){
+            toSave = new Program();
+        }
+
+        if(data.getAcademicYearId() == null){
+            throw new ValidationException("Năm học của chương trình đào tạo không được để trống !!");
+        }
+
+        toSave.setAcademicYearId(academicYear.getId());
         toSave.setSpecializationId(specialization.getId());
         toSave.setName(specialization.getName());
-
+        toSave.setTrainingTime(data.getTrainingTime() != null ? data.getTrainingTime() :  0);
         toSave = programRepository.saveAndFlush(toSave);
 
         if(toSave.getId() == null){

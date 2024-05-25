@@ -3,6 +3,7 @@ package iuh.fit.trainingsystembackend.enums;
 public enum SystemRole {
     student("Student"),
     lecturer("Lecturer"),
+    staff("Staff"),
     admin("Admin");
 
     private String value;

@@ -184,6 +184,7 @@ public class RegistrationMapper {
                 .paymentDeadline(tuition != null ? tuition.getPaymentDeadline() : null)
                 .total(total)
                 .tuitionStatus(studentTuition != null ? studentTuition.getStatus() : null)
+                .investigateStatus(studentTuition != null ? studentTuition.getInvestigateStatus() : null)
                 .paymentDate(studentTuition != null ? studentTuition.getPaymentDate() : null)
 
                 .resultId(result != null ? result.getId() : null)

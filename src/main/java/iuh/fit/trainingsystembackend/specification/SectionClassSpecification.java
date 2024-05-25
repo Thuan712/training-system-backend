@@ -18,6 +18,7 @@ public class SectionClassSpecification extends BaseSpecification<SectionClass, S
         return (root, query, criteriaBuilder) ->
                 Specification.where(attributeTermIdEqual(request.getTermId()))
                         .and(attributeEqual("sectionId", request.getSectionId()))
+                        .and(attributeEqual("specializationClassId", request.getSpecializationClassId()))
                         .and(attributeStudentIdEqual(request.getStudentId()))
                         .and(attributeContains("code", request.getCode()))
                         .and(attributeEqual("sectionClassType", request.getSectionClassType()))

@@ -18,7 +18,8 @@ import java.util.List;
 public class ProgramTermDTO {
     private Long id;
     private Long programId;
-    private List<CourseDTO> programCourses;
+    private List<CourseDTO> programCompulsoryCourses;
+    private List<CourseDTO> programElectiveCourses;
     private Integer minimumElective;
     private Integer totalElective;
     private Integer totalCompulsory;

@@ -52,6 +52,8 @@ public class ProgramMapper {
                 .academicYearId(program.getAcademicYearId())
                 .academicYearName(academicYearName)
 
+                .trainingTime(program.getTrainingTime())
+
                 .createdAt(program.getCreatedAt())
                 .updatedAt(program.getUpdatedAt())
                 .deletedAt(program.getDeletedAt())

@@ -30,7 +30,7 @@ public class LecturerMapper {
         return LecturerDTO.builder()
                 .id(lecturer.getId())
                 .userId(userEntity != null ? userEntity.getId() : null)
-                .name(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
+                .name(userEntity != null ? userEntity.getLastName() + " " + userEntity.getFirstName() : "")
                 .code(userEntity != null ? userEntity.getCode() : "")
                 .specializationId(lecturer.getSpecializationId())
                 .title(lecturer.getTitle())

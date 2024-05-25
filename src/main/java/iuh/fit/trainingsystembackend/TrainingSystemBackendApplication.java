@@ -33,10 +33,6 @@ public class TrainingSystemBackendApplication implements WebMvcConfigurer {
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = SpringApplication.run(TrainingSystemBackendApplication.class, args);
-
         System.setProperty("mode", Constants.rateLimitMode);
-
-        CacheService cacheService = applicationContext.getBean(CacheService.class);
-        cacheService.clearAll();
     }
 }

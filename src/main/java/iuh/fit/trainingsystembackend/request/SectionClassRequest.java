@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SectionClassRequest {
+    private Long specializationClassId;
     private Long termId;
     private Long lecturerId;
     private Long studentId;

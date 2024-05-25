@@ -1,6 +1,7 @@
 package iuh.fit.trainingsystembackend.mapper;
 
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
+import iuh.fit.trainingsystembackend.dto.StudentDTO;
 import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
 import iuh.fit.trainingsystembackend.enums.SectionClassType;
 import iuh.fit.trainingsystembackend.model.*;
@@ -23,6 +24,7 @@ public class SectionClassMapper {
     private StudentSectionMapper studentSectionMapper;
     private final ScheduleRepository scheduleRepository;
     private final TermRepository termRepository;
+    private StudentMapper studentMapper;
 
     public SectionClassDTO mapToDTO(SectionClass sectionClass) {
         Term term = null;
@@ -43,8 +45,8 @@ public class SectionClassMapper {
         List<Schedule> schedules = scheduleRepository.findScheduleBySectionClassId(sectionClass.getId()).stream()
                 .sorted((o1, o2) -> o1.getLearningDate().compareTo(o2.getLearningDate())).collect(Collectors.toList());
 
-        List<StudentSection> students = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
-        List<StudentSectionDTO> studentSectionDTOS = studentSectionMapper.mapToDTO(students);
+        List<Student> students = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudent).collect(Collectors.toList());
+        List<StudentDTO> studentDTOS = studentMapper.mapToDTO(students);
 
         String sectionClassType = sectionClass.getSectionClassType().equals(SectionClassType.theory) ? " - Lý thuyết" : " - Thực hành";
 
@@ -72,14 +74,15 @@ public class SectionClassMapper {
                 .maxStudents(sectionClass.getMaxStudents())
                 .timeAndPlaces(timeAndPlaces != null && !timeAndPlaces.isEmpty() ? timeAndPlaces : new ArrayList<>())
 
-                .numberOfStudents(studentSectionDTOS.size())
-                .students(studentSectionDTOS)
+                .numberOfStudents(studentDTOS.size())
+                .students(studentDTOS)
                 .createStatus(sectionClass.getCreateStatus())
                 .inputResultEnable(sectionClass.getInputResultEnable())
 
                 .startDate(!schedules.isEmpty() ? schedules.get(0).getLearningDate() : null)
                 .endDate(!schedules.isEmpty() ? schedules.get(schedules.size() - 1).getLearningDate() : null)
                 .timeAndPlaceStatus(timeAndPlaces != null && !timeAndPlaces.isEmpty() && !schedules.isEmpty())
+                .numberOfPeriods(schedules.size())
                 .build();
     }
 

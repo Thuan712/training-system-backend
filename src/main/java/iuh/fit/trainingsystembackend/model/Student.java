@@ -65,9 +65,11 @@ public class Student implements Serializable {
     @Enumerated(EnumType.STRING)
     private TypeOfEducation typeOfEducation;
 
+    @Column(name = "activation_email")
+    private String activationEmail;
+
     @Column(name = "entry_date")
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     private Date entryDate = new Date();
-
 }

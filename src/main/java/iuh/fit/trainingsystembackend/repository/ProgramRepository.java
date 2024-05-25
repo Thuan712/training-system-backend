@@ -12,4 +12,6 @@ public interface ProgramRepository extends JpaRepository<Program, Long>, JpaSpec
     Program findBySpecializationIdAndAcademicYearId(Long specializationId, Long academicYearId);
 
     Program findFirstBySpecializationIdOrderByCreatedAtDesc(Long specializationId);
+
+    Program findByAcademicYearIdAndSpecializationId(Long academicYearId, Long specializationId);
 }

@@ -67,7 +67,9 @@ private LecturerRepository lecturerRepository;
 
                 if (userEntity.getSystemRole().equals(SystemRole.admin)) {
                     existingCachedData.setUserRole(SystemRole.admin.getValue());
-                } else if (userEntity.getSystemRole().equals(SystemRole.lecturer)) {
+                } else if (userEntity.getSystemRole().equals(SystemRole.staff)) {
+                    existingCachedData.setUserRole(SystemRole.staff.getValue());
+                }else if (userEntity.getSystemRole().equals(SystemRole.lecturer)) {
                     existingCachedData.setUserRole(SystemRole.lecturer.getValue());
 
                     Lecturer lecturer = lecturerRepository.getLecturersByUserId(userEntity.getId());
@@ -117,6 +119,8 @@ private LecturerRepository lecturerRepository;
             //#region Menu Items
             if (userEntity.getSystemRole().equals(SystemRole.admin)) {
                 returnedData.put("userRole", "Admin");
+            }else  if (userEntity.getSystemRole().equals(SystemRole.staff)) {
+                returnedData.put("userRole", "Staff");
             } else if (userEntity.getSystemRole().equals(SystemRole.lecturer)) {
                 returnedData.put("userRole", "Lecturer");
 

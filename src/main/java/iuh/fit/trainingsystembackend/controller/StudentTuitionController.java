@@ -58,8 +58,10 @@ public class StudentTuitionController {
 
         if(data.getStatus().equals(TuitionStatus.paid)){
             studentTuition.setPaymentDate(new Date());
+            studentTuition.setInvestigateStatus(false);
         } else {
             studentTuition.setPaymentDate(null);
+            studentTuition.setInvestigateStatus(true);
         }
 
         studentTuition.setStatus(data.getStatus());

@@ -48,6 +48,9 @@ public class Program implements Serializable {
     @JsonIgnore
     private Specialization specialization;
 
+    @Column(name = "training_time")
+    private Double trainingTime;
+
     @Column(name = "name")
     private String name;
 

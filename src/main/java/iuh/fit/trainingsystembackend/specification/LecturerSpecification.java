@@ -19,7 +19,7 @@ public class LecturerSpecification extends BaseSpecification<Lecturer, LecturerR
                 Specification.where(attributeEqual("position",request.getPosition())
                         .and(attributeEqual("title", request.getTitle()))
                         .and(attributeEqual("userId", request.getUserId()))
-                        .and(attributeEqual("specificationId", request.getSpecificationId()))
+                        .and(attributeEqual("specializationId", request.getSpecializationId()))
         ).toPredicate(root, query, criteriaBuilder);
     }
 

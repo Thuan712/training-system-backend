@@ -22,22 +22,30 @@ public class ProgramTermMapper {
     public ProgramTermDTO mapToDTO(ProgramTerm programTerm) {
         int totalElective = 0;
         int totalCompulsory = 0;
-        List<CourseDTO> courses;
+        List<CourseDTO> compulsoryCourseDTO;
+        List<CourseDTO> electiveCourseDTO;
 
         List<ProgramCourse> programCourses = programCourseRepository.findByProgramTermId(programTerm.getId());
+        List<Course> compulsoryCourses = new ArrayList<>();
+        List<Course> electiveCourses = new ArrayList<>();
 
         if(!programCourses.isEmpty()){
             for(ProgramCourse programCourse : programCourses){
                 if(programCourse.getCourse().getCourseType().equals(CourseType.elective)){
                     totalElective += programCourse.getCourse().getCredits();
+                    electiveCourses.add(programCourse.getCourse());
+
                 } else if(programCourse.getCourse().getCourseType().equals(CourseType.compulsory)){
                     totalCompulsory += programCourse.getCourse().getCredits();
+                    compulsoryCourses.add(programCourse.getCourse());
                 }
             }
 
-            courses = courseMapper.mapToDTO(programCourses.stream().map(ProgramCourse::getCourse).collect(Collectors.toList()));
+            compulsoryCourseDTO = courseMapper.mapToDTO(compulsoryCourses);
+            electiveCourseDTO = courseMapper.mapToDTO(electiveCourses);
         } else {
-            courses = new ArrayList<>();
+            compulsoryCourseDTO = new ArrayList<>();
+            electiveCourseDTO =  new ArrayList<>();
         }
 
 
@@ -52,7 +60,8 @@ public class ProgramTermMapper {
 
                 .termType(programTerm.getTermType())
 
-                .programCourses(courses)
+                .programCompulsoryCourses(compulsoryCourseDTO)
+                .programElectiveCourses(electiveCourseDTO)
                 .build();
     }
     public List<ProgramTermDTO> mapToDTO(List<ProgramTerm> programTermList) {

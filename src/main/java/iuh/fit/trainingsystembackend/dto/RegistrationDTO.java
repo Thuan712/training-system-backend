@@ -40,7 +40,7 @@ public class RegistrationDTO {
 
     // Tuition
     private Long tuitionId;
-
+//    private
     private Double initialFee;
     private Double debt;
     private Double discountAmount;
@@ -55,7 +55,7 @@ public class RegistrationDTO {
     private Double total;
     private TuitionStatus tuitionStatus;
     private Date paymentDate;
-
+    private Boolean investigateStatus;
     // Result
     private Long resultId;
     private Double regularPoint1;

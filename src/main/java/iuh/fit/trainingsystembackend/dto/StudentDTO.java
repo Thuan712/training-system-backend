@@ -19,6 +19,7 @@ public class StudentDTO {
     private Long specializationClassId;
     private String specializationClassName;
     private Long specializationId;
+    private String specializationName;
 
     private Long userId;
     private String name;

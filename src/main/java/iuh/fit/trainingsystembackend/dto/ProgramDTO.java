@@ -25,6 +25,7 @@ public class ProgramDTO {
     private String academicYearName;
 
     private List<ProgramTermDTO> programTerms;
+    private Double trainingTime;
 
     private Date createdAt;
     private Date updatedAt;

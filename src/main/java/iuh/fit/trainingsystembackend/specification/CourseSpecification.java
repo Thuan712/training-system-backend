@@ -19,7 +19,7 @@ public class CourseSpecification extends BaseSpecification<Course, CourseRequest
                 .where(attributeEqual("specializationId", request.getSpecializationId()))
                 .and(attributeContains("name", request.getName()))
                 .and(attributeContains("code", request.getCode()))
-
+                .and(attributeEqual("courseType", request.getCourseType()))
                 .and(attributeEqual("credits", request.getCredits()))
                 .and(attributeEqual("costCredits", request.getCostCredits()))
                 .and(attributeEqual("typeOfKnowledge", request.getTypeOfKnowledge()))

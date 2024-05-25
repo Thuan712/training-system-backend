@@ -48,12 +48,13 @@ public class SectionClassDTO {
     private SectionClassStatus sectionClassStatus;
 
     private Integer numberOfStudents;
-    private List<StudentSectionDTO> students;
+    private List<StudentDTO> students;
 
     private List<TimeAndPlace> timeAndPlaces;
     private Boolean timeAndPlaceStatus;
     private Date startDate;
     private Date endDate;
+    private Integer numberOfPeriods;
 
     private Date createdAt;
     private Date updatedAt;

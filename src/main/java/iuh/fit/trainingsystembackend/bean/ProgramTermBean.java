@@ -15,5 +15,6 @@ public class ProgramTermBean implements Serializable {
     private Long id;
     private Integer minimumElective;
     private ProgramTermType termType;
-    private List<Course> programCourses = new ArrayList<>();
+    private List<Course> programCompulsoryCourses = new ArrayList<>();
+    private List<Course> programElectiveCourses = new ArrayList<>();
 }

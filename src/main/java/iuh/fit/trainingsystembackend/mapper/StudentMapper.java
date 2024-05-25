@@ -24,7 +24,7 @@ public class StudentMapper {
         return StudentDTO.builder()
                 .id(student.getId())
                 .specializationId(student.getSpecializationId())
-                .specializationId(student.getSpecializationId())
+                .specializationName(student.getSpecialization().getName())
                 .userId(userEntity != null ? userEntity.getId() : null)
                 .name(userEntity != null ? userEntity.getFirstName() + " " + userEntity.getLastName() : "")
                 .dob(userEntity != null ? userEntity.getDob() : "")
@@ -32,7 +32,7 @@ public class StudentMapper {
                 .schoolYear(student.getSchoolYear())
                 .typeOfEducation(student.getTypeOfEducation())
                 .specializationClassId(student.getSpecializationClassId())
-                .specializationClassName(student.getSpecialization().getName())
+                .specializationClassName(student.getSpecializationClass().getName())
                 .entryDate(student.getEntryDate())
                 .build();
     }
