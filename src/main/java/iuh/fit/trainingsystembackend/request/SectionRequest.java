@@ -21,4 +21,5 @@ public class SectionRequest {
     private Boolean isRegisterBefore;
     private Long specializationId;
     private Long programId;
+    private Long specializationClassId;
 }

@@ -71,6 +71,8 @@ public class SectionController {
     private ProgramMapper programMapper;
     private final ProgramTermRepository programTermRepository;
     private final ProgramCourseRepository programCourseRepository;
+    private final SpecializationClassRepository specializationClassRepository;
+    private final AcademicYearRepository academicYearRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -159,8 +161,34 @@ public class SectionController {
             sections = sections.stream().filter(section -> programCourseIds.contains(section.getCourseId())).collect(Collectors.toList());
         }
 
-        if(filterRequest.getSpecializationId() != null){
-            sections = sections.stream().filter(section -> section.getCourse().getSpecializationId().equals(filterRequest.getSpecializationId())).collect(Collectors.toList());
+        if(filterRequest.getSpecializationClassId() != null){
+            SpecializationClass specializationClass = specializationClassRepository.findById(filterRequest.getSpecializationClassId()).orElse(null);
+            if(specializationClass != null){
+                AcademicYear academicYear = academicYearRepository.findByYearStart(Integer.valueOf(specializationClass.getSchoolYear()));
+
+                if(academicYear != null){
+                    Program program = programRepository.findBySpecializationIdAndAcademicYearId(specializationClass.getSpecializationId(), academicYear.getId());
+
+                    if(program != null){
+                        List<ProgramTerm> terms = programTermRepository.findByProgramId(program.getId());
+
+                        if(!terms.isEmpty()){
+                            List<Long> filterCourse = new ArrayList<>();
+                            for(ProgramTerm programTerm : terms){
+                                List<Long> programCourseWithCourseIds = programCourseRepository.findByProgramTermId(programTerm.getId()).stream().map(ProgramCourse::getCourseId).collect(Collectors.toList());
+
+                                if(!programCourseWithCourseIds.isEmpty()){
+                                    filterCourse.addAll(programCourseWithCourseIds);
+                                }
+                            }
+
+                            sections = sections.stream().filter(section -> filterCourse.contains(section.getCourseId())).collect(Collectors.toList());
+                        }
+                    }
+                } else {
+                    return ResponseEntity.ok(new ArrayList<>());
+                }
+            }
         }
 
         List<SectionDTO> sectionDTOS = sectionMapper.mapToDTO(sections);
