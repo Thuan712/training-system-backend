@@ -34,6 +34,7 @@ public class RegistrationDTO {
     private Long sectionId;
     private String sectionName;
     private String sectionCode;
+    private SectionClassStatus sectionStatus;
 
     private RegistrationStatus registrationStatus;
     private Date createdAt;

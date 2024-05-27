@@ -14,7 +14,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, JpaSp
     List<Schedule> findScheduleBySectionClassId(Long sectionClassId);
 
 
-    List<Schedule> findByLecturerIdOrRoomAndDayOfTheWeek(Long lecturerId, String room, DayInWeek dayOfTheWeek);
+    List<Schedule> findByLecturerIdOrRoomAndDayOfTheWeekAndLearningDate(Long lecturerId, String room, DayInWeek dayOfTheWeek, Date learningDate);
 
     List<Schedule> findByDayOfTheWeekAndLearningDate(DayInWeek dayOfTheWeek, Date learningDate);
 }

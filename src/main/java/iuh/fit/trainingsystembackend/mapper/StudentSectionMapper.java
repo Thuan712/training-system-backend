@@ -4,12 +4,14 @@ import iuh.fit.trainingsystembackend.dto.RegistrationDTO;
 import iuh.fit.trainingsystembackend.dto.SectionClassDTO;
 import iuh.fit.trainingsystembackend.dto.StudentDTO;
 import iuh.fit.trainingsystembackend.dto.StudentSectionDTO;
+import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.model.*;
 import iuh.fit.trainingsystembackend.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -120,6 +122,7 @@ public class StudentSectionMapper {
                 .sectionId(section != null ? section.getId() : null)
                 .sectionName(section != null ? section.getName() : "")
                 .sectionCode(section != null ? section.getCode() : "")
+                .sectionStatus(section != null && section.getLockDate().getTime() <= new Date().getTime() ? SectionClassStatus.closed : SectionClassStatus.open)
 
                 .sectionClasses(sectionClass)
 

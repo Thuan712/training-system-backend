@@ -1,5 +1,6 @@
 package iuh.fit.trainingsystembackend.controller;
 
+import com.google.api.client.util.DateTime;
 import iuh.fit.trainingsystembackend.bean.AcademicYearBean;
 import iuh.fit.trainingsystembackend.bean.SectionBean;
 import iuh.fit.trainingsystembackend.dto.AcademicYearDTO;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -164,6 +166,8 @@ public class AcademicYearController {
                     sectionBean.setTermId(firstTerm.getId());
                     sectionBean.setName(course.getName());
                     sectionBean.setDescription(course.getDescription());
+                    sectionBean.setOpenDate(Date.from(firstTerm.getTermStart().toInstant().minus(Duration.ofDays(14))));
+                    sectionBean.setLockDate(firstTerm.getTermStart());
                     sectionBean.setDeleted(false);
 
                     Section section = sectionService.createOrUpdateSection(sectionBean);
@@ -219,6 +223,8 @@ public class AcademicYearController {
                     sectionBean.setTermId(secondTerm.getId());
                     sectionBean.setName(course.getName());
                     sectionBean.setDescription(course.getDescription());
+                    sectionBean.setOpenDate(Date.from(secondTerm.getTermStart().toInstant().minus(Duration.ofDays(14))));
+                    sectionBean.setLockDate(secondTerm.getTermStart());
                     sectionBean.setDeleted(false);
 
                     Section section = sectionService.createOrUpdateSection(sectionBean);
@@ -272,6 +278,8 @@ public class AcademicYearController {
                     sectionBean.setTermId(thirdTerm.getId());
                     sectionBean.setName(course.getName());
                     sectionBean.setDescription(course.getDescription());
+                    sectionBean.setOpenDate(Date.from(thirdTerm.getTermStart().toInstant().minus(Duration.ofDays(14))));
+                    sectionBean.setLockDate(thirdTerm.getTermStart());
                     sectionBean.setDeleted(false);
 
                     Section section = sectionService.createOrUpdateSection(sectionBean);
@@ -282,7 +290,6 @@ public class AcademicYearController {
                 }
             }
         }
-
         //#endregion
 
         //#endregion

@@ -25,7 +25,7 @@ public class LecturerMapper {
         String fullName = "";
 
         if(userEntity != null){
-            fullName = userEntity.getFirstName() + " " + userEntity.getLastName() + " - " + userEntity.getCode();
+            fullName =  userEntity.getLastName() + " " + userEntity.getFirstName() + " - " + userEntity.getCode();
         }
         return LecturerDTO.builder()
                 .id(lecturer.getId())

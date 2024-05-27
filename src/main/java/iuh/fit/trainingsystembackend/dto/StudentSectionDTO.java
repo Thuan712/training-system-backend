@@ -2,6 +2,7 @@ package iuh.fit.trainingsystembackend.dto;
 
 import iuh.fit.trainingsystembackend.enums.CompletedStatus;
 import iuh.fit.trainingsystembackend.enums.RegistrationStatus;
+import iuh.fit.trainingsystembackend.enums.SectionClassStatus;
 import iuh.fit.trainingsystembackend.model.SectionClass;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class StudentSectionDTO {
     private Long sectionId;
     private String sectionCode;
     private String sectionName;
+    private SectionClassStatus sectionStatus;
 
     private Long resultId;
     private Double regularPoint1;

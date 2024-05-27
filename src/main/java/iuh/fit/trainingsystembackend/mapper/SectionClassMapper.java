@@ -49,7 +49,10 @@ public class SectionClassMapper {
         List<StudentDTO> studentDTOS = studentMapper.mapToDTO(students);
 
         String sectionClassType = sectionClass.getSectionClassType().equals(SectionClassType.theory) ? " - Lý thuyết" : " - Thực hành";
+        List<StudentSection> studentSections = studentSectionClassRepository.findBySectionClassId(sectionClass.getId()).stream().map(StudentSectionClass::getStudentSection).collect(Collectors.toList());
+        List<StudentSectionDTO> studentSectionDTOS = studentSectionMapper.mapToDTO(studentSections);
 
+        // Section Class Status
         return SectionClassDTO.builder()
                 .id(sectionClass.getId())
 
@@ -69,13 +72,14 @@ public class SectionClassMapper {
                 .refId(sectionClass.getRefId() != null ? sectionClass.getRefId() : null)
                 .note(sectionClass.getNote())
                 .sectionClassType(sectionClass.getSectionClassType())
-                .sectionClassStatus(sectionClass.getSectionClassStatus())
+                .sectionClassStatus(null)
                 .minStudents(sectionClass.getMinStudents())
                 .maxStudents(sectionClass.getMaxStudents())
                 .timeAndPlaces(timeAndPlaces != null && !timeAndPlaces.isEmpty() ? timeAndPlaces : new ArrayList<>())
 
                 .numberOfStudents(studentDTOS.size())
                 .students(studentDTOS)
+                .studentSections(studentSectionDTOS)
                 .createStatus(sectionClass.getCreateStatus())
                 .inputResultEnable(sectionClass.getInputResultEnable())
 

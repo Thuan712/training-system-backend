@@ -55,6 +55,14 @@ public class Section implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "open_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date openDate;
+
+    @Column(name = "lock_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lockDate;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate

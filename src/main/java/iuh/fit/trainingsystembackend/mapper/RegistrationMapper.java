@@ -164,6 +164,7 @@ public class RegistrationMapper {
                 .sectionId(section != null ? section.getId() : null)
                 .sectionName(section != null ? section.getName() : "")
                 .sectionCode(section != null ? section.getCode() : "")
+                .sectionStatus(section != null && section.getLockDate().getTime() <= new Date().getTime() ? SectionClassStatus.closed : SectionClassStatus.open)
 
                 // Course
                 .courseId(course != null ? course.getId() : null)

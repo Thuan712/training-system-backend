@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -76,8 +77,24 @@ public class SectionService {
             }
 
             toSave.setCode(code);
+
         }
 
+        if(data.getOpenDate() == null){
+            throw new ValidationException("Thời gian mở học phần đăng ký không được để trống");
+        }
+
+        if(data.getLockDate() != null){
+            if(data.getOpenDate().getTime() <= data.getLockDate().getTime()){
+                throw new ValidationException("Thời gian khoá học phần đăng ký phải sau thời gian mở đăng ký !!");
+            }
+
+            toSave.setLockDate(data.getLockDate());
+        } else {
+            toSave.setLockDate(Date.from(data.getOpenDate().toInstant().plus(Duration.ofDays(14))));
+        }
+
+        toSave.setOpenDate(data.getOpenDate());
         toSave.setCourseId(data.getCourseId());
         toSave.setTermId(term.getId());
 

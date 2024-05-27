@@ -17,6 +17,8 @@ public class SectionBean implements Serializable {
     private String name;
     private String description;
     private Boolean deleted;
+    private Date openDate;
+    private Date lockDate;
 
     // Tuition
     private Double initialFee;

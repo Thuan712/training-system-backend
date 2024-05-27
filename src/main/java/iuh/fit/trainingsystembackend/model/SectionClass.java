@@ -77,11 +77,6 @@ public class SectionClass implements Serializable {
     @Enumerated(EnumType.STRING)
     private SectionClassType sectionClassType = SectionClassType.theory;
 
-    // Trạng thái lớp học phần
-    @Column(name = "section_class_status")
-    @Enumerated(EnumType.STRING)
-    private SectionClassStatus sectionClassStatus = SectionClassStatus.open;
-
     // Trạng thái tạo lớp học phần
     @Column(name = "create_status")
     private Boolean createStatus;

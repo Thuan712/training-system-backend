@@ -145,14 +145,14 @@ public class SectionController {
             Program program = programRepository.findById(student.getProgramId()).orElse(null);
             List<Long> programCourseIds = new ArrayList<>();
             if(program != null){
-                List<Long> programTermIds = programTermRepository.findByProgramId(program.getId()).stream().map(ProgramTerm::getId).collect(Collectors.toList());
+                List<ProgramTerm> programTerms = programTermRepository.findByProgramId(program.getId());
 
-                if(!programTermIds.isEmpty()){
-                    for(Long programTermId : programTermIds){
-                        List<Long> programCourseWithCourseIds = programCourseRepository.findByProgramTermId(programTermId).stream().map(ProgramCourse::getCourseId).collect(Collectors.toList());
+                if(!programTerms.isEmpty()){
+                    for(Long programTermId : programTerms.stream().map(ProgramTerm::getId).collect(Collectors.toList())){
+                        List<ProgramCourse> programCourses = programCourseRepository.findByProgramTermId(programTermId);
 
-                        if(!programCourseWithCourseIds.isEmpty()){
-                            programCourseIds.addAll(programCourseWithCourseIds);
+                        if(!programCourses.isEmpty()){
+                            programCourseIds.addAll(programCourses.stream().map(ProgramCourse::getCourseId).collect(Collectors.toList()));
                         }
                     }
                 }
@@ -332,7 +332,6 @@ public class SectionController {
         toSave.setMaxStudents(data.getMaxStudents());
 
         toSave.setNote(data.getNote());
-        toSave.setSectionClassStatus(SectionClassStatus.open);
 
         toSave = sectionClassRepository.saveAndFlush(toSave);
 

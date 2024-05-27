@@ -157,4 +157,17 @@ public class ProgramController implements Serializable {
 
         return ResponseEntity.ok(map);
     }
+
+    @PostMapping("/getLatestProgram")
+    public ResponseEntity<?> getLatestProgram(@RequestParam(value = "userId") Long userId, @RequestParam(value = "specializationId", required = false) Long specializationId){
+        Program program = programRepository.findFirstBySpecializationIdOrderByCreatedAtDesc(specializationId);
+
+        if(program == null){
+            return ResponseEntity.ok(null);
+        }
+
+        ProgramDTO programDTO = programMapper.mapToDTO(program);
+
+        return ResponseEntity.ok(programDTO);
+    }
 }

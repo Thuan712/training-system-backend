@@ -4,6 +4,7 @@ import iuh.fit.trainingsystembackend.bean.ScheduleBean;
 import iuh.fit.trainingsystembackend.dto.ScheduleDTO;
 import iuh.fit.trainingsystembackend.enums.DayInWeek;
 import iuh.fit.trainingsystembackend.enums.ScheduleType;
+import iuh.fit.trainingsystembackend.enums.SystemRole;
 import iuh.fit.trainingsystembackend.exceptions.ValidationException;
 import iuh.fit.trainingsystembackend.mapper.ScheduleMapper;
 import iuh.fit.trainingsystembackend.model.*;
@@ -22,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,6 +37,7 @@ public class ScheduleController {
     private LecturerRepository lecturerRepository;
     private final StudentSectionRepository studentSectionRepository;
     private final StudentSectionClassRepository studentSectionClassRepository;
+    private final UserRepository userRepository;
 
     @PostMapping("/getList")
     public ResponseEntity<?> getList(@RequestParam(value = "userId", required = false) Long userId, @RequestBody ScheduleRequest filterRequest) {
@@ -161,7 +160,10 @@ public class ScheduleController {
         }
 
         if (data.getScheduleType() == null || data.getScheduleType().equals(ScheduleType.normal)) {
-            List<Schedule> schedules = scheduleRepository.findByLecturerIdOrRoomAndDayOfTheWeek(lecturer.getId(), data.getRoom(), toSave.getDayOfTheWeek());
+            List<Schedule> schedules = scheduleRepository.findByLecturerIdOrRoomAndDayOfTheWeekAndLearningDate(lecturer.getId(), data.getRoom(), toSave.getDayOfTheWeek(), data.getLearningDate());
+            if(!isCreate){
+                schedules = schedules.stream().filter(schedule -> !schedule.getId().equals(data.getId())).collect(Collectors.toList());
+            }
 
             if (!schedules.isEmpty()) {
                 for (Schedule schedule : schedules) {
@@ -209,6 +211,7 @@ public class ScheduleController {
 
     @DeleteMapping("/deleteById")
     public ResponseEntity<?> deleteById(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "id") Long id) {
+
         Schedule schedule = scheduleRepository.findById(id).orElse(null);
 
         if (schedule == null) {
