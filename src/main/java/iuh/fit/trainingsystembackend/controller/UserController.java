@@ -152,7 +152,7 @@ public class UserController {
             if (!code.isEmpty()) {
                 toSave.setCode(code);
                 toSave.setUsername(code);
-                toSave.setEmail(code + "." + StringUtils.removeAccent(data.getFirstName().toLowerCase()) + "@dt.edu.com");
+                toSave.setEmail(code + "." + StringUtils.removeAccent(data.getFirstName().trim().toLowerCase()) + "@dt.edu.com");
             }
 
             String encodedPassword = new BCryptPasswordEncoder().encode("1111");
