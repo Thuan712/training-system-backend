@@ -85,7 +85,7 @@ public class SectionService {
         }
 
         if(data.getLockDate() != null){
-            if(data.getOpenDate().getTime() <= data.getLockDate().getTime()){
+            if(data.getOpenDate().getTime() >= data.getLockDate().getTime()){
                 throw new ValidationException("Thời gian khoá học phần đăng ký phải sau thời gian mở đăng ký !!");
             }
 

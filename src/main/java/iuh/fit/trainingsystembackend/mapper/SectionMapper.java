@@ -3,10 +3,8 @@ package iuh.fit.trainingsystembackend.mapper;
 import iuh.fit.trainingsystembackend.data.CourseDuration;
 import iuh.fit.trainingsystembackend.data.RequireCourse;
 import iuh.fit.trainingsystembackend.dto.SectionDTO;
-import iuh.fit.trainingsystembackend.model.Course;
-import iuh.fit.trainingsystembackend.model.Section;
-import iuh.fit.trainingsystembackend.model.Specialization;
-import iuh.fit.trainingsystembackend.model.Term;
+import iuh.fit.trainingsystembackend.model.*;
+import iuh.fit.trainingsystembackend.repository.AcademicYearRepository;
 import iuh.fit.trainingsystembackend.repository.CourseRepository;
 import iuh.fit.trainingsystembackend.repository.SpecializationRepository;
 import iuh.fit.trainingsystembackend.repository.TermRepository;
@@ -24,6 +22,7 @@ public class SectionMapper {
     private SpecializationRepository specializationRepository;
     private final CourseRepository courseRepository;
     private final TermRepository termRepository;
+    private final AcademicYearRepository academicYearRepository;
 
     public SectionDTO mapToDTO(Section section) {
         Specialization specialization = null;
@@ -40,12 +39,21 @@ public class SectionMapper {
         }
         Term term  = termRepository.findById(section.getTermId()).orElse(null);
 
+        String year = "";
+        if(term != null){
+            AcademicYear academicYear = academicYearRepository.findById(term.getAcademicYearId()).orElse(null);
+
+            if(academicYear != null){
+                int yearEnd = (academicYear.getYearStart() + 1);
+                year = academicYear.getYearStart() + "-" + yearEnd;
+            }
+        }
 
         return SectionDTO.builder()
                 .id(section.getId())
 
                 .termId(term != null ? term.getId() : null)
-                .termName(term != null ? term.getName() : "")
+                .termName(term != null ? term.getName() + " " + year : "")
 
                 .specializationId(specialization != null ? specialization.getId() : null)
                 .specializationName(specialization != null ? specialization.getName() : "")
@@ -71,6 +79,9 @@ public class SectionMapper {
                 .createdAt(section.getCreatedAt())
                 .updatedAt(section.getUpdatedAt())
                 .deletedAt(section.getDeletedAt())
+                .lockDate(section.getLockDate())
+                .openDate(section.getOpenDate())
+
                 .deleted(section.getDeleted())
                 .build();
     }

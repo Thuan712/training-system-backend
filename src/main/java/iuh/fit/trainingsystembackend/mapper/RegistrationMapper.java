@@ -70,8 +70,6 @@ public class RegistrationMapper {
             studentDTO = studentMapper.mapToDTO(student);
         }
 
-
-
         StudentTuition studentTuition = null;
         if(student != null && tuition != null ){
             studentTuition = studentTuitionRepository.findByStudentIdAndTuitionId(student.getId(), tuition.getId());

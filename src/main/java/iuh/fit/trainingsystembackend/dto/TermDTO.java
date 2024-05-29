@@ -16,6 +16,7 @@ public class TermDTO {
     private Long id;
     private Long academicYearId;
     private String academicYearName;
+    private Integer yearStart;
 
     private TermType termType;
     private String name;

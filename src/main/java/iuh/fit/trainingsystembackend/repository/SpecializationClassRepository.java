@@ -11,4 +11,6 @@ public interface SpecializationClassRepository extends JpaRepository<Specializat
     SpecializationClass findFirstByOrderBySpecializationIdDesc();
 
     int countBySpecializationId(Long specializationId);
+
+    SpecializationClass findByLecturerIdAndSpecializationIdAndSchoolYear(Long lecturerId, Long specializationId, String schoolYear);
 }

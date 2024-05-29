@@ -62,17 +62,13 @@ public class SectionController {
     private SectionService sectionService;
     private StudentSectionRepository studentSectionRepository;
     private final StudentSectionClassRepository studentSectionClassRepository;
-    private final SpecializationRepository specializationRepository;
-    private final FacultyRepository facultyRepository;
     private final StudentCourseRepository studentCourseRepository;
-    private final CourseRepository courseRepository;
-    private CourseSpecification courseSpecification;
     private final ProgramRepository programRepository;
-    private ProgramMapper programMapper;
     private final ProgramTermRepository programTermRepository;
     private final ProgramCourseRepository programCourseRepository;
     private final SpecializationClassRepository specializationClassRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final SpecializationRepository specializationRepository;
 
     @PostMapping("/createOrUpdate")
     public ResponseEntity<?> createOrUpdateSection(@RequestParam(value = "userId") Long userId, @RequestBody SectionBean data) {
@@ -208,6 +204,16 @@ public class SectionController {
             throw new ValidationException("Không tìm thấy học phần !");
         }
 
+        // Check Specialization Class
+        if(data.getSpecializationClassId() == null){
+            throw new ValidationException("Lớp chuyên ngành không được để trống !!");
+        }
+        SpecializationClass specializationClass = specializationClassRepository.findById(data.getSpecializationClassId()).orElse(null);
+
+        if(specializationClass == null){
+            throw new ValidationException("Không tìm thấy lớp chuyên ngành !!");
+        }
+
         // Check Section Class
         SectionClass toSave = null;
 
@@ -253,6 +259,7 @@ public class SectionController {
 
         toSave.setLecturerId(lecturer.getId());
         toSave.setNote(data.getNote());
+        toSave.setSpecializationClassId(specializationClass.getId());
 
         if (isCreate) {
             if (data.getSectionClassType() == null) {
@@ -513,7 +520,6 @@ public class SectionController {
         List<SectionClassDTO> sectionClassDTOS = sectionClassMapper.mapToDTO(sectionClasses);
         return ResponseEntity.ok(sectionClassDTOS);
     }
-
 
     @GetMapping("/class/getById")
     public ResponseEntity<?> getById(@RequestParam(value = "userId", required = false) Long

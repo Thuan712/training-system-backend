@@ -31,4 +31,6 @@ public class StudentDTO {
     private TypeOfEducation typeOfEducation;
 
     private Date entryDate = new Date();
+    private String activationEmail;
+
 }

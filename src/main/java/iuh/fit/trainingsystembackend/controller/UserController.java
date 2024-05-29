@@ -262,6 +262,7 @@ public class UserController {
             if (data.getActivationEmail() == null || data.getActivationEmail().isEmpty()) {
                 throw new ValidationException("Email liên hệ với sinh viên không được để trống");
             }
+            student.setActivationEmail(data.getActivationEmail());
 
             try {
                 ExecutorService executor = Executors.newFixedThreadPool(1);

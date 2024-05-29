@@ -69,6 +69,21 @@ public class StudentSectionController {
 
     @PostMapping("/registerSection")
     public ResponseEntity<?> registerSection(@RequestParam(value = "userId") Long userId, @RequestBody RegistrationSectionBean data) {
+        // Check Section
+        if (data.getSectionId() == null) {
+            throw new ValidationException("Học phần sinh viên đăng ký không được trống !!");
+        }
+
+        Section section = sectionRepository.findById(data.getSectionId()).orElse(null);
+
+        if (section == null) {
+            throw new ValidationException("Không tìm thấy học phần sinh viên đăng ký !!");
+        }
+
+//        if(section.getLockDate().getTime() < new Date().getTime()){
+//            throw new ValidationException("Học phần đã khoá đăng ký trong kỳ này !! Nếu muốn chèn lớp xin liên hệ phòng Giáo vụ");
+//        }
+
         // Check Student
         if (data.getStudentId() == null) {
             throw new ValidationException("Mã sinh viên đăng ký không được để trống !!");
@@ -89,17 +104,6 @@ public class StudentSectionController {
 
         if (term == null) {
             throw new ValidationException("Không tìm thấy học kì đăng ký sinh viên chọn !!");
-        }
-
-        // Check Section
-        if (data.getSectionId() == null) {
-            throw new ValidationException("Học phần sinh viên đăng ký không được trống !!");
-        }
-
-        Section section = sectionRepository.findById(data.getSectionId()).orElse(null);
-
-        if (section == null) {
-            throw new ValidationException("Không tìm thấy học phần sinh viên đăng ký !!");
         }
 
         // Check Course
@@ -752,6 +756,11 @@ public class StudentSectionController {
             if(studentSection.getSection().getLockDate().getTime() < new Date().getTime()){
                 throw new ValidationException("Không thể huỷ học phần này do đã khoá đăng ký !!");
             }
+        }
+
+        Course course = courseRepository.findById(studentSection.getSection().getCourseId()).orElse(null);
+        if(course == null){
+            throw new ValidationException("Không tìm thấy môn học của học phần đăng ký !!");
         }
 
         try {

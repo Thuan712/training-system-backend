@@ -30,6 +30,8 @@ public class SectionDTO {
     private Date updatedAt;
     private Date deletedAt;
     private Boolean deleted;
+    private Date lockDate;
+    private Date openDate;
 
     // Term
     private Long termId;

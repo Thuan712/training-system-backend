@@ -79,6 +79,7 @@ public class UserInfoDTO implements Serializable {
 
     private TypeOfEducation typeOfEducation;
     private String schoolYear;
+    private String activationEmail;
     //#endregion
 
     //#region Lecturer

@@ -57,8 +57,24 @@ public class SpecializationController {
                 throw new ValidationException("Không tìm thấy chuyên ngành !");
             }
         }
-
         boolean isCreate = toSave == null;
+
+        if(data.getCode() != null && !data.getCode().isEmpty()){
+            boolean isExistSpecializationCode = specializationRepository.existsByCode(data.getCode());
+
+            if(isExistSpecializationCode){
+                throw new ValidationException("Mã chuyên ngành này đã tồn tại !!");
+            }
+        }
+
+        if(!isCreate){
+            boolean isExistSpecializationName = specializationRepository.existsByNameIgnoreCase(data.getName());
+
+            if(isExistSpecializationName){
+                throw new ValidationException("Tên chuyên ngành này đã tồn tại !!");
+            }
+        }
+
         if (toSave == null) {
             toSave = new Specialization();
         }
@@ -137,10 +153,7 @@ public class SpecializationController {
                 throw new ValidationException("Không tìm thấy lớp chuyên ngành !");
             }
         }
-
-        if (toSave == null) {
-            toSave = new SpecializationClass();
-        }
+        boolean isCreate = toSave == null;
 
         if (data.getSpecializationId() == null) {
             throw new ValidationException("Mã chuyên ngành không được để trống !!");
@@ -160,6 +173,18 @@ public class SpecializationController {
 
         if(lecturer == null){
             throw new ValidationException("Không tìm thấy giảng viên !!");
+        }
+
+        if(!isCreate){
+            SpecializationClass specializationClass = specializationClassRepository.findByLecturerIdAndSpecializationIdAndSchoolYear(lecturer.getId(), specialization.getId(), data.getSchoolYear());
+
+            if(specializationClass != null){
+                throw new ValidationException("Lớp chuyên ngành của năm học này đã tồn tại !!");
+            }
+        }
+
+        if (toSave == null) {
+            toSave = new SpecializationClass();
         }
 
         toSave.setLecturerId(lecturer.getId());

@@ -41,6 +41,13 @@ public class SectionClassDTO {
     private String lecturerName;
     private String lecturerCode;
 
+    private Long specializationId;
+    private String specializationName;
+    private String specializationCode;
+
+    private Long specializationClassId;
+    private String specializationClassName;
+
     private Long sectionId;
     private String sectionName;
     private String sectionCode;

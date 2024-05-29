@@ -17,6 +17,9 @@ public class SectionClassBean {
     private Long sectionId;
     private Long refId;
 
+    private Long specializationId;
+    private Long specializationClassId;
+
     private String code;
     private Integer maxStudents;
     private Integer minStudents;
