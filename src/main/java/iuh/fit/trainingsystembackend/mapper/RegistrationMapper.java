@@ -50,37 +50,34 @@ public class RegistrationMapper {
         // Tuition
         double total = 0;
         double debt = 0;
-        if(section != null){
-            term = termRepository.findById(section.getTermId()).orElse(null);
-            course = courseRepository.findById(section.getCourseId()).orElse(null);
-            tuition = tuitionRepository.findBySectionId(section.getId());
 
-            if(tuition != null){
-                total = (tuition.getInitialFee() - tuition.getDiscountFee());
-//                if(tuition.get().equals(TuitionStatus.paid)){
-//                    debt = 0D;
-//                } else {
-//                    debt = total;
-//                }
-            }
-        }
         StudentDTO studentDTO = null;
         Student student = studentRepository.findById(studentSection.getStudentId()).orElse(null);
         if (student != null) {
             studentDTO = studentMapper.mapToDTO(student);
         }
 
+        if(section != null){
+            term = termRepository.findById(section.getTermId()).orElse(null);
+            course = courseRepository.findById(section.getCourseId()).orElse(null);
+            tuition = tuitionRepository.findBySectionId(section.getId());
+        }
+
         StudentTuition studentTuition = null;
         if(student != null && tuition != null ){
             studentTuition = studentTuitionRepository.findByStudentIdAndTuitionId(student.getId(), tuition.getId());
-        }
 
-        if (section != null) {
-            course = courseRepository.findById(section.getCourseId()).orElse(null);
+            if(studentTuition != null){
+                total = (tuition.getInitialFee() - tuition.getDiscountFee());
+                if(studentTuition.getStatus().equals(TuitionStatus.paid)){
+                    debt = 0D;
+                } else {
+                    debt = total;
+                }
+            }
         }
 
         Result result = resultRepository.findById(studentSection.getResultId()).orElse(null);
-
 
         double totalPoint = 0;
         if (result != null && result.getFinalPoint() != null && result.getFinalPoint() > 0) {
